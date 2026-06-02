@@ -10,11 +10,17 @@ function onScroll() {
   if (!reduce) {
     heroCore.style.transform = `translateY(${-80 * p}px) scale(${1 - 0.6 * p})`;
     heroCore.style.opacity = String(Math.max(1 - 1.25 * p, 0));
-    if (hint) hint.style.opacity = String(1 - 2 * p);
+    if (hint) hint.style.opacity = String(Math.max(1 - 2 * p, 0));
   }
   topnav.classList.toggle('show', p > 0.55);
 }
-window.addEventListener('scroll', () => requestAnimationFrame(onScroll), { passive: true });
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    ticking = true;
+    requestAnimationFrame(() => { onScroll(); ticking = false; });
+  }
+}, { passive: true });
 onScroll();
 
 const io = new IntersectionObserver(

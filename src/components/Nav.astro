@@ -3,7 +3,7 @@ import { profile } from '../data/profile';
 ---
 <header class="topnav" id="topnav">
   <a class="logo" href="#top">{profile.name}</a>
-  <nav><a href="#about">About</a><a href="#research">Research</a><a href="#projects">Projects</a><a href="#cv">CV</a><a href="#contact">Contact</a></nav>
+  <nav>{profile.navLinks.map(l => <a href={l.href}>{l.label}</a>)}</nav>
   <a class="cta" href={`mailto:${profile.email}`}>Let's Talk ↗</a>
 </header>
 <style>

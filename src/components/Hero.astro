@@ -6,7 +6,7 @@ import { profile } from '../data/profile';
     <div class="heroCard">
       <div class="hbar">
         <span class="pill"><span class="dot"></span> {profile.status}</span>
-        <nav><a href="#about">About</a><a href="#research">Research</a><a href="#projects">Projects</a><a href="#cv">CV</a></nav>
+        <nav>{profile.navLinks.map(l => <a href={l.href}>{l.label}</a>)}</nav>
         <a class="ctaTop" href={`mailto:${profile.email}`}>Let's Talk ↗</a>
       </div>
       <div class="heroCore" id="heroCore">

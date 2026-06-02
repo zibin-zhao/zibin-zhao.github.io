@@ -16,4 +16,11 @@ export const profile = {
     { label: 'ORCID', href: 'https://orcid.org/0000-0002-3121-9131', icon: 'orcid' },
   ],
   focus: ['Computational biology', 'Deep learning', 'Molecular dynamics', 'Diagnostics'],
+  navLinks: [
+    { label: 'About', href: '#about' },
+    { label: 'Research', href: '#research' },
+    { label: 'Projects', href: '#projects' },
+    { label: 'CV', href: '#cv' },
+    { label: 'Contact', href: '#contact' },
+  ],
 };
