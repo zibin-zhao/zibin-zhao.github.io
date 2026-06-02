@@ -17,3 +17,4 @@ h2.big{font-family:var(--font-display);font-weight:800;letter-spacing:-1px;font-
 .reveal{opacity:0;transform:translateY(32px);transition:opacity .7s,transform .7s}
 .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion: reduce){.reveal{opacity:1;transform:none}}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:6px}
