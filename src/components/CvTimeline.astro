@@ -1,7 +1,7 @@
 ---
 import Section from './Section.astro';
 import { cv } from '../data/cv';
-const items = [...cv.education, ...cv.experience];
+const items = [...cv.education, ...cv.experience, ...cv.leadership];
 ---
 <Section id="cv" num="05" label="CV / Resume">
   <div class="cvgrid">
@@ -11,7 +11,6 @@ const items = [...cv.education, ...cv.experience];
       ))}
     </div>
     <div>
-      <p class="muted">Full CV as a one-click PDF, plus an at-a-glance timeline of education, experience &amp; awards.</p>
       <div class="chips">{cv.skills.map(s => <span class="chip">{s}</span>)}</div>
       <a class="download" href={cv.pdf} download>⬇ Download CV (PDF)</a>
     </div>

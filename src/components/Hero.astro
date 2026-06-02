@@ -12,7 +12,6 @@ import SocialIcon from './SocialIcon.astro';
       </div>
       <div class="heroCore" id="heroCore">
         <h1 class="bigName"><span class="o">{profile.firstName}</span> {profile.lastName}</h1>
-        <img class="portrait" src="/portrait.jpg" alt="Portrait of Zibin Zhao" />
         <div class="role">
           <p class="roleTitle">{profile.role}</p>
           <p>{profile.tagline}</p>
@@ -39,8 +38,7 @@ import SocialIcon from './SocialIcon.astro';
   .heroCore{flex:1;position:relative;will-change:transform,opacity}
   .bigName{position:absolute;top:8%;left:0;right:0;text-align:center;z-index:2;font-family:var(--font-display);font-weight:800;letter-spacing:-5px;line-height:.9;font-size:clamp(56px,14.5vw,200px)}
   .bigName .o{color:transparent;-webkit-text-stroke:2.5px var(--ink)}
-  .portrait{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);z-index:3;width:clamp(240px,27vw,360px);height:auto;border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.20)}
-  .role{position:absolute;left:36px;bottom:48px;z-index:5;max-width:320px}
+  .role{position:absolute;left:36px;bottom:48px;z-index:5;max-width:340px}
   .roleTitle{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-1px}
   .role p{font-size:14px;color:var(--muted);margin-top:9px}
   .role .roleTitle{color:var(--ink);margin-top:0}
@@ -49,14 +47,13 @@ import SocialIcon from './SocialIcon.astro';
   .sbtn{display:flex;align-items:center;gap:9px;border:1px solid var(--hair);border-radius:24px;padding:8px 16px;font-size:13px;min-width:138px;box-shadow:0 4px 12px rgba(0,0,0,.04);background:#fff}
   .scrollHint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:6;font-size:12px;color:#a1a1aa;letter-spacing:1px;animation:bob 1.6s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
-  .bigName,.portrait,.role,.socials{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
-  .portrait{animation-name:riseP}.role{animation-delay:.22s}.socials{animation-delay:.3s}
+  .bigName,.role,.socials{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+  .role{animation-delay:.22s}.socials{animation-delay:.3s}
   @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1}}
-  @keyframes riseP{from{opacity:0;transform:translateX(-50%) translateY(30px)}to{opacity:1;transform:translateX(-50%)}}
   @media (max-width:760px){
     .hbar nav{display:none}
     .heroCore{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
-    .bigName{position:static}.portrait{position:static;transform:none;animation-name:rise}
+    .bigName{position:static}
     .role,.socials{position:static;margin:0 auto;text-align:center}
     .socials{flex-direction:row;flex-wrap:wrap;justify-content:center}
   }

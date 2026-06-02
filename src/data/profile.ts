@@ -3,9 +3,9 @@ export const profile = {
   firstName: 'ZIBIN',
   lastName: 'ZHAO',
   role: 'Bioengineering × AI',
-  tagline: 'PhD candidate at HKUST — deep learning for molecular diagnostics, CRISPR & aptamer design.',
+  tagline: 'PhD candidate at the Hong Kong University of Science and Technology — deep learning for molecular diagnostics, CRISPR & aptamer design.',
   status: 'Open to Collaboration',
-  affiliation: 'HKUST · Hsing Lab',
+  affiliation: 'The Hong Kong University of Science and Technology · Hsing Lab',
   email: 'zibin.zhao@connect.ust.hk',
   scholar: { citations: 100, hIndex: 4, i10: 3, asOf: '2026-06' },
   socials: [
