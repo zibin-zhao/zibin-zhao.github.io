@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://zibinzhao.com',
+  // TODO: switch to 'https://zibinzhao.com' + re-add public/CNAME once the domain is registered.
+  site: 'https://zibin-zhao.github.io',
   build: { format: 'directory' },
 });
