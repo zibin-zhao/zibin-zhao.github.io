@@ -12,6 +12,7 @@ import SocialIcon from './SocialIcon.astro';
       </div>
       <div class="heroCore" id="heroCore">
         <h1 class="bigName"><span class="o">{profile.firstName}</span> {profile.lastName}</h1>
+        <img class="portrait" src="/hero-portrait.jpg" alt="Watercolor portrait of Zibin Zhao" />
         <div class="role">
           <p class="roleTitle">{profile.role}</p>
           <p>{profile.tagline}</p>
@@ -38,6 +39,7 @@ import SocialIcon from './SocialIcon.astro';
   .heroCore{flex:1;position:relative;will-change:transform,opacity}
   .bigName{position:absolute;top:8%;left:0;right:0;text-align:center;z-index:2;font-family:var(--font-display);font-weight:800;letter-spacing:-5px;line-height:.9;font-size:clamp(56px,14.5vw,200px)}
   .bigName .o{color:transparent;-webkit-text-stroke:2.5px var(--ink)}
+  .portrait{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:3;height:min(64vh,580px);width:auto;pointer-events:none}
   .role{position:absolute;left:36px;bottom:48px;z-index:5;max-width:340px}
   .roleTitle{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-1px}
   .role p{font-size:14px;color:var(--muted);margin-top:9px}
@@ -48,12 +50,14 @@ import SocialIcon from './SocialIcon.astro';
   .scrollHint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:6;font-size:12px;color:#a1a1aa;letter-spacing:1px;animation:bob 1.6s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
   .bigName,.role,.socials{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+  .portrait{animation:riseP .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:.15s}
   .role{animation-delay:.22s}.socials{animation-delay:.3s}
   @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1}}
+  @keyframes riseP{from{opacity:0;transform:translateX(-50%) translateY(30px)}to{opacity:1;transform:translateX(-50%)}}
   @media (max-width:760px){
     .hbar nav{display:none}
     .heroCore{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
-    .bigName{position:static}
+    .bigName{position:static}.portrait{position:static;transform:none;height:auto;width:clamp(200px,55vw,280px);animation-name:rise}
     .role,.socials{position:static;margin:0 auto;text-align:center}
     .socials{flex-direction:row;flex-wrap:wrap;justify-content:center}
   }
