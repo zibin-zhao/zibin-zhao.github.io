@@ -1,12 +1,13 @@
 ---
-const { title, blurb, type, href } = Astro.props;
+import T from './T.astro';
+const { title, blurb, blurbZh, type, href } = Astro.props;
 const Tag = href ? 'a' : 'div';
 ---
 <Tag class="pcard" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
   <span class="tag">{type}</span>
   <h4>{title}</h4>
-  <p>{blurb}</p>
-  {href && <span class="go">View →</span>}
+  <p>{blurbZh ? <T en={blurb} zh={blurbZh} /> : blurb}</p>
+  {href && <span class="go"><T en="View →" zh="查看 →" /></span>}
 </Tag>
 <style>
   .pcard{display:block;border:1px solid var(--hair);border-radius:14px;padding:20px;transition:transform .25s,box-shadow .25s}

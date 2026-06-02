@@ -1,14 +1,15 @@
 ---
-const { title, titleZh, blurb, tags = [], href, screenshot, comingSoon } = Astro.props;
+import T from './T.astro';
+const { title, titleZh, blurb, blurbZh, tags = [], href, screenshot, comingSoon } = Astro.props;
 const Tag = href ? 'a' : 'div';
 ---
 <Tag class="card" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
-  <div class="shot">{screenshot ? <img src={screenshot} alt={`${title} screenshot`} /> : 'screenshot — coming soon'}</div>
+  <div class="shot">{screenshot ? <img src={screenshot} alt={`${title} screenshot`} /> : <T en="screenshot — coming soon" zh="截图 —— 即将上线" />}</div>
   <div class="body">
     <div class="ttl">{title} {titleZh && <span class="zh">{titleZh}</span>}</div>
-    <p class="desc">{blurb}</p>
+    <p class="desc">{blurbZh ? <T en={blurb} zh={blurbZh} /> : blurb}</p>
     <div class="tags">{tags.map(t => <span class="t">{t}</span>)}</div>
-    <span class="go">{comingSoon ? 'Coming soon' : 'View →'}</span>
+    <span class="go">{comingSoon ? <T en="Coming soon" zh="即将上线" /> : <T en="View →" zh="查看 →" />}</span>
   </div>
 </Tag>
 <style>

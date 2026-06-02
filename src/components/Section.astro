@@ -1,8 +1,9 @@
 ---
-const { id, num, label } = Astro.props;
+import T from './T.astro';
+const { id, num, label, labelZh } = Astro.props;
 ---
 <section id={id} class="reveal sec">
-  <div class="label">{num} — {label}</div>
+  <div class="label">{num} — <T en={label} zh={labelZh ?? label} /></div>
   <slot />
 </section>
 <style>

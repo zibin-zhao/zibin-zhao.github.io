@@ -1,18 +1,24 @@
 ---
 import { profile } from '../data/profile';
+import T from './T.astro';
+import LangToggle from './LangToggle.astro';
 ---
 <header class="topnav" id="topnav">
   <a class="logo" href="#top">{profile.name}</a>
-  <nav>{profile.navLinks.map(l => <a href={l.href}>{l.label}</a>)}</nav>
-  <a class="cta" href={`mailto:${profile.email}`}>Let's Talk ↗</a>
+  <nav>{profile.navLinks.map(l => <a href={l.href}><T en={l.en} zh={l.zh} /></a>)}</nav>
+  <div class="navright">
+    <LangToggle />
+    <a class="cta" href={`mailto:${profile.email}`}><T en="Let's Talk ↗" zh="联系我 ↗" /></a>
+  </div>
 </header>
 <style>
   .topnav{position:fixed;top:var(--gap);left:var(--gap);right:var(--gap);z-index:50;display:flex;justify-content:space-between;align-items:center;
-    padding:13px 24px;background:rgba(255,255,255,.78);backdrop-filter:blur(12px);border-radius:22px;box-shadow:0 8px 26px rgba(0,0,0,.10);
+    padding:11px 16px 11px 24px;background:rgba(255,255,255,.78);backdrop-filter:blur(12px);border-radius:22px;box-shadow:0 8px 26px rgba(0,0,0,.10);
     opacity:0;transform:translateY(-14px);transition:opacity .45s,transform .45s;pointer-events:none}
   .topnav.show{opacity:1;transform:none;pointer-events:auto}
   .topnav .logo{font-family:var(--font-display);font-weight:800;letter-spacing:-1px;font-size:17px}
   .topnav nav{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+  .navright{display:flex;align-items:center;gap:10px}
   .topnav .cta{background:var(--ink);color:#fff;border-radius:18px;padding:8px 15px;font-size:13px;font-weight:600}
   @media (max-width:640px){.topnav nav{display:none}}
 </style>

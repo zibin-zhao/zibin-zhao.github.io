@@ -1,18 +1,25 @@
 ---
 import Section from './Section.astro';
 import { cv } from '../data/cv';
+import T from './T.astro';
 const items = [...cv.education, ...cv.experience, ...cv.leadership];
 ---
-<Section id="cv" num="05" label="CV / Resume">
+<Section id="cv" num="05" label="CV / Resume" labelZh="简历">
   <div class="cvgrid">
     <div class="tl">
       {items.map(i => (
-        <div class="item"><h4>{i.title} — {i.org}</h4><div class="meta">{[i.period, ...(i.notes ?? [])].filter(Boolean).join(' · ')}</div></div>
+        <div class="item">
+          <h4><T en={`${i.title.en} — ${i.org.en}`} zh={`${i.title.zh} — ${i.org.zh}`} /></h4>
+          <div class="meta">
+            <span class="t-en">{[i.period.en, ...i.notes.en].filter(Boolean).join(' · ')}</span>
+            <span class="t-zh">{[i.period.zh, ...i.notes.zh].filter(Boolean).join(' · ')}</span>
+          </div>
+        </div>
       ))}
     </div>
     <div>
       <div class="chips">{cv.skills.map(s => <span class="chip">{s}</span>)}</div>
-      <a class="download" href={cv.pdf} download>⬇ Download CV (PDF)</a>
+      <a class="download" href={cv.pdf} download><T en={cv.download.en} zh={cv.download.zh} /></a>
     </div>
   </div>
 </Section>

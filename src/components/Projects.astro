@@ -1,11 +1,12 @@
 ---
 import Section from './Section.astro';
 import ProjectCard from './ProjectCard.astro';
+import T from './T.astro';
 import { getCollection } from 'astro:content';
 const items = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.order);
 ---
-<Section id="projects" num="03" label="Projects & Demos">
-  <h2 class="big">Things I've built</h2>
+<Section id="projects" num="03" label="Projects & Demos" labelZh="项目与演示">
+  <h2 class="big"><T en="Things I've built" zh="我做过的东西" /></h2>
   <div class="cards">{items.map(p => <ProjectCard {...p.data} />)}</div>
 </Section>
 <style>

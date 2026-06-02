@@ -1,15 +1,15 @@
 ---
 import { profile } from '../data/profile';
-import SocialIcon from './SocialIcon.astro';
+import T from './T.astro';
 const year = new Date().getFullYear();
 ---
 <section id="contact" class="reveal contact">
-  <div class="label">06 — Contact</div>
-  <h2 class="big">Let's talk.</h2>
-  <p>Open to collaboration, research chats &amp; opportunities.</p>
+  <div class="label">06 — <T en="Contact" zh="联系" /></div>
+  <h2 class="big"><T en="Let's talk." zh="聊聊吧。" /></h2>
+  <p><T en="Open to collaboration, research chats & opportunities." zh="欢迎合作、学术交流与各类机会。" /></p>
   <div class="row">
-    <a href={`mailto:${profile.email}`}>✉ Email</a>
-    {profile.socials.map(s => <a href={s.href} target="_blank" rel="noopener"><SocialIcon icon={s.icon} />{s.label}</a>)}
+    <a href={`mailto:${profile.email}`}>✉ <T en="Email" zh="邮箱" /></a>
+    {profile.socials.map(s => <a href={s.href} target="_blank" rel="noopener">{s.label}</a>)}
   </div>
   <footer>© {year} Zibin Zhao</footer>
 </section>

@@ -13,12 +13,12 @@ const publications = defineCollection({
 
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
-  schema: z.object({ title: z.string(), blurb: z.string(), type: z.string(), tags: z.array(z.string()).default([]), href: z.string().optional(), order: z.number().default(0) }),
+  schema: z.object({ title: z.string(), blurb: z.string(), blurbZh: z.string().optional(), type: z.string(), tags: z.array(z.string()).default([]), href: z.string().optional(), order: z.number().default(0) }),
 });
 
 const vibe = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/vibe' }),
-  schema: z.object({ title: z.string(), titleZh: z.string().optional(), blurb: z.string(), tags: z.array(z.string()).default([]), href: z.string().optional(), screenshot: z.string().optional(), comingSoon: z.boolean().default(false), order: z.number().default(0) }),
+  schema: z.object({ title: z.string(), titleZh: z.string().optional(), blurb: z.string(), blurbZh: z.string().optional(), tags: z.array(z.string()).default([]), href: z.string().optional(), screenshot: z.string().optional(), comingSoon: z.boolean().default(false), order: z.number().default(0) }),
 });
 
 export const collections = { publications, projects, vibe };

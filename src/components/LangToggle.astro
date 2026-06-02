@@ -1,0 +1,12 @@
+---
+// EN / 中 language toggle. Click handler lives in scripts/lang.ts.
+---
+<button type="button" class="langtoggle" aria-label="Switch language / 切换语言">
+  <span class="seg seg-en">EN</span><span class="seg seg-zh">中</span>
+</button>
+<style>
+  .langtoggle{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--hair);border-radius:24px;padding:4px;background:#fff;cursor:pointer;font:inherit;line-height:1}
+  .seg{font-size:12px;font-weight:600;padding:5px 9px;border-radius:18px;color:var(--muted);transition:background .2s,color .2s}
+  :global([data-lang="en"]) .seg-en{background:var(--ink);color:#fff}
+  :global([data-lang="zh"]) .seg-zh{background:var(--ink);color:#fff}
+</style>

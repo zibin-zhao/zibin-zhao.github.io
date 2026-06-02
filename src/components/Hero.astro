@@ -1,28 +1,33 @@
 ---
 import { profile } from '../data/profile';
 import SocialIcon from './SocialIcon.astro';
+import T from './T.astro';
+import LangToggle from './LangToggle.astro';
 ---
 <div class="heroPin" id="top">
   <div class="hero">
     <div class="heroCard">
       <div class="hbar">
-        <span class="pill"><span class="dot"></span> {profile.status}</span>
-        <nav>{profile.navLinks.map(l => <a href={l.href}>{l.label}</a>)}</nav>
-        <a class="ctaTop" href={`mailto:${profile.email}`}>Let's Talk ↗</a>
+        <span class="pill"><span class="dot"></span> <T en={profile.status.en} zh={profile.status.zh} /></span>
+        <nav>{profile.navLinks.map(l => <a href={l.href}><T en={l.en} zh={l.zh} /></a>)}</nav>
+        <div class="hbarright">
+          <LangToggle />
+          <a class="ctaTop" href={`mailto:${profile.email}`}><T en="Let's Talk ↗" zh="联系我 ↗" /></a>
+        </div>
       </div>
       <div class="heroCore" id="heroCore">
         <h1 class="bigName"><span class="o">{profile.firstName}</span> {profile.lastName}</h1>
         <img class="portrait" src="/hero-portrait.jpg" alt="Watercolor portrait of Zibin Zhao" />
         <div class="role">
-          <p class="roleTitle">{profile.role}</p>
-          <p>{profile.tagline}</p>
-          <a class="collab" href="#research">View research ↗</a>
+          <p class="roleTitle"><T en={profile.role.en} zh={profile.role.zh} /></p>
+          <p><T en={profile.tagline.en} zh={profile.tagline.zh} /></p>
+          <a class="collab" href="#research"><T en="View research ↗" zh="查看研究 ↗" /></a>
         </div>
         <div class="socials">
           {profile.socials.slice(0,4).map(s => <a class="sbtn" href={s.href} target="_blank" rel="noopener"><SocialIcon icon={s.icon} />{s.label}</a>)}
         </div>
       </div>
-      <div class="scrollHint" id="hint">scroll ↓</div>
+      <div class="scrollHint" id="hint"><T en="scroll ↓" zh="向下滚动 ↓" /></div>
     </div>
   </div>
 </div>
@@ -34,6 +39,7 @@ import SocialIcon from './SocialIcon.astro';
   .pill{border:1px solid var(--hair);border-radius:24px;padding:9px 15px;display:inline-flex;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.05);background:#fff}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(34,197,94,.18)}
   .hbar nav{display:flex;gap:24px;color:#3f3f46}
+  .hbarright{display:flex;align-items:center;gap:10px}
   .hbar nav a{color:inherit}
   .ctaTop{background:var(--ink);color:#fff;border-radius:24px;padding:10px 17px;font-weight:600}
   .heroCore{flex:1;position:relative;will-change:transform,opacity}

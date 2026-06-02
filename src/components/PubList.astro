@@ -2,11 +2,12 @@
 import Section from './Section.astro';
 import { getCollection } from 'astro:content';
 import { sortPubs } from '../data/pubs';
+import T from './T.astro';
 const entries = await getCollection('publications');
 const pubs = sortPubs(entries.map(e => ({ ...e.data })));
 ---
-<Section id="research" num="02" label="Research & Publications">
-  <h2 class="big">Selected work</h2>
+<Section id="research" num="02" label="Research & Publications" labelZh="研究与论文">
+  <h2 class="big"><T en="Selected work" zh="代表性成果" /></h2>
   <ul class="pubs">
     {pubs.map(p => (
       <li class="pub">

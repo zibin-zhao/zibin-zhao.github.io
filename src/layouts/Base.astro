@@ -3,10 +3,11 @@ import '../styles/global.css';
 const { title = 'Zibin Zhao', description = 'PhD candidate in Bioengineering at the Hong Kong University of Science and Technology — deep learning for molecular diagnostics, CRISPR & aptamer design.' } = Astro.props;
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>try{if(localStorage.getItem('lang')==='zh'){var d=document.documentElement;d.dataset.lang='zh';d.setAttribute('lang','zh');}}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta property="og:type" content="website" />

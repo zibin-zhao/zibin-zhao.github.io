@@ -18,3 +18,7 @@ h2.big{font-family:var(--font-display);font-weight:800;letter-spacing:-1px;font-
 .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion: reduce){.reveal{opacity:1;transform:none}}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:6px}
+/* i18n: show only the active language */
+[data-lang="en"] .t-zh{display:none}
+[data-lang="zh"] .t-en{display:none}
+[data-lang="zh"] body{font-family:var(--font-body),"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
