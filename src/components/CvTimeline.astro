@@ -7,7 +7,7 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
   <div class="cvgrid">
     <div class="tl">
       {items.map(i => (
-        <div class="item"><h4>{i.title} — {i.org}</h4><div class="meta">{i.period}{i.notes?.length ? ' · ' + i.notes.join(' · ') : ''}</div></div>
+        <div class="item"><h4>{i.title} — {i.org}</h4><div class="meta">{[i.period, ...(i.notes ?? [])].filter(Boolean).join(' · ')}</div></div>
       ))}
     </div>
     <div>
