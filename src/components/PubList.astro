@@ -1,0 +1,37 @@
+---
+import Section from './Section.astro';
+import { getCollection } from 'astro:content';
+import { sortPubs } from '../data/pubs';
+import { profile } from '../data/profile';
+const entries = await getCollection('publications');
+const pubs = sortPubs(entries.map(e => ({ ...e.data })));
+const s = profile.scholar;
+---
+<Section id="research" num="02" label="Research & Publications">
+  <h2 class="big">Selected work</h2>
+  <p class="muted">{s.citations} citations · h-index {s.hIndex} · i10 {s.i10} <span style="color:#a1a1aa">(Google Scholar, {s.asOf})</span></p>
+  <ul class="pubs">
+    {pubs.map(p => (
+      <li class="pub">
+        <span class="yr">{p.year}</span>
+        <div>
+          <h4>{p.title}{p.featured && <span class="star">★</span>}</h4>
+          {p.venue && <div class="venue">{p.venue}</div>}
+          {p.authors && <div class="auth">{p.authors}</div>}
+          {p.links && <div class="links">{Object.entries(p.links).map(([k,v]) => <a href={v} target="_blank" rel="noopener">{k.toUpperCase()}</a>)}</div>}
+        </div>
+      </li>
+    ))}
+  </ul>
+</Section>
+<style>
+  .pubs{list-style:none;margin-top:18px}
+  .pub{display:flex;gap:16px;padding:16px 0;border-top:1px solid #f0f0f0}
+  .yr{font-size:12px;color:#a1a1aa;min-width:46px;font-weight:700}
+  .pub h4{font-size:15px;font-weight:600;line-height:1.4}
+  .star{color:#18181b;margin-left:6px}
+  .venue{font-size:12px;color:var(--muted);margin-top:3px}
+  .auth{font-size:11px;color:#a1a1aa;margin-top:3px}
+  .links{display:flex;gap:12px;font-size:11px;margin-top:6px}
+  .links a{font-weight:700}
+</style>
