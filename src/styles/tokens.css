@@ -1,0 +1,7 @@
+:root{
+  --ink:#18181b; --paper:#ffffff; --bg:#e7e7e8; --muted:#52525b;
+  --hair:#e4e4e7; --accent:#22c55e;
+  --gap:18px; --radius:30px;
+  --font-display:'Space Grotesk',-apple-system,Arial,sans-serif;
+  --font-body:'Inter',-apple-system,Arial,sans-serif;
+}
