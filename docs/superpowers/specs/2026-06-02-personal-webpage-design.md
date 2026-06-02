@@ -81,9 +81,20 @@ Short first-person bio + focus areas. Visual: the artistic graduation poster (fr
 - Focus chips: Computational biology · Deep learning · Molecular dynamics · Diagnostics.
 
 ### 5.2 Research & Publications
-Reverse-chronological list; each entry: year, title, venue, links (PDF · DOI · Code · Scholar).
-- Seeded: **TEMPO** (one-pot CRISPR molecular diagnostics), **DL-SELEX** (structure-enhanced DL for aptamer selection).
-- **Data-driven:** authored in markdown/JSON content collection (see §6). `[NEEDS INPUT]` full publication list from Scholar (`EQ6DTNkAAAAJ`) / ORCID `0000-0002-3121-9131`.
+Reverse-chronological list; each entry: year, title, venue, links (PDF · DOI · Code · Scholar). Show metrics: **100 citations · h-index 4 · i10-index 3** (Google Scholar, badge with a "as of" date). Data-driven via content collection (§6).
+
+**Full list (from Scholar `EQ6DTNkAAAAJ`, to seed `src/content/publications/`):**
+1. 2026 — *DNA-guided CRISPR–Cas12a effectors for programmable RNA recognition and cleavage* — **Nature Biotechnology** (X Wu, WH Lam, Z Zhao, Y Cao, H Lin, X Feng, Y Zhai, IM Hsing).
+2. 2026 — *Thermodynamically programmed one-pot CRISPR platform for point-of-care SNP genotyping* (IM Hsing, X Wu, Y Li, Y Cao, Z Zhao, H Lu, S Liang).
+3. 2025 — *Benchtop to at-home test: Amplicon-depleted CRISPR-regulated LAMP at skin-temperature for viral load monitoring* — **Biosensors and Bioelectronics** 267.
+4. 2025 — *Structure-enhanced deep learning accelerates aptamer selection for small-molecule families like steroids* — **Briefings in Bioinformatics** 26(6). *(DL-SELEX)*
+5. 2025 — *DNA-guided CRISPR/Cas effector for programmable RNA-recognition and cleavage* (IM Hsing, X Wu, Z Zhao, Y Cao, H Lin, X Feng).
+6. 2025 — *DNA hydrogel-interfaced organic electrochemical transistor for binding-induced conformational change of small-molecule aptamers* — **ACS Applied Materials & Interfaces** 17(37).
+7. 2023 — *Skin-adherent elastomer-hydrogel patch for continuous 12-lead cardiac ambulatory monitoring during physical activities* — **Advanced Materials Technologies** 8(18).
+8. 2023 — *Integrating magnetic-bead sample extraction and molecular barcoding for one-step pooled RT-qPCR of viral pathogens* — **Analytical Chemistry** 95(14).
+9. 2023 — *Transforming ECG diagnosis: a review of transformer-based deep-learning models in cardiovascular disease detection* — **arXiv:2306.01249**. *(most-cited: 37)*
+
+> Implementation note: verify each entry's DOI/link at build; mark first-author papers; optionally tag "featured" (e.g. Nature Biotech, DL-SELEX, ECG review). Keep TEMPO/DL-SELEX code links to GitHub.
 
 ### 5.3 Projects & Demos
 Cards with tag + title + blurb + link:
@@ -96,13 +107,14 @@ Cards with tag + title + blurb + link:
 Playful, extensible gallery of AI-pair-programmed side projects. Section heading "Built for the joy of it". Cards have a **screenshot slot left blank for now** (placeholder), title (EN + 中文 subtitle), blurb, tags, link. Grid is **data-driven and extensible** — adding/reordering a project = editing one content entry; includes an "open slot / more to come" affordance.
 - **Yaos** (药师法门 · 养生 — Medicine Buddha Wellness): installable **PWA** that auto-detects current 时辰 & 节气 for personalized health-cultivation advice, with readings + calendar. Tags: PWA · HTML/JS · Wellness · Claude Code.
 - **Zen** (禅德 / Zende): **WeChat Mini Program** (uni-app/Vue + WeChat Cloud) for meditation & mindfulness — guided sessions, journaling, streaks, virtual pet, Buddhist calendar. Tags: uni-app/Vue · WeChat · Cloud DB · Claude Code.
-- `[NEEDS INPUT]` live/repo links per project; screenshots (added later).
+
+> **Not yet public:** neither project is deployed/published, so cards have **no live links for v1** — show them with a "private / coming soon" state (no broken hrefs) and blank screenshot slots. Links + screenshots get filled in when the user publishes.
 
 ### 5.5 CV / Resume
 Two-column: timeline (left) + summary & **PDF download** (right).
 - Timeline seed: PhD HKUST (2022–present, HKPFS·Redbird); BSc Melbourne (2018–2020, First Class Honours); Research Asst. HKUST (wearable 12-lead ECG); experience incl. PealthMed Ltd.
 - Skills: Python, C, MATLAB, LabVIEW, SolidWorks. Languages: Mandarin/Cantonese (native), English (professional).
-- PDF: link to an updated CV. `[NEEDS INPUT]` current CV PDF (2022 version on file may be outdated).
+- **PDF — generate a new, updated CV** as a build deliverable: take the 2022 CV (`Zibin_CV_ENG_2022.pdf`) as the base and **merge in current publications (§5.2) and works** (TEMPO, DL-SELEX, HsingMD, PealthMed). Output `public/cv.pdf`, matching the site's clean monochrome typography. The on-page timeline and the PDF share one source of truth (`src/data/cv.ts`).
 
 ### 5.6 Contact (dark closing)
 Inverted near-black section: "Let's talk." + links row: Email (`zibin.zhao@connect.ust.hk`) · GitHub · Hugging Face · Scholar · LinkedIn · ORCID. Footer with copyright. No contact form in v1 (static host).
@@ -165,19 +177,26 @@ Rationale: one focused unit per concern; adding a publication or project is a on
 ## 10. Deployment
 
 - **Host:** **GitHub Pages** from repo `zibin-zhao/<repo>` via GitHub Actions (`withastro/action` → deploy to Pages).
-- **Astro config:** set `site` and (if project-pages) `base`; prefer a **custom domain** (e.g. `zibinzhao.com`) to avoid `base` path issues. `[NEEDS INPUT]` domain choice (custom vs `zibin-zhao.github.io`).
-- CI: build on push to `main`; deploy artifact to Pages. Add `CNAME` if custom domain.
+- **Custom domain (confirmed): `zibinzhao.com`.** Set Astro `site: 'https://zibinzhao.com'` (no `base` needed with apex domain). Add `public/CNAME` containing `zibinzhao.com`; configure DNS (A/ALIAS records to GitHub Pages + `www` CNAME) and enable HTTPS in repo settings. `[ACTION]` user registers/points the domain; site works on `*.github.io` until DNS resolves.
+- CI: build on push to `main`; deploy artifact to Pages via GitHub Actions.
 
 ---
 
-## 11. Open Items (`[NEEDS INPUT]`)
+## 11. Decisions & Remaining Actions
 
-1. Full publication list (Scholar/ORCID) — or confirm "Selected work" only for v1.
-2. Vibe Coding live/repo links for Yaos & Zen (screenshots later).
-3. Updated CV PDF (2022 on file may be stale).
-4. Domain: custom (`zibinzhao.com`?) vs `zibin-zhao.github.io`.
-5. Confirm which GitHub account is canonical (`zibin-zhao`; the HF-linked `bennyzhao99` 404s).
-6. Exact tagline/bio copy and the role label ("Bioengineering × AI" placeholder).
+**Resolved (2026-06-02):**
+1. ✅ Publications — **full list** (all 9, §5.2), with Scholar metrics.
+2. ✅ Vibe Coding — **not public yet**; no live links/screenshots for v1 (show "coming soon"). User adds later.
+3. ✅ CV — **generate a new updated CV** merging current publications + works; the 2022 PDF is the base (§5.5).
+4. ✅ Domain — **custom `zibinzhao.com`** (§10).
+5. ✅ Role/tagline — **keep "Bioengineering × AI"**.
+6. ✅ Canonical GitHub — `zibin-zhao` (HF-linked `bennyzhao99` 404s; ignore).
+
+**Remaining user actions (don't block the build):**
+- Register/point DNS for `zibinzhao.com` to GitHub Pages.
+- Provide portrait outcome feedback once cutout is attempted.
+- Supply Yaos/Zen screenshots + links when published.
+- Review/approve the auto-generated CV before publishing it.
 
 ---
 
