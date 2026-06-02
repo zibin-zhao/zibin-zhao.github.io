@@ -2,14 +2,11 @@
 import Section from './Section.astro';
 import { getCollection } from 'astro:content';
 import { sortPubs } from '../data/pubs';
-import { profile } from '../data/profile';
 const entries = await getCollection('publications');
 const pubs = sortPubs(entries.map(e => ({ ...e.data })));
-const s = profile.scholar;
 ---
 <Section id="research" num="02" label="Research & Publications">
   <h2 class="big">Selected work</h2>
-  <p class="muted">{s.citations} citations · h-index {s.hIndex} · i10 {s.i10} <span style="color:#a1a1aa">(Google Scholar, {s.asOf})</span></p>
   <ul class="pubs">
     {pubs.map(p => (
       <li class="pub">

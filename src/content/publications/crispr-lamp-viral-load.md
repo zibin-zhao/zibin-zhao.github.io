@@ -3,4 +3,5 @@ title: "Benchtop to at-home test: amplicon-depleted CRISPR-regulated loop-mediat
 authors: "Y Cao, H Lin, X Lu, X Wu, Y Zhu, Z Zhao, Y Li, et al."
 venue: "Biosensors and Bioelectronics, 267"
 year: 2025
+links: { doi: "https://doi.org/10.1016/j.bios.2024.116866" }
 ---

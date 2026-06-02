@@ -1,5 +1,6 @@
 ---
 import { profile } from '../data/profile';
+import SocialIcon from './SocialIcon.astro';
 ---
 <div class="heroPin" id="top">
   <div class="hero">
@@ -18,7 +19,7 @@ import { profile } from '../data/profile';
           <a class="collab" href="#research">View research ↗</a>
         </div>
         <div class="socials">
-          {profile.socials.slice(0,4).map(s => <a class="sbtn" href={s.href} target="_blank" rel="noopener">{s.label}</a>)}
+          {profile.socials.slice(0,4).map(s => <a class="sbtn" href={s.href} target="_blank" rel="noopener"><SocialIcon icon={s.icon} />{s.label}</a>)}
         </div>
       </div>
       <div class="scrollHint" id="hint">scroll ↓</div>
@@ -45,7 +46,7 @@ import { profile } from '../data/profile';
   .role .roleTitle{color:var(--ink);margin-top:0}
   .collab{display:inline-block;margin-top:14px;background:var(--ink);color:#fff;border-radius:24px;padding:12px 22px;font-size:14px;font-weight:600}
   .socials{position:absolute;right:36px;bottom:48px;z-index:5;display:flex;flex-direction:column;gap:8px}
-  .sbtn{border:1px solid var(--hair);border-radius:24px;padding:8px 15px;font-size:13px;min-width:138px;box-shadow:0 4px 12px rgba(0,0,0,.04);background:#fff}
+  .sbtn{display:flex;align-items:center;gap:9px;border:1px solid var(--hair);border-radius:24px;padding:8px 16px;font-size:13px;min-width:138px;box-shadow:0 4px 12px rgba(0,0,0,.04);background:#fff}
   .scrollHint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:6;font-size:12px;color:#a1a1aa;letter-spacing:1px;animation:bob 1.6s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
   .bigName,.portrait,.role,.socials{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
