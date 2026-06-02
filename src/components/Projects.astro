@@ -1,0 +1,14 @@
+---
+import Section from './Section.astro';
+import ProjectCard from './ProjectCard.astro';
+import { getCollection } from 'astro:content';
+const items = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.order);
+---
+<Section id="projects" num="03" label="Projects & Demos">
+  <h2 class="big">Things I've built</h2>
+  <div class="cards">{items.map(p => <ProjectCard {...p.data} />)}</div>
+</Section>
+<style>
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+  @media (max-width:760px){.cards{grid-template-columns:1fr}}
+</style>
