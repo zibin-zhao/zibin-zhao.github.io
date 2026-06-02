@@ -1,0 +1,12 @@
+---
+const { id, num, label } = Astro.props;
+---
+<section id={id} class="reveal sec">
+  <div class="label">{num} — {label}</div>
+  <slot />
+</section>
+<style>
+  .sec{padding:72px 50px;max-width:1040px;margin:0 auto}
+  .sec + :global(.sec){border-top:1px solid #f0f0f0}
+  .label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#a1a1aa;font-weight:700}
+</style>
