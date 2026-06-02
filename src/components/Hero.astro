@@ -1,0 +1,62 @@
+---
+import { profile } from '../data/profile';
+---
+<div class="heroPin" id="top">
+  <div class="hero">
+    <div class="heroCard">
+      <div class="hbar">
+        <span class="pill"><span class="dot"></span> {profile.status}</span>
+        <nav><a href="#about">About</a><a href="#research">Research</a><a href="#projects">Projects</a><a href="#cv">CV</a></nav>
+        <a class="ctaTop" href={`mailto:${profile.email}`}>Let's Talk ↗</a>
+      </div>
+      <div class="heroCore" id="heroCore">
+        <h1 class="bigName"><span class="o">{profile.firstName}</span> {profile.lastName}</h1>
+        <img class="portrait" src="/portrait.png" alt="Portrait of Zibin Zhao" />
+        <div class="role">
+          <p class="roleTitle">{profile.role}</p>
+          <p>{profile.tagline}</p>
+          <a class="collab" href="#research">View research ↗</a>
+        </div>
+        <div class="socials">
+          {profile.socials.slice(0,4).map(s => <a class="sbtn" href={s.href} target="_blank" rel="noopener">{s.label}</a>)}
+        </div>
+      </div>
+      <div class="scrollHint" id="hint">scroll ↓</div>
+    </div>
+  </div>
+</div>
+<style>
+  .heroPin{height:200vh;position:relative}
+  .hero{position:sticky;top:0;height:100vh;padding:var(--gap);display:flex}
+  .heroCard{position:relative;flex:1;background:var(--paper);border-radius:var(--radius);box-shadow:0 18px 50px rgba(0,0,0,.13);display:flex;flex-direction:column;overflow:hidden}
+  .hbar{position:relative;z-index:6;display:flex;justify-content:space-between;align-items:center;padding:24px 32px;font-size:13px}
+  .pill{border:1px solid var(--hair);border-radius:24px;padding:9px 15px;display:inline-flex;gap:8px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.05);background:#fff}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(34,197,94,.18)}
+  .hbar nav{display:flex;gap:24px;color:#3f3f46}
+  .hbar nav a{color:inherit}
+  .ctaTop{background:var(--ink);color:#fff;border-radius:24px;padding:10px 17px;font-weight:600}
+  .heroCore{flex:1;position:relative;will-change:transform,opacity}
+  .bigName{position:absolute;top:8%;left:0;right:0;text-align:center;z-index:2;font-family:var(--font-display);font-weight:800;letter-spacing:-5px;line-height:.9;font-size:clamp(56px,14.5vw,200px)}
+  .bigName .o{color:transparent;-webkit-text-stroke:2.5px var(--ink)}
+  .portrait{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);z-index:3;width:clamp(260px,30vw,400px);height:clamp(360px,52vh,560px);object-fit:contain;object-position:bottom}
+  .role{position:absolute;left:36px;bottom:48px;z-index:5;max-width:320px}
+  .roleTitle{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-1px}
+  .role p{font-size:14px;color:var(--muted);margin-top:9px}
+  .role .roleTitle{color:var(--ink);margin-top:0}
+  .collab{display:inline-block;margin-top:14px;background:var(--ink);color:#fff;border-radius:24px;padding:12px 22px;font-size:14px;font-weight:600}
+  .socials{position:absolute;right:36px;bottom:48px;z-index:5;display:flex;flex-direction:column;gap:8px}
+  .sbtn{border:1px solid var(--hair);border-radius:24px;padding:8px 15px;font-size:13px;min-width:138px;box-shadow:0 4px 12px rgba(0,0,0,.04);background:#fff}
+  .scrollHint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:6;font-size:12px;color:#a1a1aa;letter-spacing:1px;animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+  .bigName,.portrait,.role,.socials{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+  .portrait{animation-name:riseP}.role{animation-delay:.22s}.socials{animation-delay:.3s}
+  @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1}}
+  @keyframes riseP{from{opacity:0;transform:translateX(-50%) translateY(30px)}to{opacity:1;transform:translateX(-50%)}}
+  @media (max-width:760px){
+    .hbar nav{display:none}
+    .heroCore{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+    .bigName{position:static}.portrait{position:static;transform:none;animation-name:rise}
+    .role,.socials{position:static;margin:0 auto;text-align:center}
+    .socials{flex-direction:row;flex-wrap:wrap;justify-content:center}
+  }
+</style>
