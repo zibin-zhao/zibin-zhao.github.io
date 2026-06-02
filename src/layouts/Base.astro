@@ -9,9 +9,11 @@ const { title = 'Zibin Zhao', description = 'PhD candidate in Bioengineering at 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    {Astro.site && <meta property="og:url" content={Astro.site} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="/og.png" />
+    <meta property="og:image" content={Astro.site ? new URL('og.png', Astro.site).href : '/og.png'} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body><slot /></body>

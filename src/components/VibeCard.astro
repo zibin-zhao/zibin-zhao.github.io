@@ -2,7 +2,7 @@
 const { title, titleZh, blurb, tags = [], href, screenshot, comingSoon } = Astro.props;
 const Tag = href ? 'a' : 'div';
 ---
-<Tag class="card" href={href} target={href ? '_blank' : undefined} rel="noopener">
+<Tag class="card" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
   <div class="shot">{screenshot ? <img src={screenshot} alt={`${title} screenshot`} /> : 'screenshot — coming soon'}</div>
   <div class="body">
     <div class="ttl">{title} {titleZh && <span class="zh">{titleZh}</span>}</div>

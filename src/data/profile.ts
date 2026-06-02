@@ -20,6 +20,7 @@ export const profile = {
     { label: 'About', href: '#about' },
     { label: 'Research', href: '#research' },
     { label: 'Projects', href: '#projects' },
+    { label: 'Vibe', href: '#vibe' },
     { label: 'CV', href: '#cv' },
     { label: 'Contact', href: '#contact' },
   ],
