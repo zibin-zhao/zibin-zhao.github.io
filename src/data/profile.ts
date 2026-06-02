@@ -1,0 +1,19 @@
+export const profile = {
+  name: 'ZIBIN ZHAO',
+  firstName: 'ZIBIN',
+  lastName: 'ZHAO',
+  role: 'Bioengineering × AI',
+  tagline: 'PhD candidate at HKUST — deep learning for molecular diagnostics, CRISPR & aptamer design.',
+  status: 'Open to Collaboration',
+  affiliation: 'HKUST · Hsing Lab',
+  email: 'zibin.zhao@connect.ust.hk',
+  scholar: { citations: 100, hIndex: 4, i10: 3, asOf: '2026-06' },
+  socials: [
+    { label: 'GitHub', href: 'https://github.com/zibin-zhao', icon: 'github' },
+    { label: 'Hugging Face', href: 'https://huggingface.co/zzhaobz', icon: 'hf' },
+    { label: 'Scholar', href: 'https://scholar.google.com/citations?user=EQ6DTNkAAAAJ', icon: 'scholar' },
+    { label: 'LinkedIn', href: 'https://hk.linkedin.com/in/zibinzhao', icon: 'linkedin' },
+    { label: 'ORCID', href: 'https://orcid.org/0000-0002-3121-9131', icon: 'orcid' },
+  ],
+  focus: ['Computational biology', 'Deep learning', 'Molecular dynamics', 'Diagnostics'],
+};
