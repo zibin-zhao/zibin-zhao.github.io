@@ -1,0 +1,28 @@
+---
+import Section from './Section.astro';
+import { cv } from '../data/cv';
+const items = [...cv.education, ...cv.experience];
+---
+<Section id="cv" num="05" label="CV / Resume">
+  <div class="cvgrid">
+    <div class="tl">
+      {items.map(i => (
+        <div class="item"><h4>{i.title} — {i.org}</h4><div class="meta">{i.period}{i.notes?.length ? ' · ' + i.notes.join(' · ') : ''}</div></div>
+      ))}
+    </div>
+    <div>
+      <p class="muted">Full CV as a one-click PDF, plus an at-a-glance timeline of education, experience &amp; awards.</p>
+      <div class="chips">{cv.skills.map(s => <span class="chip">{s}</span>)}</div>
+      <a class="download" href={cv.pdf} download>⬇ Download CV (PDF)</a>
+    </div>
+  </div>
+</Section>
+<style>
+  .cvgrid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:18px}
+  .tl{border-left:2px solid var(--ink);margin-left:6px;padding-left:20px}
+  .item{margin-bottom:16px;position:relative}
+  .item::before{content:"";position:absolute;left:-26px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--ink)}
+  .item h4{font-size:14px}.meta{font-size:12px;color:var(--muted)}
+  .download{background:var(--ink);color:#fff;border-radius:22px;padding:11px 20px;font-size:13px;font-weight:600;display:inline-block;margin-top:16px}
+  @media (max-width:760px){.cvgrid{grid-template-columns:1fr}}
+</style>
