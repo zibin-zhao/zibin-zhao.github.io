@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import T from '../components/T.astro';
+import LangToggle from '../components/LangToggle.astro';
+import { profile } from '../data/profile';
+---
+<Base title="Zibin Zhao — Video Intro" description="A short animated video introduction to Zibin Zhao — PhD candidate in Bioengineering at the Hong Kong University of Science and Technology.">
+  <div class="page">
+    <header class="bar">
+      <a class="logo" href="/">{profile.name}</a>
+      <div class="right">
+        <LangToggle />
+        <a class="back" href="/"><T en="← Back to site" zh="← 返回主页" /></a>
+      </div>
+    </header>
+
+    <section class="intro reveal in">
+      <div class="lbl">— <T en="Video Intro" zh="视频简介" /> —</div>
+      <h1 class="big"><T en="An intro, in motion" zh="动态简介" /></h1>
+      <p class="sub"><T en="A 13-second motion-graphics reel — bioengineering × AI, deep learning for molecular diagnostics." zh="13 秒动态短片 —— 生物工程 × 人工智能，用深度学习推进分子诊断。" /></p>
+
+      <div class="player">
+        <video src="/intro.mp4" poster="/intro-poster.jpg" autoplay muted loop playsinline controls preload="metadata"></video>
+      </div>
+
+      <div class="actions">
+        <a class="cta" href="/#contact"><T en="Get in touch ↗" zh="联系我 ↗" /></a>
+        <a class="ghost" href="/intro.mp4" download><T en="Download MP4" zh="下载视频" /></a>
+      </div>
+      <p class="made"><T en="Composed as HTML/CSS and rendered to MP4 with a HyperFrames-style pipeline." zh="以 HTML/CSS 编排，并通过 HyperFrames 式流程渲染为 MP4。" /></p>
+    </section>
+  </div>
+  <script>import '../scripts/lang.ts';</script>
+</Base>
+<style>
+  .page{min-height:100vh;background:var(--bg);padding:var(--gap)}
+  .bar{display:flex;justify-content:space-between;align-items:center;padding:13px 24px;background:rgba(255,255,255,.82);backdrop-filter:blur(12px);border-radius:22px;box-shadow:0 8px 26px rgba(0,0,0,.08)}
+  .bar .logo{font-family:var(--font-display);font-weight:800;letter-spacing:-1px;font-size:17px}
+  .bar .right{display:flex;align-items:center;gap:12px}
+  .bar .back{font-size:14px;color:var(--muted)}
+  .intro{max-width:1000px;margin:0 auto;padding:56px 24px 90px;text-align:center}
+  .lbl{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#a1a1aa;font-weight:700}
+  h1.big{font-family:var(--font-display);font-weight:800;letter-spacing:-2px;font-size:clamp(40px,7vw,76px);line-height:1;margin:14px 0 10px}
+  .sub{color:var(--muted);font-size:16px;line-height:1.6;max-width:580px;margin:0 auto 32px}
+  .player{border-radius:24px;overflow:hidden;box-shadow:0 26px 70px rgba(0,0,0,.18);background:#fff;aspect-ratio:16/9}
+  .player video{display:block;width:100%;height:100%;object-fit:cover}
+  .actions{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap}
+  .cta{background:var(--ink);color:#fff;border-radius:24px;padding:13px 26px;font-size:15px;font-weight:600}
+  .ghost{border:1px solid var(--hair);background:#fff;border-radius:24px;padding:13px 22px;font-size:15px;font-weight:600}
+  .made{margin-top:28px;color:#a1a1aa;font-size:13px}
+</style>

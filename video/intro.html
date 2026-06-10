@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<!-- HyperFrames-compatible composition. Seekable: reads ?t=<seconds>, applies a paused timeline state. -->
+<style>
+  @font-face{font-family:'SG';src:url('assets/sg700.woff2') format('woff2');font-weight:700;font-display:block}
+  @font-face{font-family:'Inter';src:url('assets/inter600.woff2') format('woff2');font-weight:600;font-display:block}
+  @font-face{font-family:'Inter';src:url('assets/inter400.woff2') format('woff2');font-weight:400;font-display:block}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1280px;height:720px;overflow:hidden}
+  #stage{position:relative;width:1280px;height:720px;overflow:hidden;background:#fff;font-family:'Inter',Arial,sans-serif;color:#18181b}
+  .scene{position:absolute;inset:0}
+  .disp{font-family:'SG','Helvetica Neue',Arial,sans-serif;font-weight:700;letter-spacing:-3px;line-height:.92}
+  .o{color:transparent;-webkit-text-stroke:2px #18181b}
+  .an{will-change:transform,opacity;opacity:0}
+  /* S1 */
+  #s1name{position:absolute;top:268px;left:0;right:0;text-align:center;font-size:128px}
+  #s1sub{position:absolute;top:432px;left:0;right:0;text-align:center;font-size:22px;letter-spacing:4px;text-transform:uppercase;color:#52525b}
+  #s1rule{position:absolute;top:410px;left:50%;width:120px;height:2px;background:#18181b;transform-origin:center}
+  /* S2 */
+  #s2img{position:absolute;bottom:0;left:130px;height:600px}
+  #s2name{position:absolute;top:188px;left:640px;font-size:72px}
+  #s2r1{position:absolute;top:300px;left:643px;font-size:23px;font-weight:600}
+  #s2r2{position:absolute;top:338px;left:643px;font-size:19px;color:#52525b;max-width:520px;line-height:1.5}
+  #s2r3{position:absolute;top:404px;left:643px;font-size:16px;color:#a1a1aa}
+  .pill2{position:absolute;left:643px;display:inline-flex;align-items:center;gap:8px;border:1px solid #e4e4e7;border-radius:24px;padding:9px 16px;font-size:15px}
+  #s2pill{top:455px}
+  .dot{width:9px;height:9px;border-radius:50%;background:#22c55e}
+  /* S3 */
+  #s3lab{position:absolute;top:118px;left:90px;font-size:15px;letter-spacing:4px;text-transform:uppercase;color:#a1a1aa}
+  .stat{position:absolute}
+  .stat .v{font-family:'SG',Arial,sans-serif;font-weight:700;font-size:108px;letter-spacing:-4px;line-height:1}
+  .stat .l{font-size:19px;color:#52525b;margin-top:6px}
+  #st1{top:175px;left:88px}#st2{top:175px;left:470px}#st3{top:175px;left:760px}
+  #st4{top:400px;left:88px}
+  #s3pub{position:absolute;top:455px;left:470px;font-size:24px;font-weight:600}
+  #s3pubL{position:absolute;top:495px;left:470px;font-size:17px;color:#52525b}
+  /* S4 (dark close) */
+  #s4{background:#18181b;color:#fff}
+  #s4chips{position:absolute;top:250px;left:0;right:0;text-align:center;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  #s4chips span{border:1px solid #3f3f46;border-radius:24px;padding:10px 20px;font-size:20px;color:#e6e6e6}
+  #s4name{position:absolute;top:330px;left:0;right:0;text-align:center;font-size:92px;color:#fff}
+  #s4name .o{-webkit-text-stroke:2px #fff}
+  #s4url{position:absolute;top:455px;left:0;right:0;text-align:center;font-size:22px;letter-spacing:2px;color:#a1a1aa}
+  #s4cta{position:absolute;top:510px;left:50%;transform:translateX(-50%);background:#fff;color:#18181b;border-radius:24px;padding:12px 26px;font-size:18px;font-weight:600}
+</style>
+</head>
+<body>
+<div id="stage" data-composition-id="intro" data-width="1280" data-height="720">
+
+  <div class="scene" id="s1">
+    <div id="s1rule" class="an"></div>
+    <div id="s1name" class="disp an"><span class="o">ZIBIN</span> ZHAO</div>
+    <div id="s1sub" class="an">Bioengineering × AI</div>
+  </div>
+
+  <div class="scene" id="s2">
+    <img id="s2img" class="an" src="assets/portrait.png" alt="" />
+    <div id="s2name" class="disp an">Zibin Zhao</div>
+    <div id="s2r1" class="an">PhD Candidate · Bioengineering</div>
+    <div id="s2r2" class="an">The Hong Kong University of Science and Technology — Hsing Lab</div>
+    <div id="s2r3" class="an">HKPFS + Redbird Award · BSc Melbourne (First Class Honours)</div>
+    <div id="s2pill" class="pill2 an"><span class="dot"></span> Open to Collaboration</div>
+  </div>
+
+  <div class="scene" id="s3">
+    <div id="s3lab" class="an">Selected impact</div>
+    <div class="stat an" id="st1"><div class="v"><span class="num" data-target="100">0</span></div><div class="l">citations</div></div>
+    <div class="stat an" id="st2"><div class="v"><span class="num" data-target="4">0</span></div><div class="l">h-index</div></div>
+    <div class="stat an" id="st3"><div class="v"><span class="num" data-target="9">0</span></div><div class="l">publications</div></div>
+    <div id="s3pub" class="disp an" style="letter-spacing:-1px;font-size:40px">Nature Biotechnology</div>
+    <div id="s3pubL" class="an">CRISPR–Cas12a effectors · 2026</div>
+  </div>
+
+  <div class="scene" id="s4">
+    <div id="s4chips" class="an"><span>CasMD</span><span>DL-SELEX</span><span>TEMPO</span><span>ECG</span></div>
+    <div id="s4name" class="disp an"><span class="o">ZIBIN</span> ZHAO</div>
+    <div id="s4url" class="an">zibin-zhao.github.io</div>
+    <div id="s4cta" class="an">Let's talk ↗</div>
+  </div>
+
+</div>
+
+<script>
+  const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+  const easeOut=p=>1-Math.pow(1-p,3);
+  const F=0.45; // crossfade
+  const scenes={ s1:[0.0,3.2], s2:[3.2,6.6], s3:[6.6,9.9], s4:[9.9,13.2] };
+  const DURATION=13.2;
+  // [id, scene, delay, dur, yOffset]
+  const els=[
+    ['s1rule','s1',0.1,0.6,0],['s1name','s1',0.25,0.9,44],['s1sub','s1',0.55,0.8,22],
+    ['s2img','s2',0.1,0.95,70],['s2name','s2',0.25,0.8,34],['s2r1','s2',0.45,0.7,26],
+    ['s2r2','s2',0.6,0.7,24],['s2r3','s2',0.75,0.7,22],['s2pill','s2',0.9,0.7,20],
+    ['s3lab','s3',0.1,0.6,18],['st1','s3',0.25,0.7,30],['st2','s3',0.45,0.7,30],
+    ['st3','s3',0.65,0.7,30],['s3pub','s3',0.9,0.7,26],['s3pubL','s3',1.05,0.7,22],
+    ['s4chips','s4',0.15,0.7,24],['s4name','s4',0.35,0.9,40],['s4url','s4',0.6,0.7,22],['s4cta','s4',0.8,0.7,20],
+  ];
+  const nums=[...document.querySelectorAll('.num')];
+  function vis(n,T){ const [s,e]=scenes[n]; return clamp((T-s)/F,0,1)*clamp((e-T)/F,0,1); }
+  function applyT(T){
+    for(const name in scenes){ const sc=document.getElementById(name); if(sc) sc.style.opacity=vis(name,T).toFixed(4); }
+    for(const [id,sc,delay,dur,y] of els){ const node=document.getElementById(id); if(!node)continue; const [s]=scenes[sc]; const p=easeOut(clamp((T-(s+delay))/dur,0,1)); node.style.opacity=p.toFixed(4); node.style.transform=`translateY(${((1-p)*y).toFixed(2)}px)`; }
+    { const [s]=scenes.s1; const p=easeOut(clamp((T-(s+0.1))/0.6,0,1)); const r=document.getElementById('s1rule'); r.style.transform=`translateX(-50%) scaleX(${p.toFixed(3)})`; }
+    for(const n of nums){ const [s]=scenes.s3; const p=easeOut(clamp((T-(s+0.25))/1.1,0,1)); n.textContent=Math.round(parseFloat(n.dataset.target)*p); }
+  }
+  window.applyT=applyT;
+  window.__DURATION=DURATION;
+  applyT(parseFloat(new URLSearchParams(location.search).get('t')||'0'));
+</script>
+</body>
+</html>

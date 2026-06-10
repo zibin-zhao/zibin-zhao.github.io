@@ -30,5 +30,6 @@ export const profile = {
     { en: 'Vibe', zh: '随性编程', href: '#vibe' },
     { en: 'CV', zh: '简历', href: '#cv' },
     { en: 'Contact', zh: '联系', href: '#contact' },
+    { en: 'Intro', zh: '视频', href: '/intro' },
   ],
 };

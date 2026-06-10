@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # superpowers
 .superpowers/
+
+# video render frames (intermediate); keep video/intro.html, render.mjs, assets, and public/intro.mp4
+video/frames/
