@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://zibin-zhao.github.io/sitemap-index.xml

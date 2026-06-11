@@ -6,7 +6,7 @@ const Tag = href ? 'a' : 'div';
 <Tag class="pcard" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
   <span class="tag">{type}</span>
   <h4>{title}</h4>
-  <p>{blurbZh ? <T en={blurb} zh={blurbZh} /> : blurb}</p>
+  <p><T en={blurb} zh={blurbZh ?? blurb} /></p>
   {href && <span class="go"><T en="View →" zh="查看 →" /></span>}
 </Tag>
 <style>

@@ -5,12 +5,31 @@ import LangToggle from './LangToggle.astro';
 ---
 <header class="topnav" id="topnav">
   <a class="logo" href="#top">{profile.name}</a>
-  <nav>{profile.navLinks.map(l => <a href={l.href}><T en={l.en} zh={l.zh} /></a>)}</nav>
+  <nav id="navlinks">{profile.navLinks.map(l => <a href={l.href}><T en={l.en} zh={l.zh} /></a>)}</nav>
   <div class="navright">
     <LangToggle />
     <a class="cta" href={`mailto:${profile.email}`}><T en="Let's Talk ↗" zh="联系我 ↗" /></a>
+    <button class="menubtn" id="menubtn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navlinks">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
+<script is:inline>
+  (() => {
+    const btn = document.getElementById('menubtn');
+    const nav = document.getElementById('navlinks');
+    if (!btn || !nav) return;
+    const close = () => { nav.classList.remove('open'); btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = nav.classList.toggle('open');
+      btn.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    });
+    nav.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
+    document.addEventListener('click', (e) => { if (!e.target.closest('#topnav')) close(); });
+  })();
+</script>
 <style>
   .topnav{position:fixed;top:var(--gap);left:var(--gap);right:var(--gap);z-index:50;display:flex;justify-content:space-between;align-items:center;
     padding:11px 16px 11px 24px;background:rgba(255,255,255,.78);backdrop-filter:blur(12px);border-radius:22px;box-shadow:0 8px 26px rgba(0,0,0,.10);
@@ -20,5 +39,18 @@ import LangToggle from './LangToggle.astro';
   .topnav nav{display:flex;gap:22px;font-size:14px;color:var(--muted)}
   .navright{display:flex;align-items:center;gap:10px}
   .topnav .cta{background:var(--ink);color:#fff;border-radius:18px;padding:8px 15px;font-size:13px;font-weight:600}
-  @media (max-width:640px){.topnav nav{display:none}}
+  .menubtn{display:none;flex-direction:column;justify-content:center;gap:4px;width:34px;height:34px;padding:0 7px;border:1px solid var(--hair);border-radius:11px;background:#fff;cursor:pointer}
+  .menubtn span{display:block;height:2px;background:var(--ink);border-radius:2px;transition:transform .25s,opacity .25s}
+  .menubtn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .menubtn.open span:nth-child(2){opacity:0}
+  .menubtn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+  @media (max-width:640px){
+    .menubtn{display:flex}
+    .topnav nav{position:absolute;top:calc(100% + 8px);right:0;left:0;flex-direction:column;gap:0;
+      background:rgba(255,255,255,.97);backdrop-filter:blur(12px);border-radius:18px;box-shadow:0 12px 30px rgba(0,0,0,.14);
+      padding:6px;opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .2s,transform .2s}
+    .topnav nav.open{opacity:1;transform:none;pointer-events:auto}
+    .topnav nav a{padding:11px 16px;border-radius:12px}
+    .topnav nav a:hover{background:rgba(0,0,0,.04)}
+  }
 </style>

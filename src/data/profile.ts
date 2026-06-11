@@ -7,6 +7,10 @@ export const profile = {
     en: 'PhD candidate at the Hong Kong University of Science and Technology — deep learning for molecular diagnostics, CRISPR & aptamer design.',
     zh: '香港科技大学博士候选人 —— 以深度学习推进分子诊断、CRISPR 与适体设计。',
   },
+  valueProp: {
+    en: 'I build tools that make care measurable, beautiful, and accessible — from molecular diagnostics to everyday wellbeing.',
+    zh: '我打造让「关怀」可被衡量、美观且触手可及的工具 —— 从分子诊断到日常身心健康。',
+  },
   status: { en: 'Open to Collaboration', zh: '开放合作' },
   email: 'zibin.zhao@connect.ust.hk',
   scholar: { citations: 100, hIndex: 4, i10: 3, asOf: '2026-06' },

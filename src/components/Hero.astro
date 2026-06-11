@@ -17,10 +17,11 @@ import LangToggle from './LangToggle.astro';
       </div>
       <div class="heroCore" id="heroCore">
         <h1 class="bigName"><span class="o">{profile.firstName}</span> {profile.lastName}</h1>
-        <img class="portrait" src="/hero-portrait.jpg" alt="Watercolor portrait of Zibin Zhao" />
+        <img class="portrait" src="/hero-portrait.jpg" alt="Watercolor portrait of Zibin Zhao" width="760" height="1269" />
         <div class="role">
           <p class="roleTitle"><T en={profile.role.en} zh={profile.role.zh} /></p>
           <p><T en={profile.tagline.en} zh={profile.tagline.zh} /></p>
+          <p class="valueProp"><T en={profile.valueProp.en} zh={profile.valueProp.zh} /></p>
           <a class="collab" href="#research"><T en="View research ↗" zh="查看研究 ↗" /></a>
         </div>
         <div class="socials">
@@ -49,6 +50,7 @@ import LangToggle from './LangToggle.astro';
   .role{position:absolute;left:36px;bottom:48px;z-index:5;max-width:340px}
   .roleTitle{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-1px}
   .role p{font-size:14px;color:var(--muted);margin-top:9px}
+  .role .valueProp{font-size:13px;color:var(--ink);font-weight:500;margin-top:11px;line-height:1.5}
   .role .roleTitle{color:var(--ink);margin-top:0}
   .collab{display:inline-block;margin-top:14px;background:var(--ink);color:#fff;border-radius:24px;padding:12px 22px;font-size:14px;font-weight:600}
   .socials{position:absolute;right:36px;bottom:48px;z-index:5;display:flex;flex-direction:column;gap:8px}

@@ -1,6 +1,26 @@
 ---
 import '../styles/global.css';
+import { profile } from '../data/profile';
 const { title = 'Zibin Zhao', description = 'PhD candidate in Bioengineering at the Hong Kong University of Science and Technology — deep learning for molecular diagnostics, CRISPR & aptamer design.' } = Astro.props;
+const ogImage = Astro.site ? new URL('og.png', Astro.site).href : '/og.png';
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Zibin Zhao',
+  url: Astro.site?.href,
+  jobTitle: 'PhD Candidate in Bioengineering',
+  affiliation: {
+    '@type': 'CollegeOrUniversity',
+    name: 'The Hong Kong University of Science and Technology',
+  },
+  alumniOf: {
+    '@type': 'CollegeOrUniversity',
+    name: 'University of Melbourne',
+  },
+  knowsAbout: ['Deep Learning', 'CRISPR Diagnostics', 'Molecular Diagnostics', 'Aptamer Design', 'Computational Biology'],
+  sameAs: profile.socials.map((s) => s.href),
+};
 ---
 <!doctype html>
 <html lang="en" data-lang="en">
@@ -10,12 +30,24 @@ const { title = 'Zibin Zhao', description = 'PhD candidate in Bioengineering at 
     <script is:inline>try{if(localStorage.getItem('lang')==='zh'){var d=document.documentElement;d.dataset.lang='zh';d.setAttribute('lang','zh');}}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="author" content="Zibin Zhao" />
+    <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
-    {Astro.site && <meta property="og:url" content={Astro.site} />}
+    <meta property="og:site_name" content="Zibin Zhao" />
+    {Astro.site && <meta property="og:url" content={canonical} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={Astro.site ? new URL('og.png', Astro.site).href : '/og.png'} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="zh_CN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   </head>
   <body><slot /></body>
 </html>

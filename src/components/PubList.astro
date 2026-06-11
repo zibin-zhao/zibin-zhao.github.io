@@ -16,7 +16,7 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
           <h4>{p.title}{p.featured && <span class="star">★</span>}</h4>
           {p.venue && <div class="venue">{p.venue}</div>}
           {p.authors && <div class="auth">{p.authors}</div>}
-          {p.links && <div class="links">{Object.entries(p.links).map(([k,v]) => <a href={v} target="_blank" rel="noopener">{k.toUpperCase()}</a>)}</div>}
+          {p.links && <div class="links">{Object.entries(p.links).filter(([,v]) => v).map(([k,v]) => <a href={v} target="_blank" rel="noopener">{k.toUpperCase()}</a>)}</div>}
         </div>
       </li>
     ))}
