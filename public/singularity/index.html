@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#000000" />
+  <title>SINGULARITY — a universe in your browser</title>
+  <meta name="description" content="400,000 particles. Zero video editing. All real, all live, in your browser." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <script type="module" crossorigin src="/singularity/assets/index-BQ8c9wQ6.js"></script>
+  <link rel="stylesheet" crossorigin href="/singularity/assets/index-BmCvrKaR.css">
+</head>
+<body>
+  <div id="stage"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <header class="hud-top">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">SINGULARITY</span>
+        <span class="brand-sub">live particle engine</span>
+      </div>
+      <div class="stats">
+        <span id="stat-count">—</span>
+        <span class="stat-sep">/</span>
+        <span id="stat-fps">— fps</span>
+        <span class="stat-live">● LIVE</span>
+      </div>
+    </header>
+
+    <div class="shape-title">
+      <div id="shape-name" class="shape-name"></div>
+      <div id="shape-index" class="shape-index"></div>
+    </div>
+
+    <footer class="hud-bottom">
+      <div class="hints">
+        <span><b>drag</b> bend space</span>
+        <span><b>tap</b> shockwave</span>
+        <span class="kbd"><b>space</b> next form</span>
+        <span class="kbd"><b>M</b> sound-react</span>
+        <span class="kbd"><b>H</b> hide ui</span>
+      </div>
+      <div class="touch-controls">
+        <button id="btn-next" aria-label="Next form">⟶</button>
+        <button id="btn-audio" aria-label="Toggle sound reaction">♪</button>
+        <button id="btn-hide" aria-label="Hide interface">⛶</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- quiet recovery affordance when the HUD is hidden -->
+  <button id="btn-show" aria-label="Show interface">⛶</button>
+
+  <!-- Intro -->
+  <div id="intro">
+    <div class="intro-inner">
+      <div class="intro-kicker">no video editing &nbsp;·&nbsp; no after effects &nbsp;·&nbsp; just math</div>
+      <h1 class="intro-title">SINGU<br />LARITY</h1>
+      <div class="intro-sub"><span id="intro-count">400,000</span> particles, live in your browser</div>
+      <div class="intro-cta">tap anywhere to enter</div>
+    </div>
+  </div>
+
+  <div id="fallback" hidden>
+    <p>Your browser can't open the portal (WebGL unavailable).<br />Try Chrome or Safari on a newer device.</p>
+  </div>
+
+</body>
+</html>
