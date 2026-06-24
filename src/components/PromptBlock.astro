@@ -1,13 +1,12 @@
 ---
-import T from './T.astro';
 const { label, text } = Astro.props;
 ---
 <div class="pblock">
   {label && <div class="plabel">{label}</div>}
   <div class="pwrap">
     <button class="copy" type="button" aria-label="Copy prompt to clipboard">
-      <span class="lbl-copy"><T en="Copy" zh="复制" /></span>
-      <span class="lbl-done"><T en="Copied ✓" zh="已复制 ✓" /></span>
+      <span class="lbl-copy">Copy</span>
+      <span class="lbl-done">Copied ✓</span>
     </button>
     <pre class="ptext">{text}</pre>
   </div>

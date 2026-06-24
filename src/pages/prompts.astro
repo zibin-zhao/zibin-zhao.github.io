@@ -1,7 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import T from '../components/T.astro';
-import LangToggle from '../components/LangToggle.astro';
 import PromptBlock from '../components/PromptBlock.astro';
 import { profile } from '../data/profile';
 import { promptPack as P } from '../data/prompts';
@@ -11,18 +9,17 @@ import { promptPack as P } from '../data/prompts';
     <header class="bar">
       <a class="logo" href="/">{profile.name}</a>
       <div class="right">
-        <LangToggle />
-        <a class="back" href="/"><T en="← Back to site" zh="← 返回主页" /></a>
+        <a class="back" href="/">← Back to site</a>
       </div>
     </header>
 
     <section class="hero">
-      <div class="kicker">— <T en={P.kicker.en} zh={P.kicker.zh} /> —</div>
+      <div class="kicker">— {P.kicker} —</div>
       <h1 class="big">{P.title}</h1>
       <p class="intro">{P.intro}</p>
       <div class="meta">
-        <div class="mrow"><span class="ml"><T en="Running example" zh="示例主题" /></span><span class="mv">{P.runningExample}</span></div>
-        <div class="mrow"><span class="ml"><T en="How to use" zh="如何使用" /></span><span class="mv">{P.howToUse}</span></div>
+        <div class="mrow"><span class="ml">Running example</span><span class="mv">{P.runningExample}</span></div>
+        <div class="mrow"><span class="ml">How to use</span><span class="mv">{P.howToUse}</span></div>
       </div>
     </section>
 
@@ -50,16 +47,15 @@ import { promptPack as P } from '../data/prompts';
     </main>
 
     <section class="discipline">
-      <div class="dlabel"><T en={P.disciplineTitle.en} zh={P.disciplineTitle.zh} /></div>
+      <div class="dlabel">{P.disciplineTitle}</div>
       <ul>{P.discipline.map(d => <li>{d}</li>)}</ul>
     </section>
 
     <footer class="foot">
-      <a class="home" href="/"><T en="← Back to zibinzhao.com" zh="← 返回 zibinzhao.com" /></a>
+      <a class="home" href="/">← Back to zibinzhao.com</a>
     </footer>
   </div>
 
-  <script>import '../scripts/lang.ts';</script>
   <script is:inline>
     (() => {
       // one-click copy

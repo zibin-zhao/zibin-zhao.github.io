@@ -14,8 +14,8 @@ export type Stage = {
 };
 
 export const promptPack = {
-  kicker: { en: 'Prompt Pack', zh: '提示词合集' },
-  title: 'Writing a CRISPR-Cas MD Review with AI',
+  kicker: 'Prompt Pack',
+  title: 'Writing any Review Articles with AI',
   intro:
     'A worked, copy-paste companion to the AI Review-Article Pipeline. Every prompt below is filled in for one running example — a review of molecular dynamics (MD) simulations of CRISPR-Cas effector complexes — so you can see exactly what a real prompt looks like. Swap the parts in [BRACKETS] to reuse any of them for your own topic.',
   runningExample:
@@ -226,7 +226,7 @@ Show the edited text, then a short list of the substantive changes you made.
     },
   ] as Stage[],
 
-  disciplineTitle: { en: 'The discipline that makes this safe', zh: '让流程可靠的纪律' },
+  disciplineTitle: 'The discipline that makes this safe',
   discipline: [
     'Stages 1–3 find and extract; stages 5–6 organize and draft; stage 7 is where you, personally, confirm every source exists and says what you claim. No prompt removes that step.',
     'The "use ONLY the sources below" guardrail in stages 5–7 is what keeps a frontier LLM from inventing references. Keep it in every drafting prompt.',
