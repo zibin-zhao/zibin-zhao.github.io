@@ -1,0 +1,30 @@
+---
+import T from './T.astro';
+const { label, text } = Astro.props;
+---
+<div class="pblock">
+  {label && <div class="plabel">{label}</div>}
+  <div class="pwrap">
+    <button class="copy" type="button" aria-label="Copy prompt to clipboard">
+      <span class="lbl-copy"><T en="Copy" zh="复制" /></span>
+      <span class="lbl-done"><T en="Copied ✓" zh="已复制 ✓" /></span>
+    </button>
+    <pre class="ptext">{text}</pre>
+  </div>
+</div>
+<style>
+  .pblock{margin-top:16px}
+  .plabel{font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:8px}
+  .pwrap{position:relative;background:#fafafa;border:1px solid var(--hair);border-radius:14px}
+  .ptext{margin:0;padding:18px 18px 18px 18px;font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    font-size:12.5px;line-height:1.65;color:#27272a;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+  .copy{position:absolute;top:10px;right:10px;z-index:2;display:inline-flex;align-items:center;gap:6px;
+    border:1px solid var(--hair);background:#fff;border-radius:14px;padding:6px 12px;font:inherit;font-size:12px;font-weight:600;
+    color:var(--ink);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.05);transition:background .2s,color .2s,border-color .2s}
+  .copy:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .lbl-done{display:none}
+  .copy.copied{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .copy.copied .lbl-copy{display:none}
+  .copy.copied .lbl-done{display:inline}
+  @media (max-width:520px){ .copy{position:static;margin:10px 0 0 14px} .ptext{padding-top:6px} }
+</style>

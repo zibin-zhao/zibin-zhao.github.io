@@ -35,5 +35,6 @@ export const profile = {
     { en: 'CV', zh: '简历', href: '#cv' },
     { en: 'Contact', zh: '联系', href: '#contact' },
     { en: 'Intro', zh: '视频', href: '/intro' },
+    { en: 'Prompts', zh: '提示词', href: '/prompts' },
   ],
 };
