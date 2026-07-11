@@ -1,30 +1,32 @@
+import { mountFieldMotion } from './field-motion';
+
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const heroCore = document.getElementById('heroCore');
+const fieldRoot = document.querySelector<HTMLElement>('[data-field-motion]');
 const topnav = document.getElementById('topnav');
-const hint = document.getElementById('hint');
 
 function onScroll() {
   if (!heroCore || !topnav) return;
-  const vh = window.innerHeight;
-  const p = Math.min(Math.max(window.scrollY / vh, 0), 1);
+  const progress = Math.min(Math.max(window.scrollY / window.innerHeight, 0), 1);
   if (!reduce) {
-    heroCore.style.transform = `translateY(${-80 * p}px) scale(${1 - 0.6 * p})`;
-    heroCore.style.opacity = String(Math.max(1 - 1.25 * p, 0));
-    if (hint) hint.style.opacity = String(Math.max(1 - 2 * p, 0));
+    heroCore.style.transform = `translateY(${-46 * progress}px) rotate(${-3 + progress * 3}deg)`;
+    heroCore.style.opacity = String(Math.max(1 - 1.25 * progress, 0));
   }
-  topnav.classList.toggle('show', p > 0.55);
+  topnav.classList.toggle('show', progress > 0.55);
 }
+
 let ticking = false;
 window.addEventListener('scroll', () => {
-  if (!ticking) {
-    ticking = true;
-    requestAnimationFrame(() => { onScroll(); ticking = false; });
-  }
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => { onScroll(); ticking = false; });
 }, { passive: true });
 onScroll();
 
-const io = new IntersectionObserver(
-  (es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
-  { threshold: 0.18 }
+const observer = new IntersectionObserver(
+  (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('in')),
+  { threshold: 0.18 },
 );
-document.querySelectorAll('.reveal').forEach((s) => io.observe(s));
+document.querySelectorAll('.reveal').forEach((section) => observer.observe(section));
+
+if (fieldRoot) mountFieldMotion(fieldRoot);

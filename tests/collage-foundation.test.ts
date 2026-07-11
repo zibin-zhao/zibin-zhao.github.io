@@ -22,4 +22,15 @@ describe('collage design foundation', () => {
     expect(layout).toContain('class="skip-link" href="#main-content"');
     expect(homepage).toContain('<main id="main-content"');
   });
+
+  it('defines the approved semantic collage hero and motion mount point', () => {
+    const hero = read('src/components/Hero.astro');
+    const heroScript = read('src/scripts/hero.ts');
+
+    expect(hero).toContain('data-field-motion');
+    expect(hero).toContain('id="hero-name"');
+    expect(hero).toContain('class="experiment-holder"');
+    expect(hero).toContain('class="field-routes"');
+    expect(heroScript).toContain("import { mountFieldMotion } from './field-motion'");
+  });
 });
