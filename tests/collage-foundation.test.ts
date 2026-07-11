@@ -54,4 +54,19 @@ describe('collage design foundation', () => {
     expect(pubs).toContain('variant="folder"');
     expect(vibeCard).toContain('Image / experiment holder');
   });
+
+  it('defines Medit as a real local-first Vibe project', () => {
+    const medit = read('src/content/vibe/medit.md');
+    const zen = read('src/content/vibe/zen.md');
+    const vibeCard = read('src/components/VibeCard.astro');
+
+    expect(medit).toContain('title: "Medit"');
+    expect(medit).toContain('href: "/medit/"');
+    expect(medit).toContain('preview: "medit"');
+    expect(medit).toContain('tags: ["PWA", "Journaling", "Meditation", "Local-first"]');
+    expect(medit).toContain('stored on your device');
+    expect(zen).toContain('order: 4');
+    expect(vibeCard).toContain("preview === 'medit'");
+    expect(vibeCard).toContain('shot--medit');
+  });
 });
