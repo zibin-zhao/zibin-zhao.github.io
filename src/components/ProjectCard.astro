@@ -10,10 +10,11 @@ const Tag = href ? 'a' : 'div';
   {href && <span class="go"><T en="View →" zh="查看 →" /></span>}
 </Tag>
 <style>
-  .pcard{display:block;border:1px solid var(--hair);border-radius:14px;padding:20px;transition:transform .25s,box-shadow .25s}
-  a.pcard:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.08)}
-  .tag{font-size:10px;border:1px solid var(--hair);border-radius:12px;padding:2px 8px;color:var(--muted)}
-  .pcard h4{font-family:var(--font-display);font-size:17px;margin:9px 0 5px}
-  .pcard p{font-size:13px;color:var(--muted);line-height:1.5}
-  .go{font-size:11px;font-weight:700;margin-top:10px;display:inline-block}
+  .pcard{display:block;border:1.5px solid var(--ink);background:var(--paper);box-shadow:var(--shadow-sticker);padding:20px;transition:transform var(--motion-fast) var(--ease-spring),box-shadow var(--motion-fast)}
+  .pcard:nth-child(2n){background:var(--blue);transform:rotate(1.2deg)}.pcard:nth-child(3n){background:var(--green-light);transform:rotate(-1deg)}
+  a.pcard:hover{transform:translate(-5px,-5px) rotate(-2deg);box-shadow:10px 10px 0 var(--ink)}
+  .tag{display:inline-block;border:1px solid var(--ink);padding:3px 8px;color:var(--ink);font:700 10px/1 var(--font-note);text-transform:uppercase}
+  .pcard h4{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:500;line-height:1;margin:13px 0 8px}
+  .pcard p{color:var(--muted);font-size:13px;line-height:1.5}.go{display:inline-block;margin-top:12px;font:700 11px/1 var(--font-note);text-decoration:underline;text-underline-offset:3px}
+  @media(max-width:760px){.pcard:nth-child(n){transform:none}}
 </style>

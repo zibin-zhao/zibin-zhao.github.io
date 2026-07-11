@@ -4,7 +4,7 @@ import { cv } from '../data/cv';
 import T from './T.astro';
 const items = [...cv.education, ...cv.experience, ...cv.leadership];
 ---
-<Section id="cv" num="05" label="CV / Resume" labelZh="简历">
+<Section id="cv" num="05" label="CV / Resume" labelZh="简历" variant="strip">
   <div class="cvgrid">
     <div class="tl">
       {items.map(i => (
@@ -24,11 +24,10 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
   </div>
 </Section>
 <style>
-  .cvgrid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:18px}
-  .tl{border-left:2px solid var(--ink);margin-left:6px;padding-left:20px}
+  .cvgrid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:18px}.tl{border-left:2px solid var(--ink);margin-left:6px;padding-left:20px}
   .item{margin-bottom:16px;position:relative}
   .item::before{content:"";position:absolute;left:-26px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--ink)}
   .item h4{font-size:14px}.meta{font-size:12px;color:var(--muted)}
-  .download{background:var(--ink);color:#fff;border-radius:22px;padding:11px 20px;font-size:13px;font-weight:600;display:inline-block;margin-top:16px}
+  .download{display:inline-block;margin-top:16px;border:1.5px solid var(--ink);background:var(--blue);box-shadow:var(--shadow-sticker);padding:11px 14px;font:700 11px/1 var(--font-note);text-transform:uppercase}
   @media (max-width:760px){.cvgrid{grid-template-columns:1fr}}
 </style>

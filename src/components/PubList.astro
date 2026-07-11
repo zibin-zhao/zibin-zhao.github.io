@@ -6,7 +6,7 @@ import T from './T.astro';
 const entries = await getCollection('publications');
 const pubs = sortPubs(entries.map(e => ({ ...e.data })));
 ---
-<Section id="research" num="02" label="Research & Publications" labelZh="研究与论文">
+<Section id="research" num="02" label="Research & Publications" labelZh="研究与论文" variant="folder">
   <h2 class="big"><T en="Selected work" zh="代表性成果" /></h2>
   <ul class="pubs">
     {pubs.map(p => (
@@ -23,13 +23,11 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
   </ul>
 </Section>
 <style>
-  .pubs{list-style:none;margin-top:18px}
-  .pub{display:flex;gap:16px;padding:16px 0;border-top:1px solid #f0f0f0}
-  .yr{font-size:12px;color:#a1a1aa;min-width:46px;font-weight:700}
-  .pub h4{font-size:15px;font-weight:600;line-height:1.4}
-  .star{color:#18181b;margin-left:6px}
-  .venue{font-size:12px;color:var(--muted);margin-top:3px}
-  .auth{font-size:11px;color:#a1a1aa;margin-top:3px}
-  .links{display:flex;gap:12px;font-size:11px;margin-top:6px}
-  .links a{font-weight:700}
+  .pubs{position:relative;list-style:none;margin-top:22px}
+  .pub{display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--ink)}
+  .pub:last-child{border-bottom:1px solid var(--ink)}
+  .yr{min-width:52px;color:var(--green);font:700 12px/1.2 var(--font-note)}
+  .pub h4{font-size:16px;font-weight:600;line-height:1.4}.star{color:var(--orange);margin-left:6px}
+  .venue{margin-top:3px;color:var(--muted);font-size:12px}.auth{margin-top:3px;color:var(--muted);font:11px/1.4 var(--font-note)}
+  .links{display:flex;gap:12px;margin-top:8px;font:700 11px/1 var(--font-note)}.links a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
 </style>

@@ -33,4 +33,16 @@ describe('collage design foundation', () => {
     expect(hero).toContain('class="field-routes"');
     expect(heroScript).toContain("import { mountFieldMotion } from './field-motion'");
   });
+
+  it('uses chapter variants and honest experiment placeholders', () => {
+    const section = read('src/components/Section.astro');
+    const about = read('src/components/About.astro');
+    const pubs = read('src/components/PubList.astro');
+    const vibeCard = read('src/components/VibeCard.astro');
+
+    expect(section).toContain("variant = 'note'");
+    expect(about).toContain('variant="note"');
+    expect(pubs).toContain('variant="folder"');
+    expect(vibeCard).toContain('Image / experiment holder');
+  });
 });
