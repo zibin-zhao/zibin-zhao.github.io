@@ -1,7 +1,22 @@
-:root{
-  --ink:#18181b; --paper:#ffffff; --bg:#e7e7e8; --muted:#52525b;
-  --hair:#e4e4e7; --accent:#22c55e;
-  --gap:18px; --radius:30px;
-  --font-display:'Space Grotesk',-apple-system,Arial,sans-serif;
-  --font-body:'Inter',-apple-system,Arial,sans-serif;
+:root {
+  --paper: #fffdf6;
+  --paper-warm: #fff0c7;
+  --ink: #123d34;
+  --muted: #4e695f;
+  --hair: rgba(18, 61, 52, 0.24);
+  --green: #2f9264;
+  --green-light: #c7ef91;
+  --blue: #8dd3f1;
+  --orange: #f49753;
+  --orange-light: #f5b181;
+  --grid-line: rgba(18, 61, 52, 0.14);
+  --gap: clamp(12px, 1.5vw, 20px);
+  --radius: 0px;
+  --shadow-sticker: 5px 5px 0 var(--ink);
+  --motion-fast: 180ms;
+  --motion-slow: 800ms;
+  --ease-spring: cubic-bezier(0.2, 1.35, 0.3, 1);
+  --font-display: 'Space Grotesk', -apple-system, Arial, sans-serif;
+  --font-body: 'Inter', -apple-system, Arial, sans-serif;
+  --font-note: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }

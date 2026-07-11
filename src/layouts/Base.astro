@@ -49,5 +49,8 @@ const personSchema = {
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   </head>
-  <body><slot /></body>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <slot />
+  </body>
 </html>
