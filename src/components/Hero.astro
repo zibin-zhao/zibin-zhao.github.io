@@ -41,7 +41,7 @@ import LangToggle from './LangToggle.astro';
 
     <div class="field-socials" aria-label="Social links">
       {profile.socials.slice(0, 4).map((social) => (
-        <a href={social.href} target="_blank" rel="noopener"><SocialIcon icon={social.icon} /><span>{social.label}</span></a>
+        <a href={social.href} target="_blank" rel="noopener" aria-label={social.label}><SocialIcon icon={social.icon} /><span>{social.label}</span></a>
       ))}
     </div>
     <p class="field-loop" aria-hidden="true"><span>molecules ↔ models ↔ small habits ↔ field notes ↔ tools for care ↔ </span><span>molecules ↔ models ↔ small habits ↔ field notes ↔ tools for care ↔ </span></p>

@@ -31,7 +31,16 @@ describe('collage design foundation', () => {
     expect(hero).toContain('id="hero-name"');
     expect(hero).toContain('class="experiment-holder"');
     expect(hero).toContain('class="field-routes"');
+    expect(hero).toContain('aria-label={social.label}');
     expect(heroScript).toContain("import { mountFieldMotion } from './field-motion'");
+  });
+
+  it('keeps the revealed navigation in the collage language', () => {
+    const nav = read('src/components/Nav.astro');
+
+    expect(nav).toContain('background:var(--paper-warm)');
+    expect(nav).toContain('box-shadow:var(--shadow-sticker)');
+    expect(nav).not.toContain('backdrop-filter:blur');
   });
 
   it('uses chapter variants and honest experiment placeholders', () => {
