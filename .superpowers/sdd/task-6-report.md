@@ -55,6 +55,22 @@ Hardening RED command: `npx playwright test tests/browser/routes.spec.ts --grep 
 - Result: expected 4 exact identities, received 3. The focused test failed at the new exact-count assertion.
 - Restored the full locator, then `npx playwright test tests/browser/routes.spec.ts` passed 9/9.
 
+### Deterministic publication order hardening
+
+The second re-review found that `sortPubs` sorted only by descending year, leaving same-year order dependent on collection input order. Production now sorts by descending year, then title through `Intl.Collator('en', { usage: 'sort', sensitivity: 'base', ignorePunctuation: true, numeric: true })`. The function requires a title in its generic input contract, returns a copy, and does not mutate the collection input.
+
+Focused RED evidence:
+
+- `npm test -- tests/pubs.test.ts` failed the shuffled same-year fixture: the 2025 records remained in input order instead of semantic title order.
+- `npx playwright test tests/browser/routes.spec.ts --grep 'complete publication|per-publication'` failed both focused tests: rendered metadata order differed, and one identity-bound card expected 0 links but received 2 from a different publication.
+
+Focused GREEN evidence:
+
+- `npm test -- tests/pubs.test.ts`: 3/3 passed, including shuffled same-year order and input immutability.
+- `npx playwright test tests/browser/routes.spec.ts --grep 'complete publication|per-publication|complete contact index'`: 3/3 passed.
+- Publication safety checks now compare exact href arrays inside each identified publication card rather than depending on one global flattened link order.
+- Every Contact index `.t-en` label is explicitly asserted visible before the bilingual text/href contract passes.
+
 ## Visual inspection
 
 Production-build screenshots are in `test-results/task6-visual/`:
@@ -73,7 +89,7 @@ Command: `npm run lint && npm run check && npm test && npm run build && npm run 
 
 - ESLint: passed.
 - Astro check: 0 errors, 0 warnings, 1 existing deprecation hint for the intentionally preserved `document.execCommand('copy')` fallback in Prompts.
-- Vitest: 41/41 passed across 6 files.
+- Vitest: 42/42 passed across 6 files.
 - Build: 7 static pages generated, including all five Index Sheet routes.
 - Playwright: 21/21 passed, including all homepage Stitch composition/motion gates and the strengthened route suite.
 

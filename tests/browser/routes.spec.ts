@@ -9,6 +9,7 @@ const publications = [
     venue: 'Nature Biotechnology',
     authors: 'X Wu, WH Lam, Z Zhao, Y Cao, H Lin, X Feng, Y Zhai, IM Hsing',
     featured: true,
+    hrefs: ['https://doi.org/10.1038/s41587-026-03120-5'],
   },
   {
     title: 'Thermodynamically programmed one-pot CRISPR platform for point-of-care SNP genotyping',
@@ -16,6 +17,7 @@ const publications = [
     venue: '',
     authors: 'IM Hsing, X Wu, Y Li, Y Cao, Z Zhao, H Lu, S Liang',
     featured: false,
+    hrefs: [],
   },
   {
     title: 'Benchtop to at-home test: amplicon-depleted CRISPR-regulated loop-mediated amplification at skin-temperature for viral load monitoring',
@@ -23,13 +25,7 @@ const publications = [
     venue: 'Biosensors and Bioelectronics, 267',
     authors: 'Y Cao, H Lin, X Lu, X Wu, Y Zhu, Z Zhao, Y Li, et al.',
     featured: false,
-  },
-  {
-    title: 'Structure-enhanced deep learning accelerates aptamer selection for small molecule families like steroids',
-    year: 2025,
-    venue: 'Briefings in Bioinformatics, 26(6)',
-    authors: 'Z Zhao, H Lin, HY Lau, H Chen, IM Hsing',
-    featured: true,
+    hrefs: ['https://doi.org/10.1016/j.bios.2024.116866'],
   },
   {
     title: 'DNA-guided CRISPR/Cas effector for programmable RNA-recognition and cleavage',
@@ -37,6 +33,7 @@ const publications = [
     venue: '',
     authors: 'IM Hsing, X Wu, Z Zhao, Y Cao, H Lin, X Feng',
     featured: false,
+    hrefs: [],
   },
   {
     title: 'DNA hydrogel-interfaced organic electrochemical transistor for the investigation of binding-induced conformational change of small molecule aptamers',
@@ -44,20 +41,18 @@ const publications = [
     venue: 'ACS Applied Materials & Interfaces, 17(37)',
     authors: 'H Lin, Z Zhao, X Feng, SY Yeung, IM Hsing',
     featured: false,
+    hrefs: ['https://doi.org/10.1021/acsami.5c11113'],
   },
   {
-    title: 'Skin-adherent elastomer-hydrogel patch for continuous 12-lead cardiac ambulatory monitoring during physical activities',
-    year: 2023,
-    venue: 'Advanced Materials Technologies, 8(18)',
-    authors: 'Y Li, Z Zhao, A Veronica, S Yu Yeung, IM Hsing',
-    featured: false,
-  },
-  {
-    title: 'Transforming ECG diagnosis: an in-depth review of transformer-based deep-learning models in cardiovascular disease detection',
-    year: 2023,
-    venue: 'arXiv:2306.01249',
-    authors: 'Z Zhao',
+    title: 'Structure-enhanced deep learning accelerates aptamer selection for small molecule families like steroids',
+    year: 2025,
+    venue: 'Briefings in Bioinformatics, 26(6)',
+    authors: 'Z Zhao, H Lin, HY Lau, H Chen, IM Hsing',
     featured: true,
+    hrefs: [
+      'https://doi.org/10.1093/bib/bbaf680',
+      'https://github.com/zibin-zhao/DL-SELEX',
+    ],
   },
   {
     title: 'Integrating magnetic-bead-based sample extraction and molecular barcoding for the one-step pooled RT-qPCR assay of viral pathogens without retesting',
@@ -65,18 +60,24 @@ const publications = [
     venue: 'Analytical Chemistry, 95(14)',
     authors: 'X Zhuang, Z Zhao, X Feng, GCY Lui, D Chan, SS Lee, IM Hsing',
     featured: false,
+    hrefs: ['https://doi.org/10.1021/acs.analchem.3c00885'],
   },
-] as const;
-
-const publicationHrefs = [
-  'https://doi.org/10.1038/s41587-026-03120-5',
-  'https://doi.org/10.1016/j.bios.2024.116866',
-  'https://doi.org/10.1093/bib/bbaf680',
-  'https://github.com/zibin-zhao/DL-SELEX',
-  'https://doi.org/10.1021/acsami.5c11113',
-  'https://doi.org/10.1002/admt.202300326',
-  'https://arxiv.org/abs/2306.01249',
-  'https://doi.org/10.1021/acs.analchem.3c00885',
+  {
+    title: 'Skin-adherent elastomer-hydrogel patch for continuous 12-lead cardiac ambulatory monitoring during physical activities',
+    year: 2023,
+    venue: 'Advanced Materials Technologies, 8(18)',
+    authors: 'Y Li, Z Zhao, A Veronica, S Yu Yeung, IM Hsing',
+    featured: false,
+    hrefs: ['https://doi.org/10.1002/admt.202300326'],
+  },
+  {
+    title: 'Transforming ECG diagnosis: an in-depth review of transformer-based deep-learning models in cardiovascular disease detection',
+    year: 2023,
+    venue: 'arXiv:2306.01249',
+    authors: 'Z Zhao',
+    featured: true,
+    hrefs: ['https://arxiv.org/abs/2306.01249'],
+  },
 ] as const;
 
 const projects = [
@@ -152,7 +153,13 @@ test('renders complete publication metadata and featured state in deterministic 
     authors: element.querySelector('.pub-authors')?.textContent?.trim(),
     featured: element.classList.contains('pub--featured'),
   })));
-  expect(rendered).toEqual(publications);
+  expect(rendered).toEqual(publications.map((publication) => ({
+    title: publication.title,
+    year: publication.year,
+    venue: publication.venue,
+    authors: publication.authors,
+    featured: publication.featured,
+  })));
   for (let index = 0; index < publications.length; index += 1) {
     await expect(cards.nth(index).locator('.pub-meta')).toBeVisible();
     await expect(cards.nth(index).locator('.pub-authors')).toBeVisible();
@@ -163,7 +170,7 @@ test('renders complete publication metadata and featured state in deterministic 
   }
 });
 
-test('binds every project and publication action to its canonical href and safety attributes', async ({ page }) => {
+test('binds every project and per-publication action to its canonical href and safety attributes', async ({ page }) => {
   await page.goto('/projects/');
   const projectLinks = page.locator('a[data-project]');
   await expect(projectLinks).toHaveCount(projects.length);
@@ -175,13 +182,24 @@ test('binds every project and publication action to its canonical href and safet
   })))).toEqual(projects.map((project) => ({ ...project, target: '_blank', rel: 'noopener noreferrer' })));
 
   await page.goto('/research/');
-  const publicationLinks = page.locator('[data-publication] .pub-links a');
-  await expect(publicationLinks).toHaveCount(publicationHrefs.length);
-  expect(await publicationLinks.evaluateAll((links) => links.map((link) => ({
-    href: link.getAttribute('href'),
-    target: link.getAttribute('target'),
-    rel: link.getAttribute('rel'),
-  })))).toEqual(publicationHrefs.map((href) => ({ href, target: '_blank', rel: 'noopener noreferrer' })));
+  const publicationCards = page.locator('[data-publication]');
+  await expect(publicationCards).toHaveCount(publications.length);
+  await expect(publicationCards.locator('.pub-links a')).toHaveCount(8);
+  expect(await publicationCards.evaluateAll((cards) => cards.map((card) => ({
+    title: card.getAttribute('data-publication'),
+    links: [...card.querySelectorAll('.pub-links a')].map((link) => ({
+      href: link.getAttribute('href'),
+      target: link.getAttribute('target'),
+      rel: link.getAttribute('rel'),
+    })),
+  })))).toEqual(publications.map((publication) => ({
+    title: publication.title,
+    links: publication.hrefs.map((href) => ({
+      href,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+    })),
+  })));
 });
 
 test('renders every CV skill and complete contact index from canonical data', async ({ page }) => {
@@ -206,6 +224,9 @@ test('renders every CV skill and complete contact index from canonical data', as
     href: link.getAttribute('href'),
     label: link.querySelector('.t-en')?.textContent,
   })))).toEqual(profile.navLinks.map((link) => ({ href: link.href, label: link.en })));
+  for (let index = 0; index < profile.navLinks.length; index += 1) {
+    await expect(contactIndex.nth(index).locator('.t-en')).toBeVisible();
+  }
 
   await page.goto('/cv/');
   expect(await page.locator('[data-cv-entry]').evaluateAll((entries) => (
