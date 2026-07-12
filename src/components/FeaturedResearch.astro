@@ -1,0 +1,291 @@
+---
+import { getCollection } from 'astro:content';
+import { HOME_RESEARCH_TITLES, selectByTitles } from '../data/home';
+import T from './T.astro';
+
+const publications = await getCollection('publications');
+const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RESEARCH_TITLES);
+---
+
+<section class="featured-research" id="research" aria-labelledby="research-title">
+  <header class="research-heading">
+    <h2 id="research-title">02 — <T en="Research & Publications" zh="研究与论文" /></h2>
+    <span class="research-annotation"><T en="Selected work" zh="代表性成果" /></span>
+  </header>
+
+  <div class="research-stack">
+    {featured.map((paper, index) => (
+      <div class:list={['fade-slot', `fade-slot--${index + 1}`, `animate-fade-up-${index + 1}`]}>
+        <article class:list={['pub-card', `pub-card--${index + 1}`]} data-featured-paper={index + 1}>
+          {index === 0 && <span class="paper-index" aria-hidden="true">1</span>}
+          <div class="paper-meta">
+            <span>{paper.year} / {paper.venue}</span>
+            <span class="magnify-icon" aria-hidden="true">⌕</span>
+          </div>
+          <h3>
+            {paper.title}
+            {paper.featured && <span class="paper-star" aria-label="Featured">★</span>}
+          </h3>
+          {paper.authors && <p class="paper-authors">{paper.authors}</p>}
+          {paper.links && (
+            <div class="paper-links">
+              {Object.entries(paper.links).filter(([, href]) => href).map(([label, href]) => (
+                <a href={href} target="_blank" rel="noopener noreferrer">{label.toUpperCase()} →</a>
+              ))}
+            </div>
+          )}
+        </article>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .featured-research {
+    position: relative;
+    z-index: 20;
+    width: min(var(--canvas-max), calc(100% - (2 * var(--page-pad))));
+    margin: 40px auto 128px;
+    scroll-margin-top: 96px;
+  }
+
+  .research-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 64px;
+    margin-left: -20px;
+  }
+
+  .research-heading h2 {
+    padding: 16px 24px;
+    border: var(--stroke);
+    background: var(--ink);
+    box-shadow: 6px 6px 0 var(--green-bright);
+    color: var(--surface);
+    font: 400 clamp(32px, 5.4vw, 56px)/1.05 var(--font-display);
+    letter-spacing: .01em;
+    text-transform: uppercase;
+    transform: rotate(2deg);
+  }
+
+  .research-annotation {
+    flex: none;
+    color: var(--outline);
+    font: 500 11px/1.4 var(--font-note);
+    text-transform: uppercase;
+    transform: rotate(-12deg);
+  }
+
+  .research-stack {
+    position: relative;
+    display: flex;
+    max-width: 1024px;
+    flex-direction: column;
+    gap: 40px;
+    margin: 0 auto;
+    padding: 4px 8px 8px;
+  }
+
+  .fade-slot { position: relative; }
+  .fade-slot--1 { z-index: 10; width: 85%; margin-left: auto; }
+  .fade-slot--2 { z-index: 20; width: 70%; margin-top: -80px; margin-right: auto; }
+  .fade-slot--3 { z-index: 10; width: 60%; margin-top: 16px; margin-left: 20%; }
+
+  .pub-card {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    padding: 24px;
+    border: var(--stroke);
+    background: var(--surface);
+    box-shadow: var(--shadow-4);
+    transform: var(--resting-transform);
+  }
+
+  .pub-card--1 { --resting-transform: rotate(-1deg); }
+  .pub-card--2 {
+    --resting-transform: rotate(2deg);
+    background: var(--surface-container);
+  }
+  .pub-card--3 {
+    --resting-shadow: var(--shadow-2);
+    --resting-transform: rotate(-3deg);
+    padding: 16px;
+    border-style: dashed;
+    box-shadow: var(--shadow-2);
+  }
+
+  .paper-index {
+    position: absolute;
+    z-index: 20;
+    top: -18px;
+    left: -18px;
+    display: grid;
+    width: 48px;
+    height: 48px;
+    border: var(--stroke);
+    border-radius: 50%;
+    background: var(--orange);
+    font: 400 24px/1 var(--font-display);
+    place-items: center;
+  }
+
+  .paper-meta {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px dashed var(--ink);
+  }
+
+  .paper-meta > span:first-child {
+    min-width: 0;
+    padding: 3px 8px;
+    background: var(--ink);
+    color: var(--surface);
+    font: 500 11px/1.4 var(--font-note);
+    overflow-wrap: anywhere;
+  }
+
+  .pub-card--2 .paper-meta > span:first-child {
+    border: 1px solid var(--ink);
+    background: var(--green-bright);
+    color: var(--ink);
+  }
+
+  .pub-card--3 .paper-meta > span:first-child {
+    padding: 2px 5px;
+    background: var(--outline);
+    font-size: 10px;
+  }
+
+  .magnify-icon {
+    flex: none;
+    font: 400 24px/1 var(--font-body);
+    transition: color .3s ease, transform .3s ease;
+  }
+
+  .pub-card h3 {
+    margin-top: 16px;
+    font-size: clamp(22px, 3.1vw, 32px);
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+  }
+
+  .pub-card--3 h3 {
+    margin-top: 10px;
+    font-size: clamp(15px, 2vw, 18px);
+    line-height: 1.3;
+  }
+
+  .paper-star { margin-left: 3px; font-size: .8em; vertical-align: top; }
+
+  .paper-authors {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .pub-card--3 .paper-authors { font-size: 12px; }
+
+  .paper-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .paper-links a {
+    min-height: 28px;
+    border-bottom: 2px solid var(--ink);
+    font: 500 11px/1.4 var(--font-note);
+    text-transform: uppercase;
+  }
+
+  .pub-card--3 .paper-links { margin-top: 8px; }
+  .pub-card--3 .paper-links a { border-bottom-width: 1px; font-size: 10px; }
+
+  @media (max-width: 700px) {
+    .featured-research { margin-top: 16px; }
+    .research-heading {
+      align-items: flex-end;
+      gap: 8px;
+      margin-bottom: 52px;
+      margin-left: -8px;
+    }
+    .research-heading h2 { padding: 13px 15px; font-size: clamp(28px, 9vw, 40px); }
+    .research-annotation { max-width: 76px; font-size: 9px; }
+    .research-stack { gap: 32px; padding-inline: 5px; }
+    .fade-slot--1 { width: 94%; }
+    .fade-slot--2 { width: 88%; margin-top: -54px; }
+    .fade-slot--3 { width: 82%; margin-top: 4px; margin-left: 12%; }
+    .pub-card { padding: 18px; }
+    .pub-card--3 { padding: 14px; }
+    .paper-meta { gap: 8px; }
+    .paper-meta > span:first-child { font-size: 9px; }
+    .pub-card h3 { font-size: clamp(18px, 5.4vw, 24px); }
+    .pub-card--3 h3 { font-size: 15px; }
+    .paper-authors { font-size: 12px; }
+  }
+
+  @media (min-width: 701px) and (max-width: 960px) {
+    .featured-research { min-height: 573px; margin-bottom: 0; }
+    .research-heading { margin-bottom: 40px; }
+    .research-heading h2 {
+      padding: 10px 14px;
+      font-size: 30px;
+      line-height: 34px;
+    }
+    .research-annotation { font-size: 8px; }
+    .research-stack { width: 90%; }
+    .fade-slot--2 { margin-top: -42px; }
+    .fade-slot--3 { margin-top: -10px; }
+    .pub-card { padding: 12px; }
+    .pub-card--3 { padding: 8px 10px; }
+    .paper-index {
+      top: -12px;
+      left: -12px;
+      width: 32px;
+      height: 32px;
+      font-size: 17px;
+    }
+    .paper-meta { gap: 8px; padding-bottom: 5px; }
+    .paper-meta > span:first-child { padding: 2px 5px; font-size: 7px; }
+    .pub-card--3 .paper-meta {
+      height: 0;
+      padding: 0;
+      border: 0;
+    }
+    .pub-card--3 .paper-meta > span:first-child {
+      position: absolute;
+      z-index: 2;
+      top: -10px;
+      left: 12px;
+      font-size: 7px;
+    }
+    .pub-card--3 .magnify-icon { position: absolute; top: 7px; right: 9px; }
+    .magnify-icon { font-size: 16px; }
+    .pub-card h3 {
+      margin-top: 8px;
+      font-size: 15px;
+      line-height: 1.16;
+    }
+    .pub-card--3 h3 {
+      margin-top: 3px;
+      padding-right: 14px;
+      font-size: 9px;
+      line-height: 1.2;
+    }
+    .paper-authors { margin-top: 6px; font-size: 9px; line-height: 1.35; }
+    .pub-card--3 .paper-authors { margin-top: 2px; font-size: 7.5px; line-height: 1.2; }
+    .paper-links { gap: 10px; margin-top: 4px; }
+    .paper-links a { display: inline-flex; min-height: 24px; align-items: center; font-size: 7px; }
+    .pub-card--3 .paper-links { margin-top: 0; }
+    .pub-card--3 .paper-links a { font-size: 7px; }
+  }
+</style>

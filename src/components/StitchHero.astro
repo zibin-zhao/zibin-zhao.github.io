@@ -1,0 +1,256 @@
+---
+import { profile } from '../data/profile';
+import T from './T.astro';
+---
+
+<section class="stitch-hero" id="top" aria-labelledby="hero-name">
+  <span class="collaboration-sticker"><T en={profile.status.en} zh={profile.status.zh} /></span>
+  <h1 class="hero-wordmark" id="hero-name">
+    <span>{profile.firstName}</span><span>{profile.lastName}</span>
+  </h1>
+  <span class="hero-formula" aria-hidden="true">
+    <span class="hero-formula-motion animate-float">f(x) = ∫(CRISPR + AI)dx</span>
+  </span>
+  <article class="hero-card">
+    <h2><T en={profile.role.en} zh={profile.role.zh} /></h2>
+    <p class="hero-thesis"><T en="AIing, caring, learning, and everyday wellbeing." zh="人工智能、关怀、学习与日常健康。" /></p>
+    <p><T en={profile.tagline.en} zh={profile.tagline.zh} /></p>
+    <div class="hero-card-meta">
+      <img src="/stitch/cart.png" alt="Illustrated rollercoaster specimen cart" width="64" height="64" />
+      <span>v1.0.4 // Active</span>
+    </div>
+  </article>
+  <a class="scroll-sticker" href="#research"><T en="Scroll for updates ↓" zh="向下查看更新 ↓" /></a>
+</section>
+
+<style>
+  :global(.stitch-shell--home .note-formula) { display: none; }
+
+  .stitch-hero {
+    position: relative;
+    min-height: 819px;
+    margin: 40px var(--page-pad) 0;
+  }
+
+  .hero-wordmark {
+    position: absolute;
+    z-index: 40;
+    top: 170px;
+    left: 0;
+    color: var(--ink);
+    font: 400 clamp(76px, 15.6vw, 120px)/.8 var(--font-display);
+    letter-spacing: -.02em;
+    pointer-events: none;
+    text-transform: uppercase;
+    transform: rotate(1deg);
+  }
+
+  .hero-wordmark span { display: block; }
+
+  .hero-wordmark span:last-child {
+    margin-top: -10px;
+    margin-left: 80px;
+    color: #3a6753;
+    opacity: .9;
+    transform: rotate(-2deg);
+  }
+
+  .collaboration-sticker {
+    position: absolute;
+    z-index: 30;
+    top: 40px;
+    left: 33%;
+    padding: 8px 16px;
+    border: var(--stroke);
+    background: var(--green-bright);
+    box-shadow: var(--shadow-4);
+    font: 500 12px/20px var(--font-note);
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    transform: rotate(-6deg);
+  }
+
+  .hero-card {
+    position: absolute;
+    z-index: 20;
+    top: 360px;
+    left: 50%;
+    width: min(450px, 60vw);
+    padding: 16px;
+    border: var(--stroke);
+    background: var(--surface);
+    box-shadow: var(--shadow-8);
+    transform: translateX(-50%) rotate(-2deg);
+  }
+
+  .hero-card h2 {
+    margin-bottom: 16px;
+    font: 400 36px/40px var(--font-display);
+    letter-spacing: .02em;
+  }
+
+  .hero-card > p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .hero-card .hero-thesis {
+    display: table;
+    margin-bottom: 16px;
+    padding: 1px 8px;
+    background: #bdedd4;
+    color: var(--ink);
+    font: 700 12px/20px var(--font-note);
+    text-transform: uppercase;
+    transform: rotate(1deg);
+  }
+
+  .hero-card-meta {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    color: var(--outline);
+    font: 500 10px/1.3 var(--font-note);
+  }
+
+  .hero-card-meta img {
+    display: block;
+    width: 64px;
+    height: 64px;
+    border: var(--stroke);
+    object-fit: cover;
+    transform: rotate(12deg);
+  }
+
+  .hero-card-meta span {
+    padding: 3px 5px;
+    border: 2px dashed var(--ink);
+    background: var(--surface);
+  }
+
+  .hero-formula {
+    position: absolute;
+    z-index: 30;
+    top: 330px;
+    left: 60%;
+    padding: 4px 8px;
+    border: 2px dashed var(--ink);
+    background: var(--surface);
+    color: var(--outline);
+    font: 500 11px/1.3 var(--font-note);
+    opacity: .7;
+    white-space: nowrap;
+    transform: rotate(12deg);
+  }
+
+  .hero-formula-motion { display: inline-block; }
+
+  .scroll-sticker {
+    position: absolute;
+    z-index: 30;
+    top: 680px;
+    left: 30%;
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    padding: 8px 16px;
+    border: var(--stroke);
+    background: var(--green-bright);
+    box-shadow: var(--shadow-2);
+    font: 500 11px/20px var(--font-note);
+    transform: rotate(-3deg);
+  }
+
+  @media (max-width: 640px) {
+    .stitch-hero {
+      display: flex;
+      min-height: auto;
+      flex-direction: column;
+      gap: 32px;
+      margin: 0;
+      overflow: clip;
+      padding: 120px 20px 90px;
+    }
+
+    .hero-wordmark,
+    .collaboration-sticker,
+    .hero-card,
+    .hero-formula,
+    .scroll-sticker {
+      position: relative;
+      inset: auto;
+      align-self: flex-start;
+    }
+
+    .hero-card {
+      width: 100%;
+      transform: rotate(-2deg);
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 960px) {
+    .stitch-hero { min-height: 510px; }
+
+    .hero-wordmark {
+      top: 70px;
+      font-size: 80px;
+    }
+
+    .hero-wordmark span:last-child {
+      margin-top: -7px;
+      margin-left: 52px;
+    }
+
+    .collaboration-sticker {
+      top: 0;
+      padding: 6px 12px;
+      font-size: 9px;
+      line-height: 16px;
+    }
+
+    .hero-card {
+      top: 200px;
+      width: min(290px, 44vw);
+      padding: 10px;
+    }
+
+    .hero-card h2 {
+      margin-bottom: 7px;
+      font-size: 22px;
+      line-height: 26px;
+    }
+
+    .hero-card > p {
+      font-size: 9px;
+      line-height: 1.35;
+    }
+
+    .hero-card .hero-thesis {
+      margin-bottom: 7px;
+      padding-inline: 5px;
+      font-size: 7.5px;
+      line-height: 14px;
+    }
+
+    .hero-card-meta { margin-top: 12px; }
+    .hero-card-meta img { width: 40px; height: 40px; }
+    .hero-card-meta span { font-size: 7px; }
+
+    .hero-formula {
+      top: 170px;
+      padding: 3px 6px;
+      font-size: 8px;
+    }
+
+    .scroll-sticker {
+      top: 410px;
+      min-height: 32px;
+      padding: 6px 12px;
+      font-size: 8px;
+      line-height: 16px;
+    }
+  }
+</style>

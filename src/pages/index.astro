@@ -1,25 +1,11 @@
 ---
-import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
-import Hero from '../components/Hero.astro';
-import About from '../components/About.astro';
-import PubList from '../components/PubList.astro';
-import Projects from '../components/Projects.astro';
-import Vibe from '../components/Vibe.astro';
-import CvTimeline from '../components/CvTimeline.astro';
-import Contact from '../components/Contact.astro';
+import StitchShell from '../layouts/StitchShell.astro';
+import StitchHero from '../components/StitchHero.astro';
+import FeaturedResearch from '../components/FeaturedResearch.astro';
+import StitchVibe from '../components/StitchVibe.astro';
 ---
-<Base>
-  <Nav />
-  <Hero />
-  <main id="main-content" class="content" tabindex="-1">
-    <About />
-    <PubList />
-    <Projects />
-    <Vibe />
-    <CvTimeline />
-  </main>
-  <Contact />
-  <script>import '../scripts/hero.ts';</script>
-  <script>import '../scripts/lang.ts';</script>
-</Base>
+<StitchShell home>
+  <StitchHero />
+  <FeaturedResearch />
+  <StitchVibe />
+</StitchShell>

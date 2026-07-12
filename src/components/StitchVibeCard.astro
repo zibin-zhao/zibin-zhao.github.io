@@ -1,0 +1,290 @@
+---
+import T from './T.astro';
+
+interface VibeItem {
+  title: string;
+  titleZh?: string;
+  blurb: string;
+  blurbZh?: string;
+  tags: string[];
+  href?: string;
+  comingSoon: boolean;
+}
+
+interface Props {
+  item: VibeItem;
+  role: 'casmd' | 'singularity' | 'medit' | 'yaos' | 'zen';
+  image?: string;
+  dark?: boolean;
+}
+
+const { item, role, image, dark = false } = Astro.props;
+const isExternal = item.href ? /^https?:\/\//.test(item.href) : false;
+const imageAlt = `${item.title} project interface preview`;
+---
+
+<article
+  class:list={['vibe-card', `vibe-card--${role}`, dark && 'vibe-card--dark']}
+  data-vibe-role={role}
+>
+  {image && (
+    <div class="vibe-image">
+      <img
+        src={image}
+        alt={imageAlt}
+        width="512"
+        height={role === 'casmd' ? '286' : '384'}
+        loading="lazy"
+        decoding="async"
+        onerror="this.setAttribute('hidden','');this.nextElementSibling?.removeAttribute('hidden')"
+      />
+      <span class="vibe-image-fallback" hidden>
+        <span aria-hidden="true"></span>
+        <b><T en={`${item.title} preview unavailable`} zh={`${item.title} 预览暂不可用`} /></b>
+      </span>
+      <span class="vibe-image-label">{item.title}</span>
+    </div>
+  )}
+
+  <div class="vibe-body">
+    <h3 class="vibe-title"><span>{item.title}</span>{item.titleZh && <span class="vibe-title-zh">{item.titleZh}</span>}</h3>
+    <p class="vibe-description"><T en={item.blurb} zh={item.blurbZh ?? item.blurb} /></p>
+    <ul class="vibe-tags" aria-label={`${item.title} technologies`}>
+      {item.tags.map((tag) => <li>{tag}</li>)}
+    </ul>
+    {item.href ? (
+      <a
+        class="vibe-action"
+        href={item.href}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      ><T en="View →" zh="查看 →" /></a>
+    ) : (
+      <span class="vibe-coming-soon"><T en={item.comingSoon ? 'Coming soon' : 'Unavailable'} zh={item.comingSoon ? '即将上线' : '暂不可用'} /></span>
+    )}
+  </div>
+</article>
+
+<style>
+  .vibe-card {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-direction: column;
+    border: var(--stroke);
+    background: var(--surface);
+    box-shadow: var(--shadow-6);
+    color: var(--ink);
+    transform: var(--resting-transform);
+    transition: box-shadow .2s ease, transform .2s ease;
+  }
+
+  .vibe-card--dark {
+    border-color: var(--ink);
+    background: var(--ink);
+    box-shadow: 6px 6px 0 var(--green);
+    color: var(--surface);
+  }
+
+  .vibe-card--zen { border-style: dashed; }
+
+  .vibe-image {
+    position: relative;
+    display: grid;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-bottom: 2px solid currentColor;
+    background: #fff;
+    place-items: center;
+  }
+
+  .vibe-card--singularity .vibe-image {
+    aspect-ratio: 8 / 5;
+    background: var(--ink);
+  }
+
+  .vibe-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .vibe-card--singularity .vibe-image img {
+    opacity: .9;
+    filter: saturate(.85) contrast(1.05);
+  }
+
+  .vibe-image-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    padding: 20px;
+    background:
+      linear-gradient(135deg, transparent 48%, currentColor 49%, currentColor 51%, transparent 52%),
+      var(--green);
+    color: var(--ink);
+    place-items: center;
+    text-align: center;
+  }
+
+  .vibe-image-fallback[hidden] { display: none; }
+
+  .vibe-image-fallback > span {
+    position: absolute;
+    width: 42%;
+    aspect-ratio: 1;
+    border: 2px dashed currentColor;
+    border-radius: 50%;
+  }
+
+  .vibe-image-fallback b {
+    z-index: 1;
+    padding: 5px 7px;
+    border: 1px solid currentColor;
+    background: var(--surface);
+    font: 500 9px/1.4 var(--font-note);
+    text-transform: uppercase;
+  }
+
+  .vibe-image-label {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    border: 1px solid currentColor;
+    background: var(--ink);
+    color: var(--surface);
+    font: 500 10px/1.3 var(--font-note);
+  }
+
+  .vibe-card--dark .vibe-image-label {
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .vibe-body {
+    display: flex;
+    min-height: 100%;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px;
+  }
+
+  .vibe-card--yaos .vibe-body,
+  .vibe-card--zen .vibe-body { padding: 22px; }
+
+  .vibe-title {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 5px 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid currentColor;
+    font: 400 clamp(20px, 3vw, 30px)/1.05 var(--font-display);
+  }
+
+  .vibe-card--zen .vibe-title { border-bottom-style: dashed; }
+
+  .vibe-title-zh {
+    color: inherit;
+    font: 500 11px/1.35 var(--font-note);
+  }
+
+  .vibe-description {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+
+  .vibe-card--dark .vibe-description { color: var(--surface); }
+
+  .vibe-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+    list-style: none;
+  }
+
+  .vibe-tags li {
+    padding: 3px 5px;
+    border: 1px solid currentColor;
+    font: 500 9px/1.2 var(--font-note);
+  }
+
+  .vibe-action,
+  .vibe-coming-soon {
+    margin-top: 16px;
+    font: 700 10px/1.4 var(--font-note);
+    text-transform: uppercase;
+  }
+
+  .vibe-action { border-bottom: 1px solid currentColor; }
+
+  .vibe-coming-soon {
+    align-self: flex-end;
+    padding: 3px 5px;
+    background: var(--outline-variant);
+    color: var(--ink);
+  }
+
+  @media (hover: hover) {
+    .vibe-card:has(.vibe-action):hover {
+      box-shadow: var(--shadow-8);
+      transform: scale(1.02) var(--resting-transform);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vibe-card { transition: none; }
+    .vibe-card:has(.vibe-action):hover {
+      box-shadow: var(--shadow-6);
+      transform: var(--resting-transform);
+    }
+    .vibe-card--dark:has(.vibe-action):hover { box-shadow: 6px 6px 0 var(--green); }
+  }
+
+  @media (max-width: 700px) {
+    .vibe-body { padding: 18px; }
+    .vibe-card--yaos .vibe-body,
+    .vibe-card--zen .vibe-body { padding: 18px; }
+    .vibe-title { font-size: clamp(20px, 7vw, 27px); }
+    .vibe-description { font-size: 12px; }
+  }
+
+  @media (min-width: 701px) and (max-width: 960px) {
+    .vibe-card--casmd .vibe-image { height: 180px; aspect-ratio: auto; }
+    .vibe-card--singularity .vibe-image { height: 128px; aspect-ratio: auto; }
+
+    .vibe-card--casmd .vibe-title,
+    .vibe-card--singularity .vibe-title {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .vibe-body { padding: 10px; }
+    .vibe-card--yaos .vibe-body,
+    .vibe-card--zen .vibe-body { padding: 10px; }
+    .vibe-title { padding-bottom: 5px; font-size: 18px; }
+    .vibe-title-zh { font-size: 8px; }
+    .vibe-description { margin-top: 6px; font-size: 8.5px; line-height: 1.3; }
+    .vibe-tags { gap: 4px; margin-top: 6px; }
+    .vibe-tags li { padding: 2px 4px; font-size: 7px; }
+    .vibe-action { display: inline-flex; min-height: 24px; align-items: center; margin-top: 0; }
+    .vibe-action,
+    .vibe-coming-soon { font-size: 8px; }
+    .vibe-coming-soon { margin-top: 6px; }
+  }
+</style>

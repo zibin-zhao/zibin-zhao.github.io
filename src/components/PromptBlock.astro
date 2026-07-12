@@ -7,7 +7,9 @@ const { label, text } = Astro.props;
     <button class="copy" type="button" aria-label="Copy prompt to clipboard">
       <span class="lbl-copy">Copy</span>
       <span class="lbl-done">Copied ✓</span>
+      <span class="lbl-failed">Copy failed</span>
     </button>
+    <span class="copy-feedback" aria-live="polite"></span>
     <pre class="ptext">{text}</pre>
   </div>
 </div>
@@ -61,6 +63,15 @@ const { label, text } = Astro.props;
     transition: background var(--motion-fast) var(--ease-press), color var(--motion-fast) var(--ease-press), transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
   }
 
+  .copy-feedback {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   .copy:hover {
     background: var(--ink);
     color: var(--paper);
@@ -71,7 +82,8 @@ const { label, text } = Astro.props;
     transform: translate(1px, 1px);
   }
 
-  .lbl-done {
+  .lbl-done,
+  .lbl-failed {
     display: none;
   }
 
@@ -85,6 +97,19 @@ const { label, text } = Astro.props;
   }
 
   .copy.copied .lbl-done {
+    display: inline;
+  }
+
+  .copy.failed {
+    background: var(--orange);
+    color: var(--ink);
+  }
+
+  .copy.failed .lbl-copy {
+    display: none;
+  }
+
+  .copy.failed .lbl-failed {
     display: inline;
   }
 

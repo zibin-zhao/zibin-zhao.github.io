@@ -1,12 +1,63 @@
 ---
-// EN / 中 language toggle. Click handler lives in scripts/lang.ts.
+// The visible target and accessible state are synchronized in scripts/lang.ts.
 ---
-<button type="button" class="langtoggle" aria-label="Switch language / 切换语言">
-  <span class="seg seg-en">EN</span><span class="seg seg-zh">中</span>
+<button
+  type="button"
+  class="langtoggle"
+  aria-label="Switch language / 切换语言 — English active; switch to 中文"
+  aria-pressed="false"
+>
+  <span class="toggle-track" aria-hidden="true"><span class="toggle-knob"></span></span>
+  <span class="target target-zh" aria-hidden="true">中</span>
+  <span class="target target-en" aria-hidden="true">EN</span>
 </button>
 <style>
-  .langtoggle{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--hair);border-radius:24px;padding:4px;background:#fff;cursor:pointer;font:inherit;line-height:1}
-  .seg{font-size:12px;font-weight:600;padding:5px 9px;border-radius:18px;color:var(--muted);transition:background .2s,color .2s}
-  :global([data-lang="en"]) .seg-en{background:var(--ink);color:#fff}
-  :global([data-lang="zh"]) .seg-zh{background:var(--ink);color:#fff}
+  .langtoggle {
+    display: none;
+    min-height: 40px;
+    align-items: center;
+    gap: 7px;
+    border: var(--stroke);
+    padding: 6px 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow-2);
+    color: var(--ink);
+    cursor: pointer;
+    font: 500 11px/1 var(--font-note);
+    transform: rotate(1deg);
+  }
+
+  :global(.js) .langtoggle { display: inline-flex; }
+
+  .toggle-track {
+    display: flex;
+    width: 32px;
+    height: 18px;
+    align-items: center;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    padding: 2px;
+    background: var(--ink);
+  }
+
+  .toggle-knob {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--surface);
+    transition: transform .15s ease;
+  }
+
+  .target { display: none; min-width: 1.5em; text-align: center; }
+  :global([data-lang='en']) .target-zh,
+  :global([data-lang='zh']) .target-en { display: inline; }
+  :global([data-lang='zh']) .toggle-knob { transform: translateX(12px); }
+
+  @media (max-width: 390px) {
+    .langtoggle { min-height: 40px; gap: 4px; padding: 4px 5px; font-size: 8px; }
+    .toggle-track { width: 27px; height: 16px; }
+    .toggle-knob { width: 10px; height: 10px; }
+    :global([data-lang='zh']) .toggle-knob { transform: translateX(10px); }
+  }
 </style>

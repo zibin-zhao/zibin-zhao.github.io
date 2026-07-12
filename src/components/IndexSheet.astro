@@ -1,0 +1,65 @@
+---
+import T from './T.astro';
+
+interface Props {
+  number: string;
+  title: string;
+  titleZh: string;
+}
+
+const { number, title, titleZh } = Astro.props;
+const headingId = `index-sheet-${number.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') || 'archive'}`;
+---
+<section class="index-sheet animate-fade-up-1" aria-labelledby={headingId}>
+  <div class="index-sheet-card">
+    <header class="index-sheet-heading">
+      <span>{number}</span>
+      <h1 id={headingId}><T en={title} zh={titleZh} /></h1>
+    </header>
+    <div class="index-sheet-content"><slot /></div>
+  </div>
+</section>
+
+<style>
+  .index-sheet {
+    width: min(var(--canvas-max), calc(100% - (2 * var(--page-pad))));
+    margin: 60px auto 0;
+  }
+  .index-sheet-card {
+    padding: clamp(20px, 4vw, 40px);
+    border: var(--stroke);
+    background: var(--surface-low);
+    box-shadow: var(--shadow-6);
+    transform: rotate(-.35deg);
+  }
+  .index-sheet-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 40px;
+    border-bottom: 2px dashed var(--ink);
+    padding-bottom: 16px;
+  }
+  .index-sheet-heading span { font: 500 14px/1 var(--font-note); }
+  .index-sheet-heading h1 {
+    font: 400 clamp(36px, 7vw, 64px)/1 var(--font-display);
+    letter-spacing: .01em;
+    text-transform: uppercase;
+  }
+  .index-sheet-content { min-width: 0; }
+  @media (max-width: 700px) {
+    .index-sheet {
+      width: calc(100% - 24px);
+      margin-top: 24px;
+    }
+    .index-sheet-card {
+      padding: 18px;
+      box-shadow: var(--shadow-4);
+      transform: none;
+    }
+    .index-sheet-heading {
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+  }
+</style>

@@ -17,16 +17,16 @@ const chrome = spawn(CHROME, [
 ], { stdio: 'ignore' });
 
 try {
-  for (let i = 0; i < 80; i++) { try { if ((await fetch(`http://localhost:${PORT}/json/version`)).ok) break; } catch {} await sleep(200); }
+  for (let i = 0; i < 80; i++) { try { if ((await fetch(`http://localhost:${PORT}/json/version`)).ok) break; } catch { /* Chrome may still be starting. */ } await sleep(200); }
   let target = null;
-  for (let i = 0; i < 40; i++) { try { target = (await (await fetch(`http://localhost:${PORT}/json`)).json()).find(t => t.type === 'page' && t.webSocketDebuggerUrl); if (target) break; } catch {} await sleep(200); }
+  for (let i = 0; i < 40; i++) { try { target = (await (await fetch(`http://localhost:${PORT}/json`)).json()).find(t => t.type === 'page' && t.webSocketDebuggerUrl); if (target) break; } catch { /* DevTools may still be starting. */ } await sleep(200); }
   if (!target) throw new Error('no devtools page target');
 
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
   let _id = 0; const pending = new Map(); const waiters = [];
   ws.onmessage = (ev) => { const m = JSON.parse(ev.data);
-    if (m.id !== undefined && pending.has(m.id)) { const p = pending.get(m.id); pending.delete(m.id); m.error ? p.reject(new Error(JSON.stringify(m.error))) : p.resolve(m.result); }
+    if (m.id !== undefined && pending.has(m.id)) { const p = pending.get(m.id); pending.delete(m.id); if (m.error) p.reject(new Error(JSON.stringify(m.error))); else p.resolve(m.result); }
     else if (m.method) for (const w of waiters.slice()) if (w.method === m.method) { waiters.splice(waiters.indexOf(w), 1); w.resolve(m.params); }
   };
   const send = (method, params = {}) => new Promise((resolve, reject) => { const id = ++_id; pending.set(id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params })); });
@@ -74,5 +74,5 @@ try {
   ws.close();
 } finally {
   chrome.kill();
-  try { execSync('pkill -f yaos-shot 2>/dev/null'); } catch {}
+  try { execSync('pkill -f yaos-shot 2>/dev/null'); } catch { /* The process may already be gone. */ }
 }
