@@ -38,6 +38,101 @@ test('renders the homepage and switches its bilingual content', async ({ page })
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'zh');
   await expect(page.locator('.collaboration-sticker .t-zh')).toHaveText('开放合作');
   await expect(page.locator('.collaboration-sticker .t-zh')).toBeVisible();
+  await expect(page.locator('.research-heading .t-zh').first()).toBeVisible();
+});
+
+test('renders the three authored featured papers and every canonical link', async ({ page }) => {
+  await page.goto('/#research');
+
+  const cards = page.locator('[data-featured-paper]');
+  await expect(cards).toHaveCount(3);
+  await expect(cards.locator('h3')).toHaveText([
+    /DNA-guided CRISPR–Cas12a effectors for programmable RNA recognition and cleavage/,
+    /Structure-enhanced deep learning accelerates aptamer selection for small molecule families like steroids/,
+    /Transforming ECG diagnosis: an in-depth review of transformer-based deep-learning models in cardiovascular disease detection/,
+  ]);
+  await expect(cards.locator('.paper-authors')).toHaveCount(3);
+  await expect(cards.locator('.paper-star')).toHaveCount(3);
+
+  const links = cards.locator('.paper-links a');
+  await expect(links).toHaveCount(4);
+  for (const link of await links.all()) {
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(link).toHaveAttribute('href', /^(https:\/\/doi\.org|https:\/\/github\.com|https:\/\/arxiv\.org)/);
+  }
+});
+
+test('exposes the complete publication archive inside the research Index Sheet', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/research/');
+
+  await expect(page).toHaveTitle(/Research — Zibin Zhao/);
+  await expect(page.locator('.index-sheet')).toBeVisible();
+  await expect(page.locator('.index-sheet .pub')).toHaveCount(9);
+  const expectedTitles = [
+    'Thermodynamically programmed one-pot CRISPR platform for point-of-care SNP genotyping',
+    'DNA-guided CRISPR–Cas12a effectors for programmable RNA recognition and cleavage',
+    'Structure-enhanced deep learning accelerates aptamer selection for small molecule families like steroids',
+    'DNA-guided CRISPR/Cas effector for programmable RNA-recognition and cleavage',
+    'DNA hydrogel-interfaced organic electrochemical transistor for the investigation of binding-induced conformational change of small molecule aptamers',
+    'Benchtop to at-home test: amplicon-depleted CRISPR-regulated loop-mediated amplification at skin-temperature for viral load monitoring',
+    'Transforming ECG diagnosis: an in-depth review of transformer-based deep-learning models in cardiovascular disease detection',
+    'Skin-adherent elastomer-hydrogel patch for continuous 12-lead cardiac ambulatory monitoring during physical activities',
+    'Integrating magnetic-bead-based sample extraction and molecular barcoding for the one-step pooled RT-qPCR assay of viral pathogens without retesting',
+  ];
+  const renderedTitles = (await page.locator('.index-sheet .pub h3').allTextContents()).map((title) => title.replace(/★$/, ''));
+  expect(renderedTitles.sort()).toEqual(expectedTitles.sort());
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+    await page.evaluate(() => document.documentElement.clientWidth),
+  );
+});
+
+test('preserves authored research widths, offsets, rotations, and overlap at 768px', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#research');
+
+  const stack = page.locator('.research-stack');
+  const slots = page.locator('.fade-slot');
+  const cards = page.locator('.pub-card');
+  const stackBox = await stack.boundingBox();
+  const boxes = await Promise.all([0, 1, 2].map((index) => slots.nth(index).boundingBox()));
+  if (!stackBox || boxes.some((box) => !box)) throw new Error('Research geometry was not rendered');
+  const [first, second, third] = boxes as NonNullable<(typeof boxes)[number]>[];
+
+  expect(first.width / stackBox.width).toBeCloseTo(.85, 1);
+  expect(second.width / stackBox.width).toBeCloseTo(.70, 1);
+  expect(third.width / stackBox.width).toBeCloseTo(.60, 1);
+  expect(first.x).toBeGreaterThan(second.x);
+  expect(third.x).toBeGreaterThan(second.x);
+  expect(second.y).toBeLessThan(first.y + first.height);
+  expect(await motionState(cards.nth(0))).toMatchObject({ angle: -1 });
+  expect(await motionState(cards.nth(1))).toMatchObject({ angle: 2 });
+  expect(await motionState(cards.nth(2))).toMatchObject({ angle: -3 });
+  await expect(cards.nth(0)).toHaveCSS('border-top-style', 'solid');
+  await expect(cards.nth(1)).toHaveCSS('border-top-style', 'solid');
+  await expect(cards.nth(2)).toHaveCSS('border-top-style', 'dashed');
+});
+
+test('keeps the asymmetric research stack legible without overflow at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#research');
+
+  await expect(page.locator('[data-featured-paper]')).toHaveCount(3);
+  for (const card of await page.locator('[data-featured-paper]').all()) await expect(card).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+    await page.evaluate(() => document.documentElement.clientWidth),
+  );
+  const widths = await page.locator('.fade-slot').evaluateAll((slots) => slots.map((slot) => slot.getBoundingClientRect().width));
+  expect(widths[0]).toBeGreaterThan(widths[1]);
+  expect(widths[1]).toBeGreaterThan(widths[2]);
+
+  const headerBox = await page.locator('.stitch-header').boundingBox();
+  const headingBox = await page.locator('.research-heading').boundingBox();
+  if (!headerBox || !headingBox) throw new Error('Anchor clearance geometry was not rendered');
+  expect(headingBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height + 12);
 });
 
 test('keeps keyboard navigation, CV destination, and Prompts behavior usable', async ({ page }) => {
@@ -75,6 +170,9 @@ test('keeps required shell anchors visible without JavaScript at 390px', async (
   for (const route of await page.locator('.footer-routes a').all()) await expect(route).toBeVisible();
   await expect(page.locator('a.draw-control[href="/prompts/"]')).toBeVisible();
   await expect(page.locator('.footer-routes a[href="/cv/"]')).toBeVisible();
+  await page.locator('.scroll-sticker').click();
+  await expect(page).toHaveURL(/#research$/);
+  await expect(page.locator('#research')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
     await page.evaluate(() => document.documentElement.clientWidth),
   );

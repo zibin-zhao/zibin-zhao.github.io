@@ -21,6 +21,26 @@ describe('Stitch shell', () => {
     }
   });
 
+  it('uses canonical records for the authored featured-research composition', () => {
+    expect(existsSync(new URL('src/components/FeaturedResearch.astro', root))).toBe(true);
+    expect(existsSync(new URL('src/pages/research.astro', root))).toBe(true);
+    const featured = read('src/components/FeaturedResearch.astro');
+    const home = read('src/pages/index.astro');
+    const archive = read('src/pages/research.astro');
+
+    expect(featured).toContain("getCollection('publications')");
+    expect(featured).toContain('selectByTitles');
+    expect(featured).toContain('HOME_RESEARCH_TITLES');
+    expect(featured).toContain('id="research"');
+    expect(featured).toContain('fade-slot');
+    expect(featured).toContain('pub-card');
+    expect(home).toContain('<FeaturedResearch />');
+    expect(home.indexOf('<FeaturedResearch />')).toBeGreaterThan(home.indexOf('<StitchHero />'));
+    expect(archive).toContain('<StitchShell title="Research — Zibin Zhao" active="research">');
+    expect(archive).toContain('<IndexSheet number="02" title="Research & Publications" titleZh="研究与论文">');
+    expect(archive).toContain('<PubList />');
+  });
+
   it('defines exact motion timings', () => {
     const css = read('src/styles/stitch-motion.css');
     expect(css).toContain('parallax-slow 20s linear infinite alternate');
