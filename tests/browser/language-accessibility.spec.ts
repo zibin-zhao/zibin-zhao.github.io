@@ -26,3 +26,17 @@ test('exposes the active language and persisted target across navigation', async
   await expect(toggle).toHaveAttribute('aria-pressed', 'false');
   await expect(toggle).toHaveAttribute('aria-label', /English active; switch to 中文/);
 });
+
+test('keeps the language hit target accessible without colliding at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const toggleBox = await page.getByRole('button', { name: 'Switch language / 切换语言' }).boundingBox();
+  const talkBox = await page.locator('.talk').boundingBox();
+  if (!toggleBox || !talkBox) throw new Error('Header controls did not render');
+
+  expect(toggleBox.width).toBeGreaterThanOrEqual(40);
+  expect(toggleBox.height).toBeGreaterThanOrEqual(40);
+  expect(toggleBox.x + toggleBox.width).toBeLessThanOrEqual(talkBox.x);
+  expect(talkBox.x + talkBox.width).toBeLessThanOrEqual(390);
+});
