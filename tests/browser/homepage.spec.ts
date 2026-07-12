@@ -1,4 +1,26 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
+
+const motionState = (locator: Locator) => locator.evaluate((element) => {
+  const style = getComputedStyle(element);
+  const matrix = new DOMMatrixReadOnly(style.transform);
+  return {
+    angle: Math.round(Math.atan2(matrix.b, matrix.a) * 180 / Math.PI),
+    shadow: style.boxShadow,
+    tx: Math.round(matrix.m41),
+    ty: Math.round(matrix.m42),
+  };
+});
+
+const activeState = async (page: Page, locator: Locator) => {
+  const box = await locator.boundingBox();
+  if (!box) throw new Error('Control has no rendered box');
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(200);
+  const state = await motionState(locator);
+  await page.mouse.up();
+  return state;
+};
 
 test('renders the homepage and switches its bilingual content', async ({ page }) => {
   await page.goto('/');
@@ -60,4 +82,36 @@ test('keeps required shell anchors visible without JavaScript at 390px', async (
   );
 
   await context.close();
+});
+
+test('applies exact normal-mode button and draw interactions', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+
+  const talk = page.locator('.talk');
+  const talkActive = await activeState(page, talk);
+  expect(talkActive).toMatchObject({ angle: 0, shadow: 'none', tx: 4, ty: 4 });
+  expect(await motionState(page.locator('.talk-angle'))).toMatchObject({ angle: -2, tx: 0, ty: 0 });
+
+  const draw = page.locator('.draw-control');
+  await draw.hover();
+  await page.waitForTimeout(200);
+  expect(await motionState(draw)).toMatchObject({ angle: 12, tx: 0, ty: 0 });
+});
+
+test('keeps button and draw resting geometry invariant under reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+
+  const talk = page.locator('.talk');
+  const talkResting = await motionState(talk);
+  expect(talkResting).toMatchObject({ angle: 0, tx: 0, ty: 0 });
+  expect(await activeState(page, talk)).toEqual(talkResting);
+  expect(await motionState(page.locator('.talk-angle'))).toMatchObject({ angle: -2, tx: 0, ty: 0 });
+
+  const draw = page.locator('.draw-control');
+  const drawResting = await motionState(draw);
+  expect(drawResting).toMatchObject({ angle: -12, tx: 0, ty: 0 });
+  await draw.hover();
+  expect(await motionState(draw)).toEqual(drawResting);
 });

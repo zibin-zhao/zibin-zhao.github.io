@@ -52,7 +52,7 @@
 .marquee span { animation: marquee 20s linear infinite; }
 .glitch-hover:hover { animation: glitch-skew .3s cubic-bezier(.25, .46, .45, .94) both infinite; }
 
-.btn-primary { transition: box-shadow .15s ease, transform .15s ease; }
+.btn-primary { box-shadow: var(--resting-shadow, var(--shadow-4)); transition: box-shadow .15s ease, transform .15s ease; }
 .btn-primary:active { box-shadow: none; transform: translate(4px, 4px); }
 
 .pub-card {
@@ -63,7 +63,7 @@
 .pub-card:hover { box-shadow: 8px 8px 0 var(--ink); transform: translate(-4px, -4px) rotate(1deg); }
 .pub-card:hover .magnify-icon { color: var(--green); transform: scale(1.2); }
 
-.draw-control { transition: transform .15s ease; }
+.draw-control { transform: var(--resting-transform, rotate(-12deg)); transition: transform .15s ease; }
 .draw-control:hover { transform: rotate(12deg); }
 
 @media (prefers-reduced-motion: reduce) {
