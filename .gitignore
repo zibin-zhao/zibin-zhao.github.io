@@ -28,8 +28,8 @@ blob-report/
 # jetbrains setting folder
 .idea/
 
-# superpowers
-.superpowers/
+# local SDD execution artifacts
+.superpowers/sdd/
 .worktrees/
 
 # video render frames (intermediate); keep video/intro.html, render.mjs, assets, and public/intro.mp4
