@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const root = new URL('..', import.meta.url);
@@ -6,6 +6,21 @@ const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
 const compact = (value: string) => value.replace(/\s+/g, '');
 
 describe('Stitch shell', () => {
+  it('uses the source-faithful hero and cart asset', () => {
+    expect(existsSync(new URL('src/components/StitchHero.astro', root))).toBe(true);
+    const hero = read('src/components/StitchHero.astro');
+    const page = read('src/pages/index.astro');
+
+    for (const marker of ['hero-wordmark', 'collaboration-sticker', 'hero-card', 'scroll-sticker']) {
+      expect(hero).toContain(marker);
+    }
+    expect(hero).toContain('src="/stitch/cart.png"');
+    expect(page).toContain('<StitchHero />');
+    for (const legacy of ['<About />', '<Projects />', '<CvTimeline />', '<Contact />']) {
+      expect(page).not.toContain(legacy);
+    }
+  });
+
   it('defines exact motion timings', () => {
     const css = read('src/styles/stitch-motion.css');
     expect(css).toContain('parallax-slow 20s linear infinite alternate');

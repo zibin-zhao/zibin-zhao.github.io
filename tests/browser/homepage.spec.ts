@@ -26,26 +26,26 @@ test('renders the homepage and switches its bilingual content', async ({ page })
   await page.goto('/');
 
   await expect(page).toHaveTitle(/Zibin Zhao/);
-  await expect(page.locator('.hero-name')).toBeVisible();
-  await expect(page.locator('.hero-name')).toContainText('ZIBIN');
-  await expect(page.locator('.hero-name')).toContainText('ZHAO');
+  await expect(page.locator('.hero-wordmark')).toBeVisible();
+  await expect(page.locator('.hero-wordmark')).toContainText('ZIBIN');
+  await expect(page.locator('.hero-wordmark')).toContainText('ZHAO');
+  await expect(page.locator('.hero-formula')).toBeVisible();
+  await expect(page.locator('.note-formula')).toBeHidden();
 
   await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'zh');
-  await expect(page.locator('.collab .t-zh')).toHaveText('开放合作');
-  await expect(page.locator('.collab .t-zh')).toBeVisible();
+  await expect(page.locator('.collaboration-sticker .t-zh')).toHaveText('开放合作');
+  await expect(page.locator('.collaboration-sticker .t-zh')).toBeVisible();
 });
 
-test('keeps keyboard navigation, CV download, and Prompts behavior usable', async ({ page }) => {
+test('keeps keyboard navigation, CV destination, and Prompts behavior usable', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Tab');
   await expect(page.locator('.skip-link')).toBeFocused();
   await expect(page.locator('.skip-link')).toBeVisible();
-  const download = page.locator('a.download[href="/cv.pdf"]');
-  await expect(download).toBeVisible();
-  await expect(download).toHaveAttribute('download', '');
+  await expect(page.locator('.footer-routes a[href="/cv/"]')).toBeVisible();
 
   await page.goto('/prompts/');
   await expect(page).toHaveURL(/\/prompts\/$/);
@@ -74,9 +74,7 @@ test('keeps required shell anchors visible without JavaScript at 390px', async (
   await expect(page.locator('.footer-routes a')).toHaveCount(6);
   for (const route of await page.locator('.footer-routes a').all()) await expect(route).toBeVisible();
   await expect(page.locator('a.draw-control[href="/prompts/"]')).toBeVisible();
-  const download = page.locator('a.download[href="/cv.pdf"]');
-  await expect(download).toBeVisible();
-  await expect(download).toHaveAttribute('download', '');
+  await expect(page.locator('.footer-routes a[href="/cv/"]')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
     await page.evaluate(() => document.documentElement.clientWidth),
   );
@@ -87,6 +85,10 @@ test('keeps required shell anchors visible without JavaScript at 390px', async (
 test('applies exact normal-mode button and draw interactions', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
+
+  expect(await motionState(page.locator('.hero-formula'))).toMatchObject({ angle: 12, tx: 0, ty: 0 });
+  await expect(page.locator('.hero-formula-motion')).toHaveCSS('animation-name', 'float');
+  await expect(page.locator('.hero-formula-motion')).toHaveCSS('animation-duration', '6s');
 
   const talk = page.locator('.talk');
   const talkActive = await activeState(page, talk);
@@ -102,6 +104,9 @@ test('applies exact normal-mode button and draw interactions', async ({ page }) 
 test('keeps button and draw resting geometry invariant under reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
+
+  expect(await motionState(page.locator('.hero-formula'))).toMatchObject({ angle: 12, tx: 0, ty: 0 });
+  await expect(page.locator('.hero-formula-motion')).toHaveCSS('animation-name', 'none');
 
   const talk = page.locator('.talk');
   const talkResting = await motionState(talk);
