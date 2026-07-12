@@ -23,8 +23,7 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
       ))}
     </ol>
 
-    <aside class="cv-tools" aria-labelledby="cv-tools-heading">
-      <h3 id="cv-tools-heading"><T en="Working tools" zh="常用工具" /></h3>
+    <aside class="cv-tools" aria-label="CV skills">
       <div class="chips">{cv.skills.map((skill) => <span class="chip">{skill}</span>)}</div>
       <a class="download" href={cv.pdf} download>
         <T en={cv.download.en} zh={cv.download.zh} />
@@ -87,13 +86,6 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
     border: var(--stroke);
     background: var(--green);
     box-shadow: var(--shadow-card);
-  }
-
-  .cv-tools h3 {
-    margin-bottom: 18px;
-    font: 500 13px/1.2 var(--font-note);
-    letter-spacing: .04em;
-    text-transform: uppercase;
   }
 
   .chips {

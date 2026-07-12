@@ -86,10 +86,17 @@ describe('Stitch lab-notebook foundation', () => {
     const cv = read('src/components/CvTimeline.astro');
     const contact = read('src/components/Contact.astro');
     expect(cv).toContain('class="cv-index"');
+    expect(cv).toContain('const items = [...cv.education, ...cv.experience, ...cv.leadership]');
+    expect(cv).toContain('items.map((item, index)');
     expect(cv).toContain('href={cv.pdf} download');
-    expect(contact).toContain('class="closing-poster"');
+    expect(cv).not.toContain('Working tools');
+    expect(cv).not.toContain('常用工具');
+    expect(contact).toContain('class="reveal closing-poster"');
     expect(contact).toContain('class="footer-index"');
+    expect(contact).toContain('profile.email');
+    expect(contact).toContain('profile.socials');
     expect(contact).toContain('profile.navLinks');
+    expect(contact).toContain('target="_blank" rel="noopener"');
     expect(contact).not.toContain('position:fixed');
   });
 });
