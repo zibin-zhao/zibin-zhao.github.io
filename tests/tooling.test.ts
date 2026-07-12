@@ -17,6 +17,11 @@ describe('production quality gates', () => {
     );
   });
 
+  it('requires the Node 22 runtime floor supported by ESLint 10', () => {
+    const pkg = JSON.parse(read('package.json'));
+    expect(pkg.engines.node).toBe('>=22.13.0');
+  });
+
   it('documents the ESLint 10 accessibility-tooling decision', () => {
     const decision = read('docs/quality-gates.md');
     expect(decision).toContain('eslint-plugin-jsx-a11y');
