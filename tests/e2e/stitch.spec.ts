@@ -283,8 +283,8 @@ test('canonical homepage matches the source-normalized vertical density and anch
     };
   });
 
-  expect(geometry.documentHeight).toBeGreaterThanOrEqual(1_980);
-  expect(geometry.documentHeight).toBeLessThanOrEqual(2_180);
+  expect(geometry.documentHeight).toBeGreaterThanOrEqual(2_060);
+  expect(geometry.documentHeight).toBeLessThanOrEqual(2_110);
   expect(geometry.hero.bottom).toBeGreaterThanOrEqual(610);
   expect(geometry.hero.bottom).toBeLessThanOrEqual(680);
   expect(geometry.research.top).toBeGreaterThanOrEqual(640);
@@ -365,15 +365,20 @@ test('canonical homepage matches the source-normalized vertical density and anch
   expect(geometry.guideRightX).toBeCloseTo(768 * .76, 0);
   expect(geometry.footerSocials.left).toBeGreaterThanOrEqual(20);
   expect(geometry.footerSocials.left).toBeLessThanOrEqual(30);
-  expect(geometry.footerSocials.width).toBeGreaterThanOrEqual(70);
-  expect(geometry.footerSocials.width).toBeLessThanOrEqual(100);
-  expect(geometry.footerSocials.left + geometry.footerSocials.width).toBeLessThanOrEqual(120);
-  expect(geometry.footerRoutes.left).toBeGreaterThanOrEqual(535);
-  expect(geometry.footerRoutes.left).toBeLessThanOrEqual(545);
-  expect(geometry.footerRoutes.width).toBeGreaterThanOrEqual(174);
-  expect(geometry.footerRoutes.width).toBeLessThanOrEqual(178);
-  expect(geometry.footerRoutes.height).toBeGreaterThanOrEqual(124);
-  expect(geometry.footerRoutes.height).toBeLessThanOrEqual(132);
+  expect(geometry.footerSocials.height).toBeGreaterThanOrEqual(40);
+  expect(geometry.footerSocials.height).toBeLessThanOrEqual(52);
+  expect(geometry.footerRoutes.right).toBeGreaterThanOrEqual(710);
+  expect(geometry.footerRoutes.right).toBeLessThanOrEqual(720);
+  expect(geometry.footerRoutes.height).toBeGreaterThanOrEqual(40);
+  expect(geometry.footerRoutes.height).toBeLessThanOrEqual(52);
+  const tabletRailStyles = await page.locator('.footer-socials, .footer-routes').evaluateAll((rails) => rails.map((rail) => {
+    const style = getComputedStyle(rail);
+    return { flexWrap: style.flexWrap, overflowX: style.overflowX };
+  }));
+  expect(tabletRailStyles).toEqual([
+    { flexWrap: 'nowrap', overflowX: 'auto' },
+    { flexWrap: 'nowrap', overflowX: 'auto' },
+  ]);
   await expect(page.locator('.footer-socials a')).toHaveCount(3);
   await expect(page.locator('.footer-routes a')).toHaveCount(6);
   for (const anchor of await page.locator('.footer-socials a, .footer-routes a').all()) await expect(anchor).toBeVisible();
@@ -391,8 +396,10 @@ test('canonical homepage matches the source-normalized vertical density and anch
 
 test('artifact projection pins both guide rails at source x positions', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'canonical-768', 'Artifact projection is verified once for canonical and mobile widths.');
-  await page.goto('/');
-  for (const [width, height] of [[768, 2_079], [390, 4_010]] as const) {
+  for (const width of [768, 390] as const) {
+    await page.setViewportSize({ width, height: width === 768 ? 1_024 : 844 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
     const cleanup = await applyArtifactProjection(page, width, height);
     const guides = await page.locator('.artifact-guide').evaluateAll((elements) => elements.map((element, index) => {
       const style = getComputedStyle(element);
@@ -564,11 +571,11 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
   const originalViewport = page.viewportSize();
   if (!originalViewport) throw new Error('Original artifact viewport was not available');
 
-  const captureFull = async (name: string, sourceHeight?: number) => {
+  const captureFull = async (name: string) => {
     const path = `${artifactDir}/${name}`;
     const viewport = page.viewportSize();
     if (!viewport) throw new Error('Artifact viewport was not available');
-    const documentHeight = sourceHeight ?? await page.evaluate(() => document.documentElement.scrollHeight);
+    const documentHeight = await page.evaluate(() => document.documentElement.scrollHeight);
     const cleanup = await applyArtifactProjection(page, viewport.width, documentHeight);
     try {
       const projectionFrame = await page.evaluate(() => {
@@ -610,6 +617,19 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
       if (!footer) throw new Error('Artifact footer was not rendered');
       expect(Math.abs(Math.round(footer.y + footer.height) - documentHeight)).toBeLessThanOrEqual(16);
       await page.screenshot({ animations: 'disabled', fullPage: false, path });
+      const size = await pngSize(path);
+      expect(size).toEqual({ height: documentHeight, width: viewport.width });
+      if (testInfo.project.name === 'canonical-768') {
+        const zen = await page.locator('[data-vibe-role="zen"]').boundingBox();
+        const dockBoxes = await Promise.all([
+          page.locator('.footer-socials').boundingBox(),
+          page.locator('.footer-routes').boundingBox(),
+        ]);
+        if (!zen || dockBoxes.some((box) => !box)) throw new Error('Canonical artifact clearance geometry was unavailable');
+        const dockTop = Math.min(...dockBoxes.map((box) => box!.y));
+        expect(zen.y + zen.height).toBeLessThanOrEqual(dockTop - 8);
+      }
+      return documentHeight;
     } finally {
       await cleanup();
     }
@@ -666,7 +686,9 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
   };
 
   if (testInfo.project.name === 'canonical-768') {
-    await captureFull('home-768-full.png', 2_079);
+    const canonicalHeight = await captureFull('home-768-full.png');
+    expect(canonicalHeight).toBeGreaterThanOrEqual(2_060);
+    expect(canonicalHeight).toBeLessThanOrEqual(2_110);
     await captureSection('research-768.png', page.locator('#research'), {
       bottom: page.locator('.pub-card--3'),
       capBefore: page.locator('#vibe > h2'),

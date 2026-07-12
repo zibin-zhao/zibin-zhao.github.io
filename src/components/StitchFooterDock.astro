@@ -211,20 +211,37 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
   }
 
   @media (min-width: 701px) and (max-width: 960px) {
-    .footer-socials { left: 24px; gap: 4px; }
+    .footer-socials,
     .footer-routes {
-      right: 52px;
-      display: grid;
-      width: 176px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      display: flex;
+      width: max-content;
+      align-items: center;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
       gap: 4px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 3px 4px 5px;
+      overscroll-behavior-inline: contain;
+      scroll-padding-inline: 4px;
+      scrollbar-width: none;
+      transform: none;
     }
+
+    .footer-socials::-webkit-scrollbar,
+    .footer-routes::-webkit-scrollbar { display: none; }
+
+    .footer-socials { left: 24px; max-width: 34vw; }
+
+    .footer-routes { right: 52px; max-width: 48vw; }
+
     .footer-pill {
+      flex: 0 0 auto;
       padding: 3px 6px;
       font-size: 7px;
     }
-    .footer-routes .route-angle { display: flex; width: 100%; }
-    .footer-routes .footer-pill { justify-content: center; }
+
+    .route-angle { flex: 0 0 auto; }
     .draw-control { right: 4px; }
   }
 </style>
