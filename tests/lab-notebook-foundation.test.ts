@@ -36,5 +36,6 @@ describe('Stitch lab-notebook foundation', () => {
     expect(hero).toContain('class="scroll-cue"');
     expect(hero).not.toContain('experiment-holder');
     expect(script).not.toContain('field-motion');
+    expect(nav).not.toContain('.nav-actions:focus-within #navlinks');
   });
 });
