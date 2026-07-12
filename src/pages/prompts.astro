@@ -51,21 +51,58 @@ import StitchShell from '../layouts/StitchShell.astro';
   <script is:inline>
     (() => {
       // one-click copy
+      const resetTimers = new WeakMap();
+      const copyAttempts = new WeakMap();
+      const copyWithFallback = (text) => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        try {
+          document.body.appendChild(ta);
+          ta.select();
+          return document.execCommand('copy') === true;
+        } catch {
+          return false;
+        } finally {
+          ta.remove();
+        }
+      };
+      const copyText = async (text) => {
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch { /* Try the legacy fallback. */ }
+        }
+        return copyWithFallback(text);
+      };
+      const resetCopyState = (btn, feedback) => {
+        btn.classList.remove('copied', 'failed');
+        btn.setAttribute('aria-label', 'Copy prompt to clipboard');
+        if (feedback) feedback.textContent = '';
+      };
       document.querySelectorAll('.copy').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const pre = btn.parentElement && btn.parentElement.querySelector('.ptext');
           const feedback = btn.parentElement && btn.parentElement.querySelector('.copy-feedback');
           const text = pre ? pre.textContent : '';
-          try { await navigator.clipboard.writeText(text); }
-          catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch { /* Copy is best-effort. */ } ta.remove(); }
-          btn.classList.add('copied');
-          btn.setAttribute('aria-label', 'Copied to clipboard');
-          if (feedback) feedback.textContent = 'Copied to clipboard';
-          setTimeout(() => {
-            btn.classList.remove('copied');
-            btn.setAttribute('aria-label', 'Copy prompt to clipboard');
-            if (feedback) feedback.textContent = '';
+          const previousTimer = resetTimers.get(btn);
+          if (previousTimer) clearTimeout(previousTimer);
+          const attempt = {};
+          copyAttempts.set(btn, attempt);
+          const copied = await copyText(text);
+          if (copyAttempts.get(btn) !== attempt) return;
+
+          btn.classList.toggle('copied', copied);
+          btn.classList.toggle('failed', !copied);
+          btn.setAttribute('aria-label', copied ? 'Copied to clipboard' : 'Copy failed. Copy manually');
+          if (feedback) feedback.textContent = copied
+            ? 'Copied to clipboard'
+            : 'Copy failed. Select the prompt and copy manually.';
+          const timer = setTimeout(() => {
+            resetCopyState(btn, feedback);
+            resetTimers.delete(btn);
           }, 1600);
+          resetTimers.set(btn, timer);
         });
       });
       // scroll-spy: highlight the active stage in the sticky nav

@@ -119,6 +119,84 @@ test('clipboard rejection uses execCommand fallback and retains copied state', a
   await expect(page.locator('.copy-feedback').first()).toHaveText('Copied to clipboard');
 });
 
+for (const primaryPath of ['absent', 'rejected'] as const) {
+  test(`${primaryPath} clipboard plus false fallback reports manual-copy failure`, async ({ page }) => {
+    await page.addInitScript((path) => {
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: path === 'absent'
+          ? undefined
+          : { writeText: () => Promise.reject(new Error('forced primary failure')) },
+      });
+      Object.defineProperty(document, 'execCommand', {
+        configurable: true,
+        value: () => false,
+      });
+    }, primaryPath);
+    await page.goto('/prompts/');
+
+    const copy = page.locator('.copy').first();
+    await copy.click();
+    await expect(copy).toHaveClass(/failed/);
+    await expect(copy).not.toHaveClass(/copied/);
+    await expect(copy).toHaveAttribute('aria-label', 'Copy failed. Copy manually');
+    await expect(copy.locator('.lbl-failed')).toBeVisible();
+    await expect(page.locator('.copy-feedback').first()).toHaveText('Copy failed. Select the prompt and copy manually.');
+    await expect(copy).not.toHaveClass(/failed/, { timeout: 2000 });
+    await expect(copy).toHaveAttribute('aria-label', 'Copy prompt to clipboard');
+    await expect(copy.locator('.lbl-copy')).toBeVisible();
+    await expect(page.locator('.copy-feedback').first()).toHaveText('');
+  });
+}
+
+test('throwing fallback reports failure without page errors and always removes its textarea', async ({ page }) => {
+  const runtimeErrors = collectRuntimeErrors(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined });
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: () => { throw new Error('forced fallback failure'); },
+    });
+  });
+  await page.goto('/prompts/');
+
+  const copy = page.locator('.copy').first();
+  await copy.click();
+  await expect(copy).toHaveClass(/failed/);
+  await expect(copy).not.toHaveClass(/copied/);
+  await expect(copy).toHaveAttribute('aria-label', 'Copy failed. Copy manually');
+  await expect(copy.locator('.lbl-failed')).toBeVisible();
+  await expect(page.locator('.copy-feedback').first()).toHaveText('Copy failed. Select the prompt and copy manually.');
+  await expect(page.locator('textarea')).toHaveCount(0);
+  expect(runtimeErrors).toEqual([]);
+});
+
+test('repeated copy activation restarts reset timing from the latest result', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: () => Promise.resolve() },
+    });
+  });
+  await page.goto('/prompts/');
+
+  const copy = page.locator('.copy').first();
+  const feedback = page.locator('.copy-feedback').first();
+  await copy.click();
+  await page.waitForTimeout(1100);
+  await copy.click();
+  await page.waitForTimeout(600);
+  await expect(copy).toHaveClass(/copied/);
+  await expect(copy).toHaveAttribute('aria-label', 'Copied to clipboard');
+  await expect(feedback).toHaveText('Copied to clipboard');
+
+  await expect(copy).not.toHaveClass(/copied/, { timeout: 1500 });
+  await expect(copy).not.toHaveClass(/failed/);
+  await expect(copy).toHaveAttribute('aria-label', 'Copy prompt to clipboard');
+  await expect(copy.locator('.lbl-copy')).toBeVisible();
+  await expect(feedback).toHaveText('');
+});
+
 test('missing IntersectionObserver leaves content and ordinary navigation usable', async ({ page }) => {
   const runtimeErrors = collectRuntimeErrors(page);
   await page.addInitScript(() => {
