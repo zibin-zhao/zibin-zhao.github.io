@@ -10,6 +10,18 @@ describe('selectByTitles', () => {
     expect(() => selectByTitles([{ title: 'A' }], ['A', 'B'])).toThrow('Missing canonical Stitch item: B');
   });
 
+  it('fails when canonical data contains a duplicate title', () => {
+    const records = [
+      { title: 'A', payload: 'first' },
+      { title: 'A', payload: 'second' },
+    ];
+    expect(() => selectByTitles(records, ['A'])).toThrow('Duplicate canonical Stitch item: A');
+  });
+
+  it('fails when the authored selection repeats a title', () => {
+    expect(() => selectByTitles([{ title: 'A' }], ['A', 'A'])).toThrow('Duplicate canonical Stitch selection: A');
+  });
+
   it('names the three papers', () => {
     expect(HOME_RESEARCH_TITLES).toEqual([
       'DNA-guided CRISPR–Cas12a effectors for programmable RNA recognition and cleavage',

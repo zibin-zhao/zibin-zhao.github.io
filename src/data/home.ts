@@ -5,7 +5,18 @@ export const HOME_RESEARCH_TITLES = [
 ] as const;
 
 export function selectByTitles<T extends { title: string }>(items: T[], titles: readonly string[]): T[] {
-  const byTitle = new Map(items.map((item) => [item.title, item]));
+  const byTitle = new Map<string, T>();
+  for (const item of items) {
+    if (byTitle.has(item.title)) throw new Error(`Duplicate canonical Stitch item: ${item.title}`);
+    byTitle.set(item.title, item);
+  }
+
+  const requestedTitles = new Set<string>();
+  for (const title of titles) {
+    if (requestedTitles.has(title)) throw new Error(`Duplicate canonical Stitch selection: ${title}`);
+    requestedTitles.add(title);
+  }
+
   return titles.map((title) => {
     const item = byTitle.get(title);
     if (!item) throw new Error(`Missing canonical Stitch item: ${title}`);
