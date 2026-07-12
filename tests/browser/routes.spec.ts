@@ -202,6 +202,113 @@ test('binds every project and per-publication action to its canonical href and s
   })));
 });
 
+test('projects use an asymmetric experiment board on desktop and a clear single-column stack on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/projects/');
+
+  const board = page.locator('.project-board');
+  const cards = board.locator('[data-project]');
+  await expect(cards).toHaveCount(projects.length);
+  const desktop = await board.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const records = [...element.querySelectorAll<HTMLElement>('[data-project]')];
+    return {
+      columns: style.gridTemplateColumns.split(' ').length,
+      cards: records.map((record) => {
+        const box = record.getBoundingClientRect();
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(record).transform);
+        return {
+          left: box.left,
+          right: box.right,
+          top: box.top,
+          bottom: box.bottom,
+          width: box.width,
+          angle: Math.atan2(matrix.b, matrix.a) * (180 / Math.PI),
+        };
+      }),
+    };
+  });
+  expect(desktop.columns).toBe(12);
+  expect(desktop.cards[0].left).toBeLessThan(desktop.cards[1].left);
+  expect(desktop.cards[0].right).toBeGreaterThan(desktop.cards[1].left);
+  expect(desktop.cards[2].left).toBeLessThan(desktop.cards[3].left);
+  expect(desktop.cards[2].right).toBeGreaterThan(desktop.cards[3].left);
+  expect(desktop.cards[0].width).toBeGreaterThan(desktop.cards[1].width);
+  expect(desktop.cards[3].width).toBeGreaterThan(desktop.cards[2].width);
+  expect(desktop.cards.every((card) => Math.abs(card.angle) >= .25)).toBe(true);
+  expect(desktop.cards.some((card, index) => index > 0 && card.top < desktop.cards[index - 1].bottom)).toBe(true);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  const mobile = await board.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const records = [...element.querySelectorAll<HTMLElement>('[data-project]')];
+    return {
+      columns: style.gridTemplateColumns.split(' ').length,
+      cards: records.map((record) => {
+        const box = record.getBoundingClientRect();
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(record).transform);
+        return {
+          left: box.left,
+          right: box.right,
+          top: box.top,
+          bottom: box.bottom,
+          angle: Math.atan2(matrix.b, matrix.a) * (180 / Math.PI),
+        };
+      }),
+    };
+  });
+  expect(mobile.columns).toBe(1);
+  for (let index = 1; index < mobile.cards.length; index += 1) {
+    expect(mobile.cards[index].top).toBeGreaterThan(mobile.cards[index - 1].bottom);
+  }
+  expect(mobile.cards.every((card) => Math.abs(card.angle) > 0 && Math.abs(card.angle) <= .4)).toBe(true);
+  expect(Math.min(...mobile.cards.map((card) => card.left))).toBeGreaterThanOrEqual(0);
+  expect(Math.max(...mobile.cards.map((card) => card.right))).toBeLessThanOrEqual(390);
+  for (const link of await cards.all()) await expect(link).toBeVisible();
+  await assertNoOverflowOrDockOverlap(page);
+});
+
+test('contact is a high-contrast ink poster with accessible accent interactions at desktop and mobile', async ({ page }) => {
+  const contrast = ([r1, g1, b1]: number[], [r2, g2, b2]: number[]) => {
+    const luminance = ([red, green, blue]: number[]) => {
+      const channels = [red, green, blue].map((channel) => {
+        const value = channel / 255;
+        return value <= .03928 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4;
+      });
+      return .2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2];
+    };
+    const values = [luminance([r1, g1, b1]), luminance([r2, g2, b2])].sort((a, b) => b - a);
+    return (values[0] + .05) / (values[1] + .05);
+  };
+  const rgb = (value: string) => value.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number) ?? [];
+
+  for (const viewport of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/contact/');
+    const poster = page.locator('.contact-record');
+    const heading = poster.locator('h2');
+    const styles = await poster.evaluate((element) => {
+      const record = getComputedStyle(element);
+      const title = getComputedStyle(element.querySelector('h2')!);
+      return { background: record.backgroundColor, foreground: title.color };
+    });
+    expect(styles.background).toBe('rgb(0, 51, 34)');
+    expect(contrast(rgb(styles.background), rgb(styles.foreground))).toBeGreaterThanOrEqual(7);
+    await expect(heading).toBeVisible();
+    await expect(poster.locator(`a[href="mailto:${profile.email}"]`)).toBeVisible();
+    await expect(poster.locator('[data-contact-social]')).toHaveCount(profile.socials.length);
+    await assertNoOverflowOrDockOverlap(page);
+  }
+
+  const indexLink = page.locator('.footer-index a').first();
+  await indexLink.hover();
+  await expect(indexLink).toHaveCSS('background-color', 'rgb(189, 240, 182)');
+  await expect(indexLink).toHaveCSS('color', 'rgb(0, 51, 34)');
+  await indexLink.focus();
+  await expect(indexLink).toHaveCSS('outline-color', 'rgb(255, 185, 95)');
+});
+
 test('renders every CV skill and complete contact index from canonical data', async ({ page }) => {
   await page.goto('/contact/');
   await expect(page.locator(`.contact-record a[href="mailto:${profile.email}"]`)).toBeVisible();

@@ -45,8 +45,9 @@ const year = new Date().getFullYear();
     min-width: 0;
     padding: clamp(22px, 4vw, 38px);
     border: var(--stroke);
-    background: var(--surface);
-    box-shadow: var(--shadow-6);
+    color: var(--surface);
+    background: var(--ink);
+    box-shadow: 6px 6px 0 var(--orange);
     transform: rotate(.5deg);
   }
 
@@ -56,19 +57,19 @@ const year = new Date().getFullYear();
     right: 18px;
     width: 54px;
     height: 18px;
-    border: var(--stroke);
-    background: repeating-linear-gradient(90deg, var(--green) 0 4px, var(--surface) 4px 8px);
+    border: 2px solid var(--surface);
+    background: repeating-linear-gradient(90deg, var(--green-bright) 0 4px, var(--orange) 4px 8px);
     content: '';
   }
 
   .contact-copy {
     padding-bottom: clamp(28px, 5vw, 48px);
-    border-bottom: 2px dashed var(--outline);
+    border-bottom: 2px dashed var(--green);
   }
 
   .contact-label {
     padding-right: 70px;
-    color: var(--muted);
+    color: var(--green-bright);
     font: 500 10px/1.4 var(--font-note);
     letter-spacing: .08em;
     text-transform: uppercase;
@@ -86,7 +87,7 @@ const year = new Date().getFullYear();
   .contact-note {
     max-width: 60ch;
     margin-top: 20px;
-    color: var(--muted);
+    color: var(--surface);
     font-size: clamp(15px, 2vw, 18px);
     line-height: 1.55;
     text-wrap: pretty;
@@ -131,14 +132,23 @@ const year = new Date().getFullYear();
     min-height: 40px;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px dashed var(--outline);
+    border-bottom: 2px dashed var(--green);
+    color: var(--surface);
     font: 500 11px/1.4 var(--font-note);
-    transition: background-color var(--motion-fast) var(--ease-press);
+    transition: color var(--motion-fast) var(--ease-press), background-color var(--motion-fast) var(--ease-press);
   }
 
   .footer-index a:hover,
   .social-index a:hover {
     background: var(--green-bright);
+    color: var(--ink);
+  }
+
+  .footer-index a:focus-visible,
+  .social-index a:focus-visible,
+  .email:focus-visible {
+    outline-color: var(--orange);
+    box-shadow: 0 0 0 5px var(--ink);
   }
 
   .social-index {
@@ -150,14 +160,14 @@ const year = new Date().getFullYear();
   footer {
     margin-top: clamp(30px, 5vw, 52px);
     padding-top: 12px;
-    border-top: 2px dashed var(--outline);
-    color: var(--muted);
+    border-top: 2px dashed var(--green);
+    color: var(--surface);
     font: 500 11px/1.4 var(--font-note);
   }
 
   @media (max-width: 700px) {
     .contact-record {
-      box-shadow: var(--shadow-4);
+      box-shadow: 4px 4px 0 var(--orange);
       transform: none;
     }
 

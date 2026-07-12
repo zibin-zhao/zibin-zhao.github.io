@@ -32,15 +32,12 @@ const Tag = href ? 'a' : 'div';
     border: 2px solid var(--ink);
     background: var(--paper-card);
     box-shadow: var(--shadow-6);
+    transform: var(--project-transform, none);
     transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
   }
 
-  .project-card:nth-child(2n) {
-    transform: translateY(14px) rotate(.35deg);
-  }
-
   a.project-card:hover {
-    transform: translate(-2px, -2px) rotate(-.35deg);
+    transform: var(--project-hover-transform, translate(-2px, -2px) rotate(-.35deg));
     box-shadow: var(--shadow-6);
   }
 
@@ -148,12 +145,6 @@ const Tag = href ? 'a' : 'div';
     font: 500 11px/1.2 var(--font-note);
     text-decoration: underline;
     text-underline-offset: 4px;
-  }
-
-  @media (max-width: 760px) {
-    .project-card:nth-child(n) {
-      transform: none;
-    }
   }
 
   @media (max-width: 480px) {
