@@ -53,8 +53,8 @@ describe('preserved portfolio behavior', () => {
     const page = read('src/pages/prompts.astro');
     const block = read('src/components/PromptBlock.astro');
     expect(promptPack.stages).toHaveLength(8);
-    expect(page).toContain('<h1>{P.title}</h1>');
-    expect(page).toContain('<h2>{s.title}</h2>');
+    expect(page).toContain('<IndexSheet number="//" title={P.title} titleZh={P.title}>');
+    expect(page).toContain('<h2>{stage.title}</h2>');
     expect(page).toContain("['stage-card', 'stage']");
     expect(page).toContain("document.querySelectorAll('.copy')");
     expect(page).toContain('navigator.clipboard.writeText');

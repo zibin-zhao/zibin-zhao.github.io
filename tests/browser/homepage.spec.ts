@@ -223,10 +223,10 @@ test('keeps keyboard navigation, CV destination, and Prompts behavior usable', a
 
   await page.goto('/prompts/');
   await expect(page).toHaveURL(/\/prompts\/$/);
-  await expect(page.locator('.prompt-hero > h1')).toHaveCount(1);
+  await expect(page.locator('main h1')).toHaveCount(1);
   await expect(page.locator('.stage')).toHaveCount(8);
   await expect(page.locator('.stage h2')).toHaveCount(8);
-  const copy = page.getByRole('button', { name: 'Copy prompt to clipboard' }).first();
+  const copy = page.locator('.copy').first();
   await copy.click();
   await expect(copy).toHaveClass(/copied/);
 });

@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { cv } from '../src/data/cv';
 import { profile } from '../src/data/profile';
+import { promptPack } from '../src/data/prompts';
 
 const root = new URL('..', import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
@@ -30,6 +31,23 @@ describe('Index Sheet route contracts', () => {
       expect(page).not.toMatch(/getCollection|\.map\(|profile\.|cv\./);
     });
   }
+
+  it('renders the complete Prompt Pack inside the Prompts Index Sheet', () => {
+    const page = read('src/pages/prompts.astro');
+    const blockCount = promptPack.stages.reduce((total, stage) => total + stage.blocks.length, 0);
+
+    expect(promptPack.stages).toHaveLength(8);
+    expect(blockCount).toBe(11);
+    expect(page).toContain('<StitchShell title="Prompt Pack — Zibin Zhao"');
+    expect(page).toContain('active="prompts"');
+    expect(page).toContain('<IndexSheet number="//" title={P.title} titleZh={P.title}>');
+    expect(page).toContain('P.stages.map((stage)');
+    expect(page).toContain('stage.blocks.map((block)');
+    expect(page).toContain('<h2>{stage.title}</h2>');
+    expect(page).toContain('<h2 class="dlabel">{P.disciplineTitle}</h2>');
+    expect(page).not.toContain('<Base');
+    expect(page).not.toMatch(/<main\b/);
+  });
 });
 
 describe('complete archive source contracts', () => {

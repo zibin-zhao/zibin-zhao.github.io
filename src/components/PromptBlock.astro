@@ -8,6 +8,7 @@ const { label, text } = Astro.props;
       <span class="lbl-copy">Copy</span>
       <span class="lbl-done">Copied ✓</span>
     </button>
+    <span class="copy-feedback" aria-live="polite"></span>
     <pre class="ptext">{text}</pre>
   </div>
 </div>
@@ -59,6 +60,15 @@ const { label, text } = Astro.props;
     font: 500 10px/1.2 var(--font-note);
     text-transform: uppercase;
     transition: background var(--motion-fast) var(--ease-press), color var(--motion-fast) var(--ease-press), transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
+  }
+
+  .copy-feedback {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .copy:hover {

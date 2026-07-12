@@ -1,57 +1,52 @@
 ---
-import Base from '../layouts/Base.astro';
+import IndexSheet from '../components/IndexSheet.astro';
 import PromptBlock from '../components/PromptBlock.astro';
 import { promptPack as P } from '../data/prompts';
+import StitchShell from '../layouts/StitchShell.astro';
 ---
-<Base title="Prompt Pack — Zibin Zhao" description="A copy-paste prompt pack for writing a CRISPR-Cas molecular-dynamics review with AI — an anti-hallucination, stage-by-stage research pipeline.">
-  <div class="page">
-    <header class="prompt-bar">
-      <a class="prompt-index-label" href="/">ZIBINZHAO.COM · PROMPT ARCHIVE</a>
-      <a class="back" href="/">← Back to site</a>
-    </header>
-
+<StitchShell title="Prompt Pack — Zibin Zhao" description="A copy-paste prompt pack for writing a CRISPR-Cas molecular-dynamics review with AI — an anti-hallucination, stage-by-stage research pipeline." active="prompts">
+  <IndexSheet number="//" title={P.title} titleZh={P.title}>
     <section class="prompt-hero">
       <p class="kicker">{P.kicker}</p>
-      <h1>{P.title}</h1>
       <p class="intro">{P.intro}</p>
       <div class="meta">
-        <div class="mrow"><span class="ml">Running example</span><span class="mv">{P.runningExample}</span></div>
-        <div class="mrow"><span class="ml">How to use</span><span class="mv">{P.howToUse}</span></div>
+        <p class="mrow"><strong class="ml">Running example</strong><span class="mv">{P.runningExample}</span></p>
+        <p class="mrow"><strong class="ml">How to use</strong><span class="mv">{P.howToUse}</span></p>
       </div>
     </section>
 
     <nav class="stagenav" id="stagenav" aria-label="Pipeline stages">
-      {P.stages.map(s => (
-        <a href={`#stage-${s.num}`} data-stage={s.num}><b>{s.num}</b><span>{s.title}</span></a>
+      {P.stages.map((stage) => (
+        <a href={`#stage-${stage.num}`} data-stage={stage.num}><b>{stage.num}</b><span>{stage.title}</span></a>
       ))}
     </nav>
 
-    <main class="stages" id="main-content">
-      {P.stages.map(s => (
-        <section class:list={['stage-card', 'stage']} id={`stage-${s.num}`}>
+    <div class="stages">
+      {P.stages.map((stage) => (
+        <section class:list={['stage-card', 'stage']} id={`stage-${stage.num}`}>
           <header class="stage-heading">
-            <span class="stage-number">{s.num}</span>
+            <span class="stage-number" aria-hidden="true">{stage.num}</span>
             <div>
-              <h2>{s.title}</h2>
-              <span class:list={['tool', s.frontier && 'frontier']}>{s.tool}</span>
+              <h2>{stage.title}</h2>
+              <span class:list={['tool', stage.frontier && 'frontier']}>{stage.tool}</span>
             </div>
           </header>
-          {s.note && <p class="note">{s.note}</p>}
-          {s.blocks.map((block) => <PromptBlock label={block.label} text={block.text} />)}
-          {s.afterNote && <p class="after">↳ {s.afterNote}</p>}
+          {stage.note && <p class="note">{stage.note}</p>}
+          {stage.blocks.map((block) => <PromptBlock label={block.label} text={block.text} />)}
+          {stage.afterNote && <p class="after">↳ {stage.afterNote}</p>}
         </section>
       ))}
-    </main>
+    </div>
 
     <section class="discipline">
       <h2 class="dlabel">{P.disciplineTitle}</h2>
-      <ul>{P.discipline.map(d => <li>{d}</li>)}</ul>
+      <ul>{P.discipline.map((item) => <li>{item}</li>)}</ul>
     </section>
 
     <footer class="foot">
       <a class="home" href="/">← Back to zibinzhao.com</a>
     </footer>
-  </div>
+  </IndexSheet>
 
   <script is:inline>
     (() => {
@@ -59,61 +54,56 @@ import { promptPack as P } from '../data/prompts';
       document.querySelectorAll('.copy').forEach((btn) => {
         btn.addEventListener('click', async () => {
           const pre = btn.parentElement && btn.parentElement.querySelector('.ptext');
+          const feedback = btn.parentElement && btn.parentElement.querySelector('.copy-feedback');
           const text = pre ? pre.textContent : '';
           try { await navigator.clipboard.writeText(text); }
           catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch { /* Copy is best-effort. */ } ta.remove(); }
           btn.classList.add('copied');
-          setTimeout(() => btn.classList.remove('copied'), 1600);
+          btn.setAttribute('aria-label', 'Copied to clipboard');
+          if (feedback) feedback.textContent = 'Copied to clipboard';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.setAttribute('aria-label', 'Copy prompt to clipboard');
+            if (feedback) feedback.textContent = '';
+          }, 1600);
         });
       });
       // scroll-spy: highlight the active stage in the sticky nav
       const links = [...document.querySelectorAll('.stagenav a')];
       const byStage = Object.fromEntries(links.map((a) => [a.dataset.stage, a]));
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((e) => {
-          if (!e.isIntersecting) return;
-          const id = e.target.id.replace('stage-', '');
-          links.forEach((a) => a.classList.remove('active'));
-          const a = byStage[id];
-          if (a) { a.classList.add('active'); a.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+      let deliberateStage = '';
+      const setActive = (active) => {
+        links.forEach((a) => {
+          const isActive = a === active;
+          a.classList.toggle('active', isActive);
+          if (isActive) a.setAttribute('aria-current', 'location');
+          else a.removeAttribute('aria-current');
         });
-      }, { rootMargin: '-42% 0px -52% 0px' });
-      document.querySelectorAll('.stage').forEach((s) => io.observe(s));
+      };
+      links.forEach((a) => {
+        a.addEventListener('click', () => {
+          deliberateStage = a.dataset.stage || '';
+          setActive(a);
+        });
+      });
+      if (typeof IntersectionObserver !== 'undefined') {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const id = e.target.id.replace('stage-', '');
+            if (deliberateStage && id !== deliberateStage) return;
+            deliberateStage = '';
+            const a = byStage[id];
+            if (a) { setActive(a); a.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+          });
+        }, { rootMargin: '-42% 0px -52% 0px' });
+        document.querySelectorAll('.stage').forEach((s) => io.observe(s));
+      }
     })();
   </script>
-</Base>
+</StitchShell>
 
 <style>
-  :global(.skip-link) {
-    position: fixed;
-    z-index: 50;
-    top: 12px;
-    left: 12px;
-    display: inline-flex;
-    min-height: 40px;
-    align-items: center;
-    padding: 9px 11px;
-    border: var(--stroke);
-    background: var(--paper-card);
-    box-shadow: var(--shadow-control);
-    font: 500 11px/1.2 var(--font-note);
-    text-transform: uppercase;
-    transform: translateY(calc(-100% - 24px));
-    transition: transform var(--motion-fast) var(--ease-press);
-  }
-
-  :global(.skip-link:focus-visible) {
-    transform: none;
-  }
-
-  .page {
-    min-height: 100vh;
-    padding: var(--page-pad);
-  }
-
-  .prompt-bar,
-  .prompt-index-label,
-  .back,
   .stagenav,
   .stage-card,
   .meta,
@@ -123,38 +113,10 @@ import { promptPack as P } from '../data/prompts';
     box-shadow: var(--shadow-control);
   }
 
-  .prompt-bar {
-    display: flex;
-    max-width: var(--content-max);
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    margin: 0 auto;
-    padding: 10px 12px;
-    transform: rotate(-.35deg);
-  }
-
-  .prompt-index-label,
-  .back {
-    display: inline-flex;
-    min-height: 40px;
-    align-items: center;
-    padding: 7px 9px;
-    font: 500 11px/1 var(--font-note);
-    text-transform: uppercase;
-    transition: background var(--motion-fast) var(--ease-press), color var(--motion-fast) var(--ease-press), transform var(--motion-fast) var(--ease-press);
-  }
-
-  .prompt-index-label:hover,
-  .back:hover {
-    background: var(--green-bright);
-    transform: translate(-1px, -1px);
-  }
-
   .prompt-hero {
     max-width: 880px;
     margin: 0 auto;
-    padding: 90px 20px 24px;
+    padding: 0 0 24px;
     text-align: left;
   }
 
@@ -165,16 +127,8 @@ import { promptPack as P } from '../data/prompts';
     text-transform: uppercase;
   }
 
-  .prompt-hero h1 {
-    max-width: 820px;
-    margin: 16px 0 20px;
-    font: 400 clamp(42px, 7vw, 78px)/.98 var(--font-display);
-    letter-spacing: .01em;
-    text-transform: uppercase;
-    text-wrap: balance;
-  }
-
   .intro {
+    margin-top: 16px;
     max-width: 72ch;
     color: var(--muted);
     font-size: clamp(15px, 2vw, 18px);
@@ -212,7 +166,7 @@ import { promptPack as P } from '../data/prompts';
 
   .stagenav {
     position: sticky;
-    top: var(--page-pad);
+    top: 80px;
     z-index: 30;
     display: flex;
     max-width: 980px;
@@ -255,6 +209,11 @@ import { promptPack as P } from '../data/prompts';
     color: var(--paper);
   }
 
+  .stagenav a:focus-visible {
+    position: relative;
+    z-index: 1;
+  }
+
   .stagenav a.active b {
     color: var(--paper);
   }
@@ -268,7 +227,7 @@ import { promptPack as P } from '../data/prompts';
     max-width: 980px;
     margin: 28px auto 0;
     padding: clamp(22px, 4vw, 38px);
-    scroll-margin-top: 110px;
+    scroll-margin-top: 150px;
   }
 
   .stage-card:nth-child(even) {
@@ -396,29 +355,8 @@ import { promptPack as P } from '../data/prompts';
   }
 
   @media (max-width: 640px) {
-    .page {
-      padding: 14px;
-    }
-
-    .prompt-bar {
-      align-items: stretch;
-      transform: none;
-    }
-
-    .prompt-index-label,
-    .back {
-      display: flex;
-      align-items: center;
-      font-size: 9px;
-      line-height: 1.25;
-    }
-
-    .prompt-index-label {
-      max-width: 190px;
-    }
-
     .prompt-hero {
-      padding: 64px 6px 18px;
+      padding: 0 0 18px;
     }
 
     .mrow {
@@ -431,7 +369,7 @@ import { promptPack as P } from '../data/prompts';
     }
 
     .stagenav {
-      top: 14px;
+      top: 64px;
     }
 
     .stagenav a span {
@@ -446,6 +384,10 @@ import { promptPack as P } from '../data/prompts';
 
     .stage-card:nth-child(n) {
       transform: none;
+    }
+
+    .stage-card {
+      scroll-margin-top: 126px;
     }
 
     .stage-number {

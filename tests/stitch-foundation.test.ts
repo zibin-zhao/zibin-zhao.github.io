@@ -158,6 +158,24 @@ describe('Stitch shell', () => {
     for (const href of ['/about/', '/research/', '/projects/', '/#vibe', '/cv/', '/contact/', '/prompts/']) {
       expect(footer).toContain(href);
     }
+    expect(footer).toContain("aria-current={active === 'prompts' ? 'page' : undefined}");
+  });
+
+  it('preserves Prompts hooks inside StitchShell', () => {
+    const page = read('src/pages/prompts.astro');
+    const block = read('src/components/PromptBlock.astro');
+
+    for (const marker of [
+      '<StitchShell',
+      "document.querySelectorAll('.copy')",
+      "document.querySelectorAll('.stage')",
+      'navigator.clipboard.writeText',
+      "document.execCommand('copy')",
+      'new IntersectionObserver',
+    ]) expect(page).toContain(marker);
+    for (const hook of ['class="copy"', 'class="ptext"']) expect(block).toContain(hook);
+    expect(page).toContain('typeof IntersectionObserver');
+    expect(page).toContain("document.querySelectorAll('.stagenav a')");
   });
 
   it('keeps required anchors visible and above pointer-inert decoration at every width', () => {
