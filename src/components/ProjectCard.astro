@@ -13,7 +13,7 @@ interface Props {
 const { title, blurb, blurbZh, type, href, tags = [] } = Astro.props;
 const Tag = href ? 'a' : 'div';
 ---
-<Tag class="project-card" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
+<Tag class="project-card" data-project={title} href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener noreferrer' : undefined}>
   <div class="project-schematic" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
   <div class="project-copy">
     <span class="project-type">{type}</span>
@@ -31,7 +31,7 @@ const Tag = href ? 'a' : 'div';
     grid-template-columns: minmax(112px, 34%) minmax(0, 1fr);
     border: 2px solid var(--ink);
     background: var(--paper-card);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-6);
     transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
   }
 
@@ -40,8 +40,8 @@ const Tag = href ? 'a' : 'div';
   }
 
   a.project-card:hover {
-    transform: translate(-3px, -3px) rotate(-.35deg);
-    box-shadow: 9px 9px 0 var(--ink);
+    transform: translate(-2px, -2px) rotate(-.35deg);
+    box-shadow: var(--shadow-6);
   }
 
   .project-schematic {
@@ -107,7 +107,7 @@ const Tag = href ? 'a' : 'div';
 
   .project-type {
     padding: 5px 8px;
-    border: 1px solid var(--ink);
+    border: 2px dashed var(--outline);
     background: var(--paper);
     font: 500 10px/1.25 var(--font-note);
     text-transform: uppercase;

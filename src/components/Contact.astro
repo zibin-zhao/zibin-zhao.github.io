@@ -5,11 +5,11 @@ import T from './T.astro';
 const year = new Date().getFullYear();
 ---
 
-<section id="contact" class="reveal closing-poster">
-  <div class="closing-copy">
-    <p class="closing-label">06 — <T en="Contact" zh="联系" /></p>
+<section id="contact" class="reveal contact-record">
+  <div class="contact-copy">
+    <p class="contact-label">ARCHIVE 06 / CORRESPONDENCE</p>
     <h2><T en="Let's make something useful." zh="一起做些真正有用的东西。" /></h2>
-    <p class="closing-note">
+    <p class="contact-note">
       <T
         en="Open to collaboration, research chats & opportunities."
         zh="欢迎合作、学术交流与各类机会。"
@@ -20,7 +20,7 @@ const year = new Date().getFullYear();
     </a>
   </div>
 
-  <div class="closing-indexes">
+  <div class="contact-indexes">
     <nav class="footer-index" aria-label="Footer chapters">
       {profile.navLinks.map((link) => (
         <a href={link.href}><T en={link.en} zh={link.zh} /></a>
@@ -29,7 +29,7 @@ const year = new Date().getFullYear();
 
     <div class="social-index" aria-label="Social profiles">
       {profile.socials.map((social) => (
-        <a href={social.href} target="_blank" rel="noopener">
+        <a data-contact-social={social.label} href={social.href} target="_blank" rel="noopener noreferrer">
           {social.label} <span aria-hidden="true">↗</span>
         </a>
       ))}
@@ -40,55 +40,54 @@ const year = new Date().getFullYear();
 </section>
 
 <style>
-  .closing-poster {
+  .contact-record {
     position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    padding: clamp(64px, 10vw, 120px) var(--page-pad) clamp(28px, 5vw, 52px);
-    border-block: var(--stroke);
-    color: var(--paper);
-    background: var(--ink);
+    min-width: 0;
+    padding: clamp(22px, 4vw, 38px);
+    border: var(--stroke);
+    background: var(--surface);
+    box-shadow: var(--shadow-6);
+    transform: rotate(.5deg);
   }
 
-  .closing-poster::before {
+  .contact-record::before {
     position: absolute;
-    z-index: -1;
-    top: clamp(-90px, -8vw, -32px);
-    right: clamp(-90px, -6vw, -24px);
-    width: clamp(150px, 24vw, 310px);
-    aspect-ratio: 1;
-    border: 2px solid var(--paper);
-    border-radius: 50%;
-    background: var(--orange);
+    top: 18px;
+    right: 18px;
+    width: 54px;
+    height: 18px;
+    border: var(--stroke);
+    background: repeating-linear-gradient(90deg, var(--green) 0 4px, var(--surface) 4px 8px);
     content: '';
   }
 
-  .closing-copy,
-  .closing-indexes,
-  footer {
-    width: min(100%, var(--content-max));
-    margin-inline: auto;
+  .contact-copy {
+    padding-bottom: clamp(28px, 5vw, 48px);
+    border-bottom: 2px dashed var(--outline);
   }
 
-  .closing-label {
-    color: var(--orange);
-    font: 500 13px/1.2 var(--font-note);
-    letter-spacing: .05em;
+  .contact-label {
+    padding-right: 70px;
+    color: var(--muted);
+    font: 500 10px/1.4 var(--font-note);
+    letter-spacing: .08em;
     text-transform: uppercase;
   }
 
-  .closing-poster h2 {
-    max-width: 850px;
-    margin-top: clamp(20px, 4vw, 42px);
-    font: 400 clamp(44px, 8.5vw, 96px)/.98 var(--font-display);
+  .contact-record h2 {
+    max-width: 760px;
+    margin-top: clamp(18px, 3vw, 30px);
+    font: 400 clamp(38px, 7vw, 72px)/.98 var(--font-display);
     letter-spacing: -.02em;
     text-wrap: balance;
+    text-transform: uppercase;
   }
 
-  .closing-note {
+  .contact-note {
     max-width: 60ch;
-    margin-top: clamp(24px, 4vw, 38px);
-    font-size: clamp(15px, 2vw, 19px);
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: clamp(15px, 2vw, 18px);
     line-height: 1.55;
     text-wrap: pretty;
   }
@@ -99,11 +98,13 @@ const year = new Date().getFullYear();
     gap: .6em;
     align-items: center;
     max-width: 100%;
-    margin-top: clamp(18px, 3vw, 30px);
-    padding-bottom: 6px;
-    border-bottom: 2px solid var(--orange);
-    color: var(--paper);
-    font: 500 clamp(15px, 2.4vw, 23px)/1.25 var(--font-note);
+    margin-top: 24px;
+    padding: 10px 12px;
+    border: var(--stroke);
+    color: var(--ink);
+    background: var(--orange);
+    box-shadow: var(--shadow-4);
+    font: 500 clamp(13px, 2vw, 18px)/1.25 var(--font-note);
   }
 
   .email-address {
@@ -111,20 +112,17 @@ const year = new Date().getFullYear();
     overflow-wrap: anywhere;
   }
 
-  .closing-indexes {
+  .contact-indexes {
     display: grid;
     grid-template-columns: minmax(0, 1.45fr) minmax(230px, .55fr);
-    gap: clamp(34px, 7vw, 88px);
-    margin-top: clamp(66px, 10vw, 118px);
-    padding-top: clamp(24px, 4vw, 42px);
-    border-top: 1px solid var(--green);
+    gap: clamp(28px, 5vw, 56px);
+    padding-top: clamp(28px, 5vw, 48px);
   }
 
   .footer-index {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 22px;
-    align-content: start;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 18px;
   }
 
   .footer-index a,
@@ -132,42 +130,48 @@ const year = new Date().getFullYear();
     display: inline-flex;
     min-height: 40px;
     align-items: center;
-    font: 500 12px/1.4 var(--font-note);
-    transition: color var(--motion-fast) var(--ease-press);
+    justify-content: space-between;
+    border-bottom: 2px dashed var(--outline);
+    font: 500 11px/1.4 var(--font-note);
+    transition: background-color var(--motion-fast) var(--ease-press);
   }
 
   .footer-index a:hover,
   .social-index a:hover {
-    color: var(--orange);
+    background: var(--green-bright);
   }
 
   .social-index {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px 20px;
+    gap: 8px 18px;
   }
 
   footer {
-    margin-top: clamp(42px, 7vw, 76px);
-    color: var(--green-bright);
+    margin-top: clamp(30px, 5vw, 52px);
+    padding-top: 12px;
+    border-top: 2px dashed var(--outline);
+    color: var(--muted);
     font: 500 11px/1.4 var(--font-note);
   }
 
   @media (max-width: 700px) {
-    .closing-poster::before {
-      opacity: .65;
+    .contact-record {
+      box-shadow: var(--shadow-4);
+      transform: none;
     }
 
-    .closing-indexes {
+    .contact-indexes {
       grid-template-columns: 1fr;
     }
   }
 
   @media (max-width: 440px) {
-    .closing-poster h2 {
+    .contact-record h2 {
       font-size: clamp(40px, 14vw, 58px);
     }
 
+    .footer-index,
     .social-index {
       grid-template-columns: 1fr;
     }

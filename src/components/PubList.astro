@@ -8,12 +8,12 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
 <Section id="research" num="02" label="Research & Publications" labelZh="研究与论文" variant="folder">
   <ol class="pubs">
     {pubs.map((p, index) => (
-      <li class:list={['pub', p.featured ? 'pub--featured' : 'pub--archive']}>
+      <li class:list={['pub', p.featured ? 'pub--featured' : 'pub--archive']} data-publication={p.title}>
         {p.featured && <span class="pub-index" aria-hidden="true">{index + 1}</span>}
         <div class="pub-meta"><span>{p.year}</span>{p.venue && <span>{p.venue}</span>}</div>
         <h3>{p.title}{p.featured && <span class="star" aria-label="Featured">★</span>}</h3>
         {p.authors && <p class="pub-authors">{p.authors}</p>}
-        {p.links && <div class="pub-links">{Object.entries(p.links).filter(([, value]) => value).map(([key, value]) => <a href={value} target="_blank" rel="noopener">{key.toUpperCase()} ↗</a>)}</div>}
+        {p.links && <div class="pub-links">{Object.entries(p.links).filter(([, value]) => value).map(([key, value]) => <a href={value} target="_blank" rel="noopener noreferrer">{key.toUpperCase()} ↗</a>)}</div>}
       </li>
     ))}
   </ol>
@@ -32,18 +32,18 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
     grid-column: span 4;
     min-width: 0;
     padding: 22px;
-    border: 1px solid var(--ink);
+    border: var(--stroke);
     background: var(--paper-card);
     counter-increment: publication;
   }
 
   .pub--featured {
     grid-column: span 6;
-    min-height: 290px;
+    min-height: 250px;
     padding: clamp(28px, 4vw, 44px);
     border: var(--stroke);
     background: var(--green-bright);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-6);
   }
 
   .pub--archive::before {
@@ -78,7 +78,7 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
     width: fit-content;
     max-width: calc(100% - 58px);
     margin-bottom: 22px;
-    border: 1px solid var(--ink);
+    border: 2px dashed var(--outline);
     color: var(--muted);
     background: var(--paper);
     font: 500 10px/1.35 var(--font-note);
@@ -96,7 +96,7 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
   }
 
   .pub-meta span + span {
-    border-left: 1px solid var(--ink);
+    border-left: 2px dashed var(--outline);
   }
 
   .pub h3 {
@@ -137,7 +137,7 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
     min-height: 40px;
     align-items: center;
     padding: 7px 9px;
-    border: 1px solid var(--ink);
+    border: var(--stroke);
     background: var(--orange);
     box-shadow: 2px 2px 0 var(--ink);
     font: 500 10px/1 var(--font-note);
@@ -167,7 +167,7 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
 
     .pub--featured {
       min-height: 0;
-      box-shadow: 4px 4px 0 var(--ink);
+      box-shadow: var(--shadow-4);
     }
   }
 </style>

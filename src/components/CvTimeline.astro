@@ -10,7 +10,7 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
   <div class="cv-layout">
     <ol class="cv-index">
       {items.map((item, index) => (
-        <li class="cv-entry">
+        <li class="cv-entry" data-cv-entry={item.title.en}>
           <span class="cv-num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
           <div class="cv-copy">
             <h3>
@@ -42,7 +42,7 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
 
   .cv-index {
     min-width: 0;
-    border-top: var(--stroke);
+    border-top: 2px dashed var(--outline);
     list-style: none;
   }
 
@@ -51,7 +51,7 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
     grid-template-columns: clamp(42px, 6vw, 68px) minmax(0, 1fr);
     gap: clamp(12px, 2.5vw, 26px);
     padding: clamp(19px, 3vw, 30px) 0;
-    border-bottom: var(--stroke);
+    border-bottom: 2px dashed var(--outline);
   }
 
   .cv-num {
@@ -85,7 +85,7 @@ const items = [...cv.education, ...cv.experience, ...cv.leadership];
     padding: clamp(20px, 3vw, 28px);
     border: var(--stroke);
     background: var(--green);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-6);
   }
 
   .chips {
