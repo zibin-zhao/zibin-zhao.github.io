@@ -1,8 +1,8 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { mkdir, readFile } from 'node:fs/promises';
+import process from 'node:process';
 
 const routes = ['/', '/about/', '/research/', '/projects/', '/cv/', '/contact/', '/prompts/'] as const;
-const artifactDir = 'artifacts/stitch';
 
 const applyArtifactProjection = async (page: Page, width: number, height: number) => {
   const originalViewport = page.viewportSize();
@@ -494,6 +494,9 @@ test('mobile without JavaScript keeps English content and every ordinary destina
 });
 
 test('capture deterministic source-comparison artifacts', async ({ page }, testInfo) => {
+  const artifactDir = process.env.UPDATE_STITCH_ARTIFACTS === '1'
+    ? 'artifacts/stitch'
+    : testInfo.outputPath('artifacts');
   await mkdir(artifactDir, { recursive: true });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'networkidle' });

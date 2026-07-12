@@ -17,6 +17,20 @@ describe('production quality gates', () => {
     );
   });
 
+  it('keeps ordinary browser tests read-only and exposes an explicit artifact update command', () => {
+    const pkg = JSON.parse(read('package.json'));
+    const stitchSpec = read('tests/e2e/stitch.spec.ts');
+    const qualityGates = read('docs/quality-gates.md');
+
+    expect(pkg.scripts['test:visual:update']).toBe(
+      'UPDATE_STITCH_ARTIFACTS=1 playwright test tests/e2e/stitch.spec.ts --grep "capture deterministic source-comparison artifacts" --project=canonical-768 --project=desktop --project=mobile',
+    );
+    expect(stitchSpec).toContain("process.env.UPDATE_STITCH_ARTIFACTS === '1'");
+    expect(stitchSpec).toContain("testInfo.outputPath('artifacts')");
+    expect(qualityGates).toContain('`npm run test:browser` is read-only with respect to tracked artifacts');
+    expect(qualityGates).toContain('`npm run test:visual:update` intentionally refreshes');
+  });
+
   it('requires the Node 22 runtime floor supported by ESLint 10', () => {
     const pkg = JSON.parse(read('package.json'));
     expect(pkg.engines.node).toBe('>=22.13.0');
