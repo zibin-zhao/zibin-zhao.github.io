@@ -2,14 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 describe('Index menu state helper', () => {
   it('synchronizes panel class, aria-expanded, and optional focus return', async () => {
-    let menuModule: typeof import('../src/scripts/menu') | undefined;
-    try {
-      menuModule = await import('../src/scripts/menu');
-    } catch {
-      // The assertion below reports a failed import with a focused message.
-    }
-    expect(menuModule).toBeDefined();
-    if (!menuModule) return;
+    const menuModule = await import('../src/scripts/menu');
 
     const classes = new Set<string>();
     const panel = {
