@@ -7,9 +7,27 @@ const items = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.
 ---
 <Section id="projects" num="03" label="Projects & Demos" labelZh="项目与演示" variant="scrap">
   <h2 class="big"><T en="Things I've built" zh="我做过的东西" /></h2>
-  <div class="cards">{items.map(p => <ProjectCard {...p.data} />)}</div>
+  <div class="project-board">{items.map((project) => <ProjectCard {...project.data} />)}</div>
 </Section>
 <style>
-  .cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
-  @media (max-width:760px){.cards{grid-template-columns:1fr}}
+  .big {
+    max-width: 12ch;
+    font: 400 clamp(40px, 6vw, 72px)/.95 var(--font-display);
+    letter-spacing: -.02em;
+    text-wrap: balance;
+    text-transform: uppercase;
+  }
+
+  .project-board {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(18px, 3vw, 30px);
+    margin-top: clamp(30px, 5vw, 52px);
+  }
+
+  @media (max-width: 760px) {
+    .project-board {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 </style>

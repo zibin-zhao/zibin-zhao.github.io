@@ -1,20 +1,160 @@
 ---
 import T from './T.astro';
-const { title, blurb, blurbZh, type, href } = Astro.props;
+const { title, blurb, blurbZh, type, href, tags = [] } = Astro.props;
 const Tag = href ? 'a' : 'div';
 ---
-<Tag class="pcard" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
-  <span class="tag">{type}</span>
-  <h4>{title}</h4>
-  <p><T en={blurb} zh={blurbZh ?? blurb} /></p>
-  {href && <span class="go"><T en="View →" zh="查看 →" /></span>}
+<Tag class="project-card" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
+  <div class="project-schematic" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
+  <div class="project-copy">
+    <span class="project-type">{type}</span>
+    <h3>{title}</h3>
+    <p><T en={blurb} zh={blurbZh ?? blurb} /></p>
+    <div class="project-tags">{tags.map((tag) => <span>{tag}</span>)}</div>
+    {href && <span class="project-action"><T en="Open experiment ↗" zh="打开实验 ↗" /></span>}
+  </div>
 </Tag>
 <style>
-  .pcard{display:block;border:1.5px solid var(--ink);background:var(--paper);box-shadow:var(--shadow-sticker);padding:20px;transition:transform var(--motion-fast) var(--ease-spring),box-shadow var(--motion-fast)}
-  .pcard:nth-child(2n){background:var(--blue);transform:rotate(1.2deg)}.pcard:nth-child(3n){background:var(--green-light);transform:rotate(-1deg)}
-  a.pcard:hover{transform:translate(-5px,-5px) rotate(-2deg);box-shadow:10px 10px 0 var(--ink)}
-  .tag{display:inline-block;border:1px solid var(--ink);padding:3px 8px;color:var(--ink);font:700 10px/1 var(--font-note);text-transform:uppercase}
-  .pcard h4{font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:500;line-height:1;margin:13px 0 8px}
-  .pcard p{color:var(--muted);font-size:13px;line-height:1.5}.go{display:inline-block;margin-top:12px;font:700 11px/1 var(--font-note);text-decoration:underline;text-underline-offset:3px}
-  @media(max-width:760px){.pcard:nth-child(n){transform:none}}
+  .project-card {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    grid-template-columns: minmax(112px, 34%) minmax(0, 1fr);
+    border: 2px solid var(--ink);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-card);
+    transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
+  }
+
+  .project-card:nth-child(2n) {
+    transform: translateY(14px) rotate(.35deg);
+  }
+
+  a.project-card:hover {
+    transform: translate(-3px, -3px) rotate(-.35deg);
+    box-shadow: 9px 9px 0 var(--ink);
+  }
+
+  .project-schematic {
+    position: relative;
+    min-height: 230px;
+    overflow: hidden;
+    border-right: 2px solid var(--ink);
+    background: var(--green);
+  }
+
+  .project-schematic::before,
+  .project-schematic::after,
+  .project-schematic span,
+  .project-schematic i {
+    position: absolute;
+    display: block;
+    border: 2px solid var(--ink);
+  }
+
+  .project-schematic::before {
+    content: '';
+    top: 20%;
+    left: 18%;
+    width: 64%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+  }
+
+  .project-schematic::after {
+    content: '';
+    inset: 48% 12% auto;
+    border-width: 2px 0 0;
+    transform: rotate(-18deg);
+  }
+
+  .project-schematic span {
+    width: 16px;
+    height: 16px;
+    background: var(--paper);
+    transform: rotate(45deg);
+  }
+
+  .project-schematic span:nth-child(1) { top: 16%; left: 15%; }
+  .project-schematic span:nth-child(2) { top: 50%; right: 12%; background: var(--orange); }
+  .project-schematic span:nth-child(3) { bottom: 14%; left: 26%; }
+
+  .project-schematic i {
+    right: 16%;
+    bottom: 14%;
+    width: 34%;
+    height: 28%;
+    background: transparent;
+    transform: rotate(8deg);
+  }
+
+  .project-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: clamp(20px, 3vw, 30px);
+  }
+
+  .project-type {
+    padding: 5px 8px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font: 500 10px/1.25 var(--font-note);
+    text-transform: uppercase;
+  }
+
+  .project-copy h3 {
+    margin: 18px 0 10px;
+    font: 400 clamp(28px, 3vw, 38px)/1 var(--font-display);
+    letter-spacing: -.02em;
+    overflow-wrap: anywhere;
+    text-transform: uppercase;
+  }
+
+  .project-copy p {
+    max-width: 46ch;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 18px;
+  }
+
+  .project-tags span {
+    padding: 4px 7px;
+    background: var(--green-bright);
+    font: 500 9px/1.2 var(--font-note);
+  }
+
+  .project-action {
+    margin-top: auto;
+    padding-top: 24px;
+    font: 500 11px/1.2 var(--font-note);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 760px) {
+    .project-card:nth-child(n) {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .project-card {
+      grid-template-columns: 1fr;
+    }
+
+    .project-schematic {
+      min-height: 150px;
+      border-right: 0;
+      border-bottom: 2px solid var(--ink);
+    }
+  }
 </style>

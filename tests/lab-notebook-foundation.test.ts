@@ -69,4 +69,16 @@ describe('Stitch lab-notebook foundation', () => {
     expect(about).toMatch(/\.dossier\s*\{[^}]*transform:\s*rotate\(-\.35deg\);/);
     expect(about).toMatch(/@media \(max-width: 640px\)[\s\S]*?\.dossier\s*\{[\s\S]*?transform:\s*none;/);
   });
+
+  it('uses explicit project and Vibe image fallbacks', () => {
+    const projects = read('src/components/Projects.astro');
+    const projectCard = read('src/components/ProjectCard.astro');
+    const vibe = read('src/components/Vibe.astro');
+    const vibeCard = read('src/components/VibeCard.astro');
+    expect(projects).toContain('class="project-board"');
+    expect(projectCard).toContain('class="project-schematic"');
+    expect(vibe).toContain('class="vibe-board"');
+    expect(vibeCard).toContain('class="shot-fallback"');
+    expect(vibeCard).toContain('width="800" height="600"');
+  });
 });

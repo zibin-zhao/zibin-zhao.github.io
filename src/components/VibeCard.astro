@@ -4,7 +4,13 @@ const { title, titleZh, blurb, blurbZh, tags = [], href, screenshot, preview, co
 const Tag = href ? 'a' : 'div';
 ---
 <Tag class="card" href={href} target={href ? '_blank' : undefined} rel={href ? 'noopener' : undefined}>
-  <div class:list={['shot', preview && `shot--${preview}`]}>{screenshot ? <img src={screenshot} alt={`${title} screenshot`} width="800" height="600" loading="lazy" /> : preview === 'medit' ? <span class="medit-preview" aria-label="Medit: a quiet place for journaling and gentle daily rituals">☾ &nbsp; leaf / quiet place &nbsp; ☾</span> : <T en="Image / experiment holder — awaiting an original screenshot" zh="图像 / 实验占位区 —— 等待原创截图" />}</div>
+  <div class:list={['shot', preview && `shot--${preview}`]}>
+    {screenshot
+      ? <img src={screenshot} alt={`${title} screenshot`} width="800" height="600" loading="lazy" />
+      : preview === 'medit'
+        ? <span class="medit-preview" aria-label="Medit: a quiet place for journaling and gentle daily rituals">☾ leaf / quiet place ☾</span>
+        : <span class="shot-fallback" aria-hidden="true"><i></i><i></i><i></i><b>EXPERIMENT PREVIEW</b></span>}
+  </div>
   <div class="body">
     <div class="ttl">{title} {titleZh && <span class="zh">{titleZh}</span>}</div>
     <p class="desc"><T en={blurb} zh={blurbZh ?? blurb} /></p>
@@ -13,14 +19,165 @@ const Tag = href ? 'a' : 'div';
   </div>
 </Tag>
 <style>
-  .card{display:flex;flex-direction:column;overflow:hidden;border:1.5px solid var(--ink);background:var(--paper);box-shadow:var(--shadow-sticker);transition:transform var(--motion-fast) var(--ease-spring),box-shadow var(--motion-fast)}
-  .card:nth-child(2n){background:var(--orange-light);transform:rotate(-1deg)}
-  a.card:hover{transform:translate(-5px,-5px) rotate(2deg);box-shadow:10px 10px 0 var(--ink)}
-  .shot{display:flex;aspect-ratio:4/3;align-items:center;justify-content:center;border-bottom:1.5px dashed var(--ink);background:repeating-linear-gradient(45deg,rgba(141,211,241,.62),rgba(141,211,241,.62) 12px,rgba(255,253,246,.72) 12px,rgba(255,253,246,.72) 24px);padding:18px;color:var(--ink);font:700 10px/1.45 var(--font-note);letter-spacing:.05em;text-align:center;text-transform:uppercase}
-  .shot img{width:100%;height:100%;object-fit:cover}
-  .shot--medit{background:linear-gradient(145deg,#e8dec4,#f7f0de);color:#6b5730}
-  .medit-preview{border:1px solid currentColor;padding:10px 12px;font:700 10px/1 var(--font-note);letter-spacing:.08em;text-transform:uppercase;transform:rotate(-2deg)}
-  .body{padding:18px}.ttl{display:flex;align-items:center;gap:8px;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:500}.zh{color:var(--muted);font:10px/1 var(--font-note)}
-  .desc{margin:8px 0 12px;color:var(--muted);font-size:13px;line-height:1.55}.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}.t{border:1px solid var(--ink);padding:3px 7px;font:700 9px/1 var(--font-note);color:var(--ink)}.go{font:700 11px/1 var(--font-note);text-decoration:underline;text-underline-offset:3px}
-  @media(max-width:760px){.card:nth-child(n){transform:none}}
+  .card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border: 2px solid var(--ink);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-card);
+    transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
+  }
+
+  .card:nth-child(2n) {
+    transform: translateY(14px) rotate(-.35deg);
+  }
+
+  a.card:hover {
+    transform: translate(-3px, -3px) rotate(.35deg);
+    box-shadow: 9px 9px 0 var(--ink);
+  }
+
+  .shot {
+    display: flex;
+    aspect-ratio: 4 / 3;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 2px solid var(--ink);
+    background: var(--green);
+    color: var(--ink);
+  }
+
+  .shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .shot--medit {
+    background: #e8dec4;
+    color: #493c22;
+  }
+
+  .medit-preview {
+    max-width: calc(100% - 40px);
+    padding: 12px 14px;
+    border: 1px solid currentColor;
+    font: 500 10px/1.35 var(--font-note);
+    letter-spacing: .06em;
+    text-align: center;
+    text-transform: uppercase;
+    transform: rotate(-2deg);
+  }
+
+  .shot-fallback {
+    position: relative;
+    display: grid;
+    width: min(72%, 270px);
+    aspect-ratio: 4 / 3;
+    place-items: center;
+    border: 2px solid var(--ink);
+  }
+
+  .shot-fallback::before,
+  .shot-fallback::after {
+    position: absolute;
+    content: '';
+  }
+
+  .shot-fallback::before {
+    inset: 12%;
+    border: 1px dashed var(--ink);
+  }
+
+  .shot-fallback::after {
+    width: 38%;
+    aspect-ratio: 1;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+  }
+
+  .shot-fallback i {
+    position: absolute;
+    z-index: 1;
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    transform: rotate(45deg);
+  }
+
+  .shot-fallback i:nth-child(1) { top: 8%; left: 8%; }
+  .shot-fallback i:nth-child(2) { top: 20%; right: 18%; background: var(--orange); }
+  .shot-fallback i:nth-child(3) { right: 10%; bottom: 12%; }
+
+  .shot-fallback b {
+    z-index: 2;
+    padding: 5px 7px;
+    background: var(--paper);
+    font: 500 8px/1.2 var(--font-note);
+    letter-spacing: .04em;
+  }
+
+  .body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: clamp(20px, 3vw, 30px);
+  }
+
+  .ttl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    font: 400 clamp(28px, 3vw, 38px)/1 var(--font-display);
+    letter-spacing: -.02em;
+    text-transform: uppercase;
+  }
+
+  .zh {
+    color: var(--muted);
+    font: 500 11px/1.2 var(--font-note);
+  }
+
+  .desc {
+    max-width: 62ch;
+    margin: 12px 0 18px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+
+  .t {
+    padding: 4px 7px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    font: 500 9px/1.2 var(--font-note);
+  }
+
+  .go {
+    margin-top: auto;
+    font: 500 11px/1.2 var(--font-note);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 760px) {
+    .card:nth-child(n) {
+      transform: none;
+    }
+  }
 </style>
