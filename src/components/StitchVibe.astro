@@ -157,4 +157,25 @@ const singularityImage = '/stitch/singularity.png';
     .vibe-lower > .vibe-card { max-width: none; }
     .vibe-lower > .vibe-card + .vibe-card { margin-top: -10px; }
   }
+
+  @media (min-width: 701px) and (max-width: 1100px) {
+    .stitch-vibe { margin-bottom: 8px; padding-top: 16px; }
+    .stitch-vibe > h2 {
+      padding: 8px 10px;
+      font-size: 31px;
+    }
+    .lol-note {
+      width: min(43%, 294px);
+      margin-bottom: 25px;
+      padding: 8px 10px;
+      font-size: 8px;
+    }
+    .lol-note strong { margin-bottom: 4px; padding-bottom: 2px; font-size: 9px; }
+    .vibe-mosaic { gap: 30px; }
+    .vibe-mosaic > [data-vibe-slot='singularity'] { margin-top: -44px; margin-left: 17%; }
+    .vibe-mosaic > [data-vibe-slot='singularity'] > .vibe-card { width: 84%; }
+    [data-vibe-slot='medit'] { margin-top: -78px; }
+    .vibe-lower { gap: 12px; margin-top: 0; }
+    .vibe-lower > .vibe-card { flex: 0 1 272px; max-width: 272px; }
+  }
 </style>

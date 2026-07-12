@@ -190,4 +190,67 @@ import T from './T.astro';
       transform: rotate(-2deg);
     }
   }
+
+  @media (min-width: 641px) and (max-width: 1100px) {
+    .stitch-hero { min-height: 510px; }
+
+    .hero-wordmark {
+      top: 70px;
+      font-size: 80px;
+    }
+
+    .hero-wordmark span:last-child {
+      margin-top: -7px;
+      margin-left: 52px;
+    }
+
+    .collaboration-sticker {
+      top: 0;
+      padding: 6px 12px;
+      font-size: 9px;
+      line-height: 16px;
+    }
+
+    .hero-card {
+      top: 200px;
+      width: min(290px, 44vw);
+      padding: 10px;
+    }
+
+    .hero-card h2 {
+      margin-bottom: 7px;
+      font-size: 22px;
+      line-height: 26px;
+    }
+
+    .hero-card > p {
+      font-size: 9px;
+      line-height: 1.35;
+    }
+
+    .hero-card .hero-thesis {
+      margin-bottom: 7px;
+      padding-inline: 5px;
+      font-size: 7.5px;
+      line-height: 14px;
+    }
+
+    .hero-card-meta { margin-top: 12px; }
+    .hero-card-meta img { width: 40px; height: 40px; }
+    .hero-card-meta span { font-size: 7px; }
+
+    .hero-formula {
+      top: 170px;
+      padding: 3px 6px;
+      font-size: 8px;
+    }
+
+    .scroll-sticker {
+      top: 410px;
+      min-height: 32px;
+      padding: 6px 12px;
+      font-size: 8px;
+      line-height: 16px;
+    }
+  }
 </style>

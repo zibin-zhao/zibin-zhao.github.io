@@ -232,4 +232,47 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
     .pub-card--3 h3 { font-size: 15px; }
     .paper-authors { font-size: 12px; }
   }
+
+  @media (min-width: 701px) and (max-width: 1100px) {
+    .featured-research { margin-bottom: 0; }
+    .research-heading { margin-bottom: 40px; }
+    .research-heading h2 {
+      padding: 10px 14px;
+      font-size: 30px;
+      line-height: 34px;
+    }
+    .research-annotation { font-size: 8px; }
+    .research-stack { width: 90%; }
+    .fade-slot--2 { margin-top: -42px; }
+    .fade-slot--3 { margin-top: -10px; }
+    .pub-card { padding: 12px; }
+    .pub-card--3 { padding: 10px; }
+    .paper-index {
+      top: -12px;
+      left: -12px;
+      width: 32px;
+      height: 32px;
+      font-size: 17px;
+    }
+    .paper-meta { gap: 8px; padding-bottom: 5px; }
+    .paper-meta > span:first-child { padding: 2px 5px; font-size: 7px; }
+    .pub-card--3 .paper-meta > span:first-child { font-size: 7px; }
+    .magnify-icon { font-size: 16px; }
+    .pub-card h3 {
+      margin-top: 8px;
+      font-size: 15px;
+      line-height: 1.16;
+    }
+    .pub-card--3 h3 {
+      margin-top: 6px;
+      font-size: 11px;
+      line-height: 1.25;
+    }
+    .paper-authors { margin-top: 6px; font-size: 9px; line-height: 1.35; }
+    .pub-card--3 .paper-authors { font-size: 8px; }
+    .paper-links { gap: 10px; margin-top: 8px; }
+    .paper-links a { min-height: 18px; font-size: 7px; }
+    .pub-card--3 .paper-links { margin-top: 5px; }
+    .pub-card--3 .paper-links a { font-size: 7px; }
+  }
 </style>

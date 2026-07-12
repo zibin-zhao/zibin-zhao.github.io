@@ -21,7 +21,7 @@
   --shadow-4: 4px 4px 0 var(--ink);
   --shadow-6: 6px 6px 0 var(--ink);
   --shadow-8: 8px 8px 0 var(--ink);
-  --footer-reserve: 150px;
+  --footer-reserve: 170px;
   --font-display: 'Anton', 'Arial Narrow', sans-serif;
   --font-body: 'Space Grotesk', 'PingFang SC', sans-serif;
   --font-note: 'JetBrains Mono', ui-monospace, monospace;

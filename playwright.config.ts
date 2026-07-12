@@ -9,7 +9,7 @@ const port = 43217;
 const baseURL = `http://${host}:${port}`;
 
 export default defineConfig({
-  testDir: './tests/browser',
+  testDir: './tests',
   testMatch: '**/*.spec.ts',
   fullyParallel: false,
   workers: 1,
@@ -21,9 +21,31 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: `npm run dev -- --host ${host} --port ${port}`,
+    command: `npm run build && npm run preview -- --host ${host} --port ${port}`,
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120_000,
   },
+  projects: [
+    {
+      name: 'regression',
+      testMatch: '**/browser/*.spec.ts',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'canonical-768',
+      testMatch: '**/e2e/stitch.spec.ts',
+      use: { viewport: { width: 768, height: 1024 } },
+    },
+    {
+      name: 'desktop',
+      testMatch: '**/e2e/stitch.spec.ts',
+      use: { viewport: { width: 1440, height: 1000 } },
+    },
+    {
+      name: 'mobile',
+      testMatch: '**/e2e/stitch.spec.ts',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } },
+    },
+  ],
 });
