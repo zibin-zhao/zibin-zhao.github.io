@@ -22,17 +22,17 @@ describe('preserved portfolio behavior', () => {
     const toggle = read('src/components/LangToggle.astro');
     const lang = read('src/scripts/lang.ts');
     expect(text).toContain('<span class="t-en">{en}</span><span class="t-zh">{zh}</span>');
-    expect(toggle).toMatch(/\.langtoggle\s*\{[^}]*display:none;/);
-    expect(toggle).toMatch(/:global\(\.js\) \.langtoggle\s*\{[^}]*display:inline-flex/);
-    expect(lang).toContain("root.setAttribute('lang', l === 'zh' ? 'zh' : 'en')");
-    expect(lang).toContain("localStorage.setItem('lang', l)");
+    expect(toggle).toMatch(/\.langtoggle\s*\{[^}]*display:\s*none;/);
+    expect(toggle).toMatch(/:global\(\.js\) \.langtoggle\s*\{[^}]*display:\s*inline-flex/);
+    expect(lang).toContain("root.setAttribute('lang', lang)");
+    expect(lang).toContain("localStorage.setItem('lang', lang)");
   });
 
   it('keeps responsive evidence layouts single-column at tablet width', () => {
     const contracts: Array<[string, RegExp]> = [
       ['src/components/PubList.astro', /@media \(max-width: 780px\)[\s\S]*?\.pubs\s*\{\s*display:\s*block;/],
       ['src/components/Projects.astro', /@media \(max-width: 780px\)[\s\S]*?\.project-board\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\);/],
-      ['src/components/Vibe.astro', /@media \(max-width: 780px\)[\s\S]*?\.vibe-board\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\);/],
+      ['src/components/StitchVibe.astro', /@media \(max-width: 700px\)[\s\S]*?\.vibe-mosaic\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;/],
       ['src/components/CvTimeline.astro', /@media \(max-width: 780px\)[\s\S]*?\.cv-layout\s*\{\s*grid-template-columns:\s*1fr;/],
     ];
     for (const [path, contract] of contracts) expect(read(path)).toMatch(contract);
@@ -63,7 +63,8 @@ describe('preserved portfolio behavior', () => {
   });
 
   it('keeps authoritative CasMD data cross-listed in deterministic Vibe order', () => {
-    const vibe = read('src/components/Vibe.astro');
+    const vibe = read('src/components/StitchVibe.astro');
+    const home = read('src/data/home.ts');
     const project = read('src/content/projects/hsingmd.md');
     const casmd = read('src/content/vibe/casmd.md');
     for (const fact of [
@@ -74,6 +75,9 @@ describe('preserved portfolio behavior', () => {
       expect(project).toContain(fact);
       expect(casmd).toContain(fact);
     }
-    expect(vibe).toContain('a.data.order-b.data.order || a.id.localeCompare(b.id)');
+    expect(vibe).toContain("getCollection('vibe')");
+    expect(vibe).toContain('selectByTitles');
+    expect(vibe).toContain('HOME_VIBE_TITLES');
+    expect(home).toContain("'CasMD',\n  'Singularity',\n  'Medit',\n  'Yaos',\n  'Zen',");
   });
 });
