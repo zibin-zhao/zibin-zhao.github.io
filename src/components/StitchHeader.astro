@@ -51,6 +51,8 @@ import { profile } from '../data/profile';
   }
 
   .talk {
+    --resting-shadow: var(--shadow-4);
+    --resting-transform: rotate(-2deg);
     display: inline-flex;
     min-height: 40px;
     align-items: center;
@@ -72,6 +74,9 @@ import { profile } from '../data/profile';
   }
 
   @media (max-width: 390px) {
-    .talk { display: none; }
+    .stitch-header { gap: 4px; padding-inline: 10px; }
+    .site-stamp { max-width: 40vw; padding: 5px; font-size: 7px; letter-spacing: .04em; }
+    .header-actions { gap: 4px; }
+    .talk { padding-inline: 6px; font-size: 7px; letter-spacing: 0; }
   }
 </style>

@@ -84,26 +84,29 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
   }
 
   .footer-pill {
+    --resting-background: var(--surface);
+    --resting-shadow: var(--shadow-2);
+    --resting-transform: none;
     display: inline-flex;
     min-height: 28px;
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
     border: var(--stroke);
-    background: var(--surface);
+    background: var(--resting-background);
     box-shadow: var(--shadow-2);
     font: 500 10px/1 var(--font-note);
     text-transform: uppercase;
   }
 
-  .footer-pill:hover,
-  .footer-pill[aria-current='page'] { background: var(--surface-container); }
-  .footer-pill.green { background: var(--green-bright); }
-  .footer-pill.orange { background: var(--orange); }
-  .footer-pill.mint { background: color-mix(in srgb, var(--green-bright) 60%, var(--surface)); }
+  .footer-pill:hover { background: var(--surface-container); }
+  .footer-pill[aria-current='page'] { --resting-background: var(--surface-container); }
+  .footer-pill.green { --resting-background: var(--green-bright); }
+  .footer-pill.orange { --resting-background: var(--orange); }
+  .footer-pill.mint { --resting-background: color-mix(in srgb, var(--green-bright) 60%, var(--surface)); }
 
-  .social-2 { transform: rotate(2deg); }
-  .social-3 { transform: rotate(-1deg); }
+  .social-2 { --resting-transform: rotate(2deg); transform: var(--resting-transform); }
+  .social-3 { --resting-transform: rotate(-1deg); transform: var(--resting-transform); }
   .route-angle { display: inline-flex; }
   .route-angle-2 { transform: rotate(-2deg); }
   .route-angle-3 { transform: rotate(2deg); }
@@ -136,6 +139,8 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
   }
 
   .draw-control {
+    --resting-shadow: 2px 2px 0 #ef4444;
+    --resting-transform: rotate(-12deg);
     position: absolute;
     z-index: 50;
     right: 20px;
@@ -148,10 +153,10 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
     border: 2px solid #ef4444;
     border-radius: 50%;
     background: var(--surface);
-    box-shadow: 2px 2px 0 #ef4444;
+    box-shadow: var(--resting-shadow);
     color: #ef4444;
     font: 700 23px/1 var(--font-note);
-    transform: rotate(-12deg);
+    transform: var(--resting-transform);
   }
 
   @media (max-width: 700px) {
@@ -161,7 +166,24 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
   }
 
   @media (max-width: 520px) {
-    .footer-socials { display: none; }
-    .footer-routes { width: calc(100% - 70px); }
+    .footer-socials {
+      right: 8px;
+      bottom: calc(130px + env(safe-area-inset-bottom));
+      left: 8px;
+      align-items: center;
+      flex-flow: row wrap;
+      gap: 4px;
+      transform: none;
+    }
+    .footer-routes {
+      right: 52px;
+      bottom: calc(58px + env(safe-area-inset-bottom));
+      left: 8px;
+      width: auto;
+      justify-content: flex-start;
+      gap: 4px;
+    }
+    .footer-pill { padding-inline: 5px; }
+    .draw-control { right: 8px; }
   }
 </style>

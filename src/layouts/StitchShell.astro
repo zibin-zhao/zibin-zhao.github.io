@@ -34,4 +34,7 @@ const { title, description, active, home = false } = Astro.props;
     min-height: calc(100vh - 80px);
     padding-bottom: calc(var(--footer-reserve) + env(safe-area-inset-bottom));
   }
+  @media (max-width: 520px) {
+    .stitch-main { padding-bottom: calc(190px + env(safe-area-inset-bottom)); }
+  }
 </style>

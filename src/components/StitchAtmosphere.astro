@@ -28,8 +28,8 @@
     opacity: .6;
   }
 
-  .guide-left { left: 15%; }
-  .guide-right { right: 24%; top: 5%; }
+  .guide-left { left: 15%; transform: rotate(1deg); }
+  .guide-right { right: 24%; top: 5%; transform: rotate(-2deg); }
 
   .atmosphere-blob { display: block; border: var(--stroke); }
   .blob-left {
@@ -58,8 +58,8 @@
     font: 500 12px/1.3 var(--font-note);
     opacity: .7;
   }
-  .note-formula { top: 15%; left: 60%; border-style: dashed; }
-  .note-pathway { top: 45%; left: 8%; }
+  .note-formula { top: 15%; left: 60%; border-style: dashed; transform: rotate(12deg); }
+  .note-pathway { top: 45%; left: 8%; transform: rotate(-6deg); }
   .note-question {
     right: 12%;
     top: 75%;
@@ -68,6 +68,7 @@
     color: var(--ink);
     font: 400 24px/1 var(--font-display);
     opacity: .8;
+    transform: rotate(3deg);
   }
 
   @media (max-width: 520px) {
