@@ -24,4 +24,17 @@ describe('Stitch lab-notebook foundation', () => {
     expect(layout).toContain('class="paper-atmosphere"');
     expect(global).toContain('background-size: var(--grid-size) var(--grid-size)');
   });
+
+  it('uses the Stitch index navigation and physical hero card', () => {
+    const nav = read('src/components/Nav.astro');
+    const hero = read('src/components/Hero.astro');
+    const script = read('src/scripts/hero.ts');
+    expect(nav).toContain('UNFINISHED INDEX');
+    expect(nav).toContain('id="navlinks"');
+    expect(hero).toContain('id="hero-name"');
+    expect(hero).toContain('class="hero-specimen"');
+    expect(hero).toContain('class="scroll-cue"');
+    expect(hero).not.toContain('experiment-holder');
+    expect(script).not.toContain('field-motion');
+  });
 });

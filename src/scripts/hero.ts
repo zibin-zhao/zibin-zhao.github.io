@@ -1,32 +1,20 @@
-import { mountFieldMotion } from './field-motion';
-
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const heroCore = document.getElementById('heroCore');
-const fieldRoot = document.querySelector<HTMLElement>('[data-field-motion]');
 const topnav = document.getElementById('topnav');
+const menu = document.getElementById('menubtn');
+const links = document.getElementById('navlinks');
 
-function onScroll() {
-  if (!heroCore || !topnav) return;
-  const progress = Math.min(Math.max(window.scrollY / window.innerHeight, 0), 1);
-  if (!reduce) {
-    heroCore.style.transform = `translateY(${-46 * progress}px) rotate(${-3 + progress * 3}deg)`;
-    heroCore.style.opacity = String(Math.max(1 - 1.25 * progress, 0));
-  }
-  topnav.classList.toggle('show', progress > 0.55);
+const updateNav = () => topnav?.classList.toggle('scrolled', window.scrollY > 24);
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
+
+menu?.addEventListener('click', () => {
+  const open = links?.classList.toggle('open') ?? false;
+  menu.setAttribute('aria-expanded', String(open));
+});
+
+if (!reduce && 'IntersectionObserver' in window) {
+  const observer = new IntersectionObserver((entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('in')), { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach((node) => observer.observe(node));
+} else {
+  document.querySelectorAll('.reveal').forEach((node) => node.classList.add('in'));
 }
-
-let ticking = false;
-window.addEventListener('scroll', () => {
-  if (ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => { onScroll(); ticking = false; });
-}, { passive: true });
-onScroll();
-
-const observer = new IntersectionObserver(
-  (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('in')),
-  { threshold: 0.18 },
-);
-document.querySelectorAll('.reveal').forEach((section) => observer.observe(section));
-
-if (fieldRoot) mountFieldMotion(fieldRoot);
