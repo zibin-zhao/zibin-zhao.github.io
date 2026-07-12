@@ -85,15 +85,18 @@ import LangToggle from './LangToggle.astro';
     border: var(--stroke);
     background: var(--paper-card);
     box-shadow: var(--shadow-control);
+    visibility: hidden;
     opacity: 0;
     transform: translateY(-8px);
-    transition: opacity var(--motion-fast), transform var(--motion-fast);
+    transition: opacity var(--motion-fast), transform var(--motion-fast), visibility 0s linear var(--motion-fast);
     pointer-events: none;
   }
 
   #navlinks.open {
+    visibility: visible;
     opacity: 1;
     transform: none;
+    transition-delay: 0s, 0s, 0s;
     pointer-events: auto;
   }
 

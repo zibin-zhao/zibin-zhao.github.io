@@ -37,5 +37,7 @@ describe('Stitch lab-notebook foundation', () => {
     expect(hero).not.toContain('experiment-holder');
     expect(script).not.toContain('field-motion');
     expect(nav).not.toContain('.nav-actions:focus-within #navlinks');
+    expect(nav).toMatch(/#navlinks\s*\{[\s\S]*?visibility: hidden;/);
+    expect(nav).toMatch(/#navlinks\.open\s*\{[\s\S]*?visibility: visible;/);
   });
 });
