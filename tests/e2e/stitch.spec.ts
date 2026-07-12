@@ -1,8 +1,81 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 
 const routes = ['/', '/about/', '/research/', '/projects/', '/cv/', '/contact/', '/prompts/'] as const;
 const artifactDir = 'artifacts/stitch';
+
+const applyArtifactProjection = async (page: Page, width: number, height: number) => {
+  const originalViewport = page.viewportSize();
+  if (!originalViewport) throw new Error('Artifact projection requires a viewport');
+  await page.setViewportSize({ width, height });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const style = await page.addStyleTag({ content: `
+    html.artifact-projection { --artifact-height: ${height}px; }
+    html.artifact-projection .stitch-atmosphere {
+      position: absolute !important;
+      bottom: auto !important;
+      width: 100% !important;
+      height: var(--artifact-height) !important;
+    }
+    html.artifact-projection .artifact-guide {
+      position: absolute !important;
+      top: 0 !important;
+      width: 2px !important;
+      height: var(--artifact-height) !important;
+      background-image: linear-gradient(to bottom, var(--ink) 50%, transparent 50%) !important;
+      background-size: 2px 20px !important;
+      opacity: .6 !important;
+      pointer-events: none !important;
+      transform-origin: 50% 0 !important;
+    }
+    html.artifact-projection .artifact-guide-left { left: 15% !important; transform: rotate(1deg) !important; }
+    html.artifact-projection .artifact-guide-right { right: 24% !important; left: auto !important; transform: rotate(-2deg) !important; }
+  ` });
+  await page.evaluate((artifactHeight) => new Promise<void>((resolve) => {
+    document.documentElement.classList.add('artifact-projection');
+    const atmosphere = document.querySelector<HTMLElement>('.stitch-atmosphere');
+    const left = document.querySelector<HTMLElement>('.guide-left');
+    const right = document.querySelector<HTMLElement>('.guide-right');
+    for (const element of [atmosphere, left, right]) {
+      if (!element) throw new Error('Artifact projection target is missing');
+      element.dataset.artifactOriginalStyle = element.getAttribute('style') ?? '';
+    }
+    atmosphere!.style.setProperty('position', 'absolute', 'important');
+    atmosphere!.style.setProperty('bottom', 'auto', 'important');
+    atmosphere!.style.setProperty('width', '100%', 'important');
+    atmosphere!.style.setProperty('height', `${artifactHeight}px`, 'important');
+    left!.style.setProperty('visibility', 'hidden', 'important');
+    right!.style.setProperty('visibility', 'hidden', 'important');
+    const projectedLeft = document.createElement('i');
+    projectedLeft.className = 'artifact-guide artifact-guide-left';
+    const projectedRight = document.createElement('i');
+    projectedRight.className = 'artifact-guide artifact-guide-right';
+    atmosphere!.append(projectedLeft, projectedRight);
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      resolve();
+    });
+  }), height);
+  return async () => {
+    await page.evaluate(() => {
+      document.documentElement.classList.remove('artifact-projection');
+      document.querySelectorAll('.artifact-guide').forEach((element) => element.remove());
+      for (const element of document.querySelectorAll<HTMLElement>('[data-artifact-original-style]')) {
+        const original = element.dataset.artifactOriginalStyle ?? '';
+        if (original) element.setAttribute('style', original);
+        else element.removeAttribute('style');
+        delete element.dataset.artifactOriginalStyle;
+      }
+    });
+    await style.evaluate((element) => (element as Element).remove());
+    await page.setViewportSize(originalViewport);
+  };
+};
+
+const pngSize = async (path: string) => {
+  const bytes = await readFile(path);
+  return { height: bytes.readUInt32BE(20), width: bytes.readUInt32BE(16) };
+};
 
 const collectRuntimeErrors = (page: Page) => {
   const errors: string[] = [];
@@ -184,14 +257,20 @@ test('canonical homepage matches the source-normalized vertical density and anch
         bottom: rect.bottom + scrollY,
         height: rect.height,
         left: rect.left,
+        right: rect.right,
         top: rect.top + scrollY,
         width: rect.width,
       };
     };
     return {
       documentHeight: document.documentElement.scrollHeight,
+      contact: box('.footer-routes a[href="/contact/"]'),
+      draw: box('.draw-control'),
       footerRoutes: box('.footer-routes'),
       footerSocials: box('.footer-socials'),
+      guideLeftX: (document.querySelector('.guide-left') as HTMLElement).offsetLeft,
+      guideRightX: (document.querySelector('.guide-right') as HTMLElement).offsetLeft
+        + (document.querySelector('.guide-right') as HTMLElement).offsetWidth,
       hero: box('.stitch-hero'),
       heroCard: box('.hero-card'),
       research: box('#research'),
@@ -220,20 +299,42 @@ test('canonical homepage matches the source-normalized vertical density and anch
   expect(geometry.heroCard.width).toBeLessThanOrEqual(310);
   expect(geometry.heroCard.left).toBeGreaterThanOrEqual(225);
   expect(geometry.heroCard.left).toBeLessThanOrEqual(255);
+  expect(geometry.heroCard.top).toBeGreaterThanOrEqual(300);
+  expect(geometry.heroCard.top).toBeLessThanOrEqual(330);
   expect(geometry.researchBanner.width).toBeGreaterThanOrEqual(360);
   expect(geometry.researchBanner.width).toBeLessThanOrEqual(410);
+  expect(geometry.researchBanner.left).toBeGreaterThanOrEqual(10);
+  expect(geometry.researchBanner.left).toBeLessThanOrEqual(30);
+  expect(geometry.researchBanner.top).toBeGreaterThanOrEqual(650);
+  expect(geometry.researchBanner.top).toBeLessThanOrEqual(680);
   const researchWidthRanges = [[500, 545], [410, 450], [350, 390]] as const;
+  const researchLeftRanges = [[160, 185], [65, 95], [190, 215]] as const;
+  const researchTopRanges = [[750, 790], [880, 925], [1_065, 1_110]] as const;
   for (let index = 0; index < geometry.researchCards.length; index += 1) {
     expect(geometry.researchCards[index].width).toBeGreaterThanOrEqual(researchWidthRanges[index][0]);
     expect(geometry.researchCards[index].width).toBeLessThanOrEqual(researchWidthRanges[index][1]);
+    expect(geometry.researchCards[index].left).toBeGreaterThanOrEqual(researchLeftRanges[index][0]);
+    expect(geometry.researchCards[index].left).toBeLessThanOrEqual(researchLeftRanges[index][1]);
+    expect(geometry.researchCards[index].top).toBeGreaterThanOrEqual(researchTopRanges[index][0]);
+    expect(geometry.researchCards[index].top).toBeLessThanOrEqual(researchTopRanges[index][1]);
   }
+  expect(geometry.researchCards[2].height).toBeGreaterThanOrEqual(75);
+  expect(geometry.researchCards[2].height).toBeLessThanOrEqual(105);
   expect(geometry.vibeHeading.width).toBeGreaterThanOrEqual(220);
   expect(geometry.vibeHeading.width).toBeLessThanOrEqual(260);
+  expect(geometry.vibeHeading.left).toBeGreaterThanOrEqual(485);
+  expect(geometry.vibeHeading.left).toBeLessThanOrEqual(510);
+  expect(geometry.vibeHeading.top).toBeGreaterThanOrEqual(1_220);
+  expect(geometry.vibeHeading.top).toBeLessThanOrEqual(1_250);
   expect(geometry.vibeNote.width).toBeGreaterThanOrEqual(275);
   expect(geometry.vibeNote.width).toBeLessThanOrEqual(310);
   expect(geometry.vibeNote.top).toBeGreaterThanOrEqual(1_220);
   expect(geometry.vibeNote.top).toBeLessThanOrEqual(1_250);
   const [casmd, singularity, medit, yaos, zen] = geometry.vibeCards;
+  expect(casmd.left).toBeGreaterThanOrEqual(25);
+  expect(casmd.left).toBeLessThanOrEqual(50);
+  expect(casmd.width).toBeGreaterThanOrEqual(430);
+  expect(casmd.width).toBeLessThanOrEqual(470);
   expect(casmd.top).toBeGreaterThanOrEqual(1_300);
   expect(casmd.top).toBeLessThanOrEqual(1_340);
   expect(singularity.width).toBeGreaterThanOrEqual(260);
@@ -244,6 +345,8 @@ test('canonical homepage matches the source-normalized vertical density and anch
   expect(singularity.top).toBeLessThanOrEqual(1_590);
   expect(medit.width).toBeGreaterThanOrEqual(260);
   expect(medit.width).toBeLessThanOrEqual(300);
+  expect(medit.left).toBeGreaterThanOrEqual(380);
+  expect(medit.left).toBeLessThanOrEqual(410);
   expect(medit.top).toBeGreaterThanOrEqual(1_515);
   expect(medit.top).toBeLessThanOrEqual(1_565);
   for (const card of [yaos, zen]) {
@@ -254,6 +357,12 @@ test('canonical homepage matches the source-normalized vertical density and anch
   expect(yaos.left).toBeLessThanOrEqual(125);
   expect(zen.left).toBeGreaterThanOrEqual(375);
   expect(zen.left).toBeLessThanOrEqual(415);
+  for (const card of [yaos, zen]) {
+    expect(card.top).toBeGreaterThanOrEqual(1_820);
+    expect(card.top).toBeLessThanOrEqual(1_880);
+  }
+  expect(geometry.guideLeftX).toBeCloseTo(768 * .15, 0);
+  expect(geometry.guideRightX).toBeCloseTo(768 * .76, 0);
   expect(geometry.footerSocials.left).toBeGreaterThanOrEqual(20);
   expect(geometry.footerSocials.left).toBeLessThanOrEqual(30);
   expect(geometry.footerSocials.width).toBeGreaterThanOrEqual(70);
@@ -268,6 +377,66 @@ test('canonical homepage matches the source-normalized vertical density and anch
   await expect(page.locator('.footer-socials a')).toHaveCount(3);
   await expect(page.locator('.footer-routes a')).toHaveCount(6);
   for (const anchor of await page.locator('.footer-socials a, .footer-routes a').all()) await expect(anchor).toBeVisible();
+  const horizontalOverlap = Math.max(0, Math.min(geometry.contact.right, geometry.draw.right) - Math.max(geometry.contact.left, geometry.draw.left));
+  const verticalOverlap = Math.max(0, Math.min(geometry.contact.bottom, geometry.draw.bottom) - Math.max(geometry.contact.top, geometry.draw.top));
+  expect(horizontalOverlap * verticalOverlap).toBe(0);
+  expect(geometry.draw.left - geometry.contact.right).toBeGreaterThanOrEqual(4);
+
+  await page.locator('.footer-routes a[href="/contact/"]').click();
+  await expect(page).toHaveURL(/\/contact\/$/);
+  await page.goto('/');
+  await page.locator('.draw-control').click();
+  await expect(page).toHaveURL(/\/prompts\/$/);
+});
+
+test('artifact projection pins both guide rails at source x positions', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'canonical-768', 'Artifact projection is verified once for canonical and mobile widths.');
+  await page.goto('/');
+  for (const [width, height] of [[768, 2_079], [390, 4_010]] as const) {
+    const cleanup = await applyArtifactProjection(page, width, height);
+    const guides = await page.locator('.artifact-guide').evaluateAll((elements) => elements.map((element, index) => {
+      const style = getComputedStyle(element);
+      const htmlElement = element as HTMLElement;
+      return {
+        height: parseFloat(style.height),
+        layoutX: htmlElement.offsetLeft + (index === 1 ? htmlElement.offsetWidth : 0),
+        transform: style.transform,
+        transformOrigin: style.transformOrigin,
+      };
+    }));
+    expect(Math.abs(guides[0].layoutX - (width * .15))).toBeLessThanOrEqual(1);
+    expect(Math.abs(guides[1].layoutX - (width * .76))).toBeLessThanOrEqual(1);
+    expect(guides[0].height).toBeCloseTo(height, 0);
+    expect(guides[1].height).toBeCloseTo(height, 0);
+    expect(guides[0].transform).not.toBe('none');
+    expect(guides[1].transform).not.toBe('none');
+    expect(guides[0].transformOrigin).toMatch(/ 0px$/);
+    expect(guides[1].transformOrigin).toMatch(/ 0px$/);
+    await cleanup();
+  }
+});
+
+test('1024px restores readable text and interaction sizing without overflow', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'canonical-768', 'Intermediate readability is retained once without tripling the suite.');
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await expectNoHorizontalOverflow(page);
+  const sizing = await page.evaluate(() => {
+    const style = (selector: string) => getComputedStyle(document.querySelector(selector) as Element);
+    return {
+      footerFont: parseFloat(style('.footer-pill').fontSize),
+      footerHeight: parseFloat(style('.footer-pill').minHeight),
+      paperLinkHeight: parseFloat(style('.paper-links a').minHeight),
+      paperMetaFont: parseFloat(style('.paper-meta > span').fontSize),
+      vibeFont: parseFloat(style('.vibe-description').fontSize),
+    };
+  });
+  expect(sizing.paperMetaFont).toBeGreaterThanOrEqual(10);
+  expect(sizing.vibeFont).toBeGreaterThanOrEqual(12);
+  expect(sizing.footerFont).toBeGreaterThanOrEqual(9);
+  expect(sizing.footerHeight).toBeGreaterThanOrEqual(24);
+  expect(sizing.paperLinkHeight).toBeGreaterThanOrEqual(24);
 });
 
 test('mobile without JavaScript keeps English content and every ordinary destination', async ({ browser }, testInfo) => {
@@ -301,36 +470,137 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
   const originalViewport = page.viewportSize();
   if (!originalViewport) throw new Error('Original artifact viewport was not available');
 
-  const capture = async (name: string, locator?: Locator, sourceHeight?: number) => {
+  const captureFull = async (name: string, sourceHeight?: number) => {
     const path = `${artifactDir}/${name}`;
-    if (locator) await locator.screenshot({ animations: 'disabled', path });
-    else {
-      const viewport = page.viewportSize();
-      if (!viewport) throw new Error('Artifact viewport was not available');
-      const documentHeight = sourceHeight ?? await page.evaluate(() => document.documentElement.scrollHeight);
-      await page.setViewportSize({ width: viewport.width, height: documentHeight });
+    const viewport = page.viewportSize();
+    if (!viewport) throw new Error('Artifact viewport was not available');
+    const documentHeight = sourceHeight ?? await page.evaluate(() => document.documentElement.scrollHeight);
+    const cleanup = await applyArtifactProjection(page, viewport.width, documentHeight);
+    try {
+      const projectionFrame = await page.evaluate(() => {
+        const atmosphere = document.querySelector('.stitch-atmosphere')?.getBoundingClientRect();
+        return {
+          atmosphereLeft: atmosphere?.left,
+          atmosphereWidth: atmosphere?.width,
+          clientWidth: document.documentElement.clientWidth,
+          projected: document.documentElement.classList.contains('artifact-projection'),
+          scrollX: window.scrollX,
+        };
+      });
+      expect(projectionFrame).toEqual({
+        atmosphereLeft: 0,
+        atmosphereWidth: viewport.width,
+        clientWidth: viewport.width,
+        projected: true,
+        scrollX: 0,
+      });
+      const guides = await page.locator('.artifact-guide').evaluateAll((elements) => elements.map((element, index) => {
+        const style = getComputedStyle(element);
+        const htmlElement = element as HTMLElement;
+        return {
+          height: parseFloat(style.height),
+          layoutX: htmlElement.offsetLeft + (index === 1 ? htmlElement.offsetWidth : 0),
+          transform: style.transform,
+          transformOrigin: style.transformOrigin,
+        };
+      }));
+      expect(guides[0].transform).not.toBe('none');
+      expect(guides[1].transform).not.toBe('none');
+      expect(Math.abs(guides[0].layoutX - (viewport.width * .15))).toBeLessThanOrEqual(1);
+      expect(Math.abs(guides[1].layoutX - (viewport.width * .76))).toBeLessThanOrEqual(1);
+      expect(guides[0].height).toBeCloseTo(documentHeight, 0);
+      expect(guides[1].height).toBeCloseTo(documentHeight, 0);
+      expect(guides[0].transformOrigin).toMatch(/ 0px$/);
+      expect(guides[1].transformOrigin).toMatch(/ 0px$/);
       const footer = await page.locator('.footer-decoration').boundingBox();
       if (!footer) throw new Error('Artifact footer was not rendered');
       expect(Math.abs(Math.round(footer.y + footer.height) - documentHeight)).toBeLessThanOrEqual(16);
       await page.screenshot({ animations: 'disabled', fullPage: false, path });
+    } finally {
+      await cleanup();
+    }
+  };
+
+  const captureSection = async (
+    name: string,
+    locator: Locator,
+    bounds: { after?: Locator; bottom: Locator; capBefore?: Locator; top: Locator },
+    horizontalMargin = 32,
+    verticalMargin = 20,
+  ) => {
+    const path = `${artifactDir}/${name}`;
+    const box = await locator.boundingBox();
+    const topBox = await bounds.top.boundingBox();
+    const bottomBox = await bounds.bottom.boundingBox();
+    const capBeforeBox = await bounds.capBefore?.boundingBox();
+    const afterBox = await bounds.after?.boundingBox();
+    const viewport = page.viewportSize();
+    if (!box || !topBox || !bottomBox || !viewport) throw new Error(`Section geometry was unavailable for ${name}`);
+    const pageY = Math.max(0, Math.floor(Math.min(box.y, topBox.y) - verticalMargin));
+    let pageBottom = Math.ceil(bottomBox.y + bottomBox.height + verticalMargin);
+    if (capBeforeBox) pageBottom = Math.min(pageBottom, Math.floor(capBeforeBox.y - 4));
+    if (afterBox) expect(pageY).toBeGreaterThanOrEqual(Math.ceil(afterBox.y + afterBox.height + 4));
+    if (capBeforeBox) expect(pageBottom).toBeLessThanOrEqual(Math.floor(capBeforeBox.y - 4));
+    const clip = {
+      x: Math.max(0, Math.floor(box.x - horizontalMargin)),
+      pageY,
+      width: Math.min(viewport.width, Math.ceil(box.x + box.width + horizontalMargin))
+        - Math.max(0, Math.floor(box.x - horizontalMargin)),
+      height: pageBottom - pageY,
+    };
+    const fixedLayers = page.locator('.stitch-header, .stitch-footer');
+    await fixedLayers.evaluateAll((elements) => {
+      for (const element of elements) (element as HTMLElement).style.visibility = 'hidden';
+    });
+    try {
+      await page.setViewportSize({ width: viewport.width, height: Math.max(viewport.height, clip.height) });
+      await page.evaluate((pageY) => window.scrollTo(0, pageY), clip.pageY);
+      const scrollY = await page.evaluate(() => window.scrollY);
+      for (const layer of await fixedLayers.all()) await expect(layer).toBeHidden();
+      await page.screenshot({
+        animations: 'disabled',
+        clip: { x: clip.x, y: clip.pageY - scrollY, width: clip.width, height: clip.height },
+        path,
+      });
+    } finally {
+      await fixedLayers.evaluateAll((elements) => {
+        for (const element of elements) (element as HTMLElement).style.removeProperty('visibility');
+      });
+      await page.setViewportSize(viewport);
+      await page.evaluate(() => window.scrollTo(0, 0));
     }
   };
 
   if (testInfo.project.name === 'canonical-768') {
-    await capture('home-768-full.png', undefined, 2_079);
-    await capture('research-768.png', page.locator('#research'));
-    await capture('vibe-768.png', page.locator('#vibe'));
+    await captureFull('home-768-full.png', 2_079);
+    await captureSection('research-768.png', page.locator('#research'), {
+      bottom: page.locator('.pub-card--3'),
+      capBefore: page.locator('#vibe > h2'),
+      top: page.locator('.research-heading h2'),
+    });
+    await captureSection('vibe-768.png', page.locator('#vibe'), {
+      after: page.locator('.pub-card--3'),
+      bottom: page.locator('.vibe-lower'),
+      top: page.locator('#vibe > h2'),
+    });
+    const researchSize = await pngSize(`${artifactDir}/research-768.png`);
+    const vibeSize = await pngSize(`${artifactDir}/vibe-768.png`);
+    expect(researchSize.width).toBeGreaterThanOrEqual(720);
+    expect(researchSize.height).toBeGreaterThanOrEqual(540);
+    expect(researchSize.height).toBeLessThanOrEqual(600);
+    expect(vibeSize.width).toBeGreaterThanOrEqual(720);
+    expect(vibeSize.height).toBeGreaterThanOrEqual(790);
   } else if (testInfo.project.name === 'desktop') {
-    await capture('home-1440-full.png');
+    await captureFull('home-1440-full.png');
   } else if (testInfo.project.name === 'mobile') {
-    await capture('home-390-full.png');
+    await captureFull('home-390-full.png');
     await page.setViewportSize(originalViewport);
     await page.goto('/research/', { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
-    await capture('research-index-390-full.png');
+    await captureFull('research-index-390-full.png');
     await page.setViewportSize(originalViewport);
     await page.goto('/prompts/', { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
-    await capture('prompts-390-full.png');
+    await captureFull('prompts-390-full.png');
   }
 });

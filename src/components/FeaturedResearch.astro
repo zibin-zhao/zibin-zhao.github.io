@@ -233,8 +233,8 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
     .paper-authors { font-size: 12px; }
   }
 
-  @media (min-width: 701px) and (max-width: 1100px) {
-    .featured-research { margin-bottom: 0; }
+  @media (min-width: 701px) and (max-width: 960px) {
+    .featured-research { min-height: 573px; margin-bottom: 0; }
     .research-heading { margin-bottom: 40px; }
     .research-heading h2 {
       padding: 10px 14px;
@@ -246,7 +246,7 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
     .fade-slot--2 { margin-top: -42px; }
     .fade-slot--3 { margin-top: -10px; }
     .pub-card { padding: 12px; }
-    .pub-card--3 { padding: 10px; }
+    .pub-card--3 { padding: 8px 10px; }
     .paper-index {
       top: -12px;
       left: -12px;
@@ -256,7 +256,19 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
     }
     .paper-meta { gap: 8px; padding-bottom: 5px; }
     .paper-meta > span:first-child { padding: 2px 5px; font-size: 7px; }
-    .pub-card--3 .paper-meta > span:first-child { font-size: 7px; }
+    .pub-card--3 .paper-meta {
+      height: 0;
+      padding: 0;
+      border: 0;
+    }
+    .pub-card--3 .paper-meta > span:first-child {
+      position: absolute;
+      z-index: 2;
+      top: -10px;
+      left: 12px;
+      font-size: 7px;
+    }
+    .pub-card--3 .magnify-icon { position: absolute; top: 7px; right: 9px; }
     .magnify-icon { font-size: 16px; }
     .pub-card h3 {
       margin-top: 8px;
@@ -264,15 +276,16 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
       line-height: 1.16;
     }
     .pub-card--3 h3 {
-      margin-top: 6px;
-      font-size: 11px;
-      line-height: 1.25;
+      margin-top: 3px;
+      padding-right: 14px;
+      font-size: 9px;
+      line-height: 1.2;
     }
     .paper-authors { margin-top: 6px; font-size: 9px; line-height: 1.35; }
-    .pub-card--3 .paper-authors { font-size: 8px; }
-    .paper-links { gap: 10px; margin-top: 8px; }
-    .paper-links a { min-height: 18px; font-size: 7px; }
-    .pub-card--3 .paper-links { margin-top: 5px; }
+    .pub-card--3 .paper-authors { margin-top: 2px; font-size: 7.5px; line-height: 1.2; }
+    .paper-links { gap: 10px; margin-top: 4px; }
+    .paper-links a { display: inline-flex; min-height: 24px; align-items: center; font-size: 7px; }
+    .pub-card--3 .paper-links { margin-top: 0; }
     .pub-card--3 .paper-links a { font-size: 7px; }
   }
 </style>
