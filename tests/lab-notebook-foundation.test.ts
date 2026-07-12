@@ -81,4 +81,15 @@ describe('Stitch lab-notebook foundation', () => {
     expect(vibeCard).toContain('class="shot-fallback"');
     expect(vibeCard).toContain('width="800" height="600"');
   });
+
+  it('keeps CV download and in-flow closing index', () => {
+    const cv = read('src/components/CvTimeline.astro');
+    const contact = read('src/components/Contact.astro');
+    expect(cv).toContain('class="cv-index"');
+    expect(cv).toContain('href={cv.pdf} download');
+    expect(contact).toContain('class="closing-poster"');
+    expect(contact).toContain('class="footer-index"');
+    expect(contact).toContain('profile.navLinks');
+    expect(contact).not.toContain('position:fixed');
+  });
 });
