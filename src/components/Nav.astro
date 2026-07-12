@@ -77,6 +77,8 @@ import LangToggle from './LangToggle.astro';
     text-transform: uppercase;
   }
 
+  .menubtn { display: none; }
+  :global(.js) .menubtn { display: block; }
   .talk { background: var(--green); }
 
   #navlinks {
@@ -88,6 +90,13 @@ import LangToggle from './LangToggle.astro';
     border: var(--stroke);
     background: var(--paper-card);
     box-shadow: var(--shadow-control);
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  :global(.js) #navlinks {
     visibility: hidden;
     opacity: 0;
     transform: translateY(-8px);
@@ -95,7 +104,7 @@ import LangToggle from './LangToggle.astro';
     pointer-events: none;
   }
 
-  #navlinks.open {
+  :global(.js) #navlinks.open {
     visibility: visible;
     opacity: 1;
     transform: none;
@@ -118,11 +127,14 @@ import LangToggle from './LangToggle.astro';
   #navlinks a:hover { background: var(--green); }
 
   .nav-actions :global(.langtoggle) {
+    display: none;
     min-height: 40px;
     border: 1px solid var(--ink);
     border-radius: 0;
     background: var(--paper);
   }
+
+  :global(.js) .nav-actions :global(.langtoggle) { display: inline-flex; }
 
   .nav-actions :global(.seg) {
     border-radius: 0;

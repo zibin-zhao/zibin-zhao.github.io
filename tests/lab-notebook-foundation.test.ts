@@ -27,6 +27,13 @@ describe('Stitch lab-notebook foundation', () => {
     expect(global).toMatch(/\.skip-link:focus-visible\s*\{[^}]*transform:\s*none;/);
   });
 
+  it('uses a two-color focus indicator and high-contrast Prompts stage numbers', () => {
+    const global = read('src/styles/global.css');
+    const prompts = read('src/pages/prompts.astro');
+    expect(global).toMatch(/:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--ink\);[^}]*outline-offset:\s*2px;[^}]*box-shadow:\s*0 0 0 5px var\(--paper\);/);
+    expect(prompts).toMatch(/\.stage-number\s*\{[^}]*color:\s*var\(--ink\);[^}]*background:\s*var\(--orange\);/);
+  });
+
   it('keeps chapter content visible without JavaScript-triggered reveal classes', () => {
     const global = read('src/styles/global.css');
     expect(global).toMatch(/\.reveal\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*none;/);
@@ -35,6 +42,7 @@ describe('Stitch lab-notebook foundation', () => {
 
   it('uses the Stitch index navigation and physical hero card', () => {
     const nav = read('src/components/Nav.astro');
+    const layout = read('src/layouts/Base.astro');
     const hero = read('src/components/Hero.astro');
     const script = read('src/scripts/hero.ts');
     expect(nav).toContain('UNFINISHED INDEX');
@@ -46,9 +54,13 @@ describe('Stitch lab-notebook foundation', () => {
     expect(hero).not.toContain('lh3.googleusercontent.com');
     expect(hero).not.toContain('experiment-holder');
     expect(script).not.toContain('field-motion');
+    expect(layout).toContain("document.documentElement.classList.add('js')");
     expect(nav).not.toContain('.nav-actions:focus-within #navlinks');
-    expect(nav).toMatch(/#navlinks\s*\{[\s\S]*?visibility: hidden;/);
-    expect(nav).toMatch(/#navlinks\.open\s*\{[\s\S]*?visibility: visible;/);
+    expect(nav).toMatch(/\.menubtn\s*\{[^}]*display:\s*none;/);
+    expect(nav).toMatch(/:global\(\.js\) \.menubtn\s*\{[^}]*display:\s*block;/);
+    expect(nav).toMatch(/#navlinks\s*\{[\s\S]*?visibility:\s*visible;[\s\S]*?pointer-events:\s*auto;/);
+    expect(nav).toMatch(/:global\(\.js\) #navlinks\s*\{[\s\S]*?visibility:\s*hidden;[\s\S]*?pointer-events:\s*none;/);
+    expect(nav).toMatch(/:global\(\.js\) #navlinks\.open\s*\{[\s\S]*?visibility:\s*visible;/);
   });
 
   it('renders dossier and evidence-card chapter variants', () => {
