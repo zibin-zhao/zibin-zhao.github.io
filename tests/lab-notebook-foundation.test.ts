@@ -56,10 +56,12 @@ describe('Stitch lab-notebook foundation', () => {
     expect(script).not.toContain('field-motion');
     expect(layout).toContain("document.documentElement.classList.add('js')");
     expect(nav).not.toContain('.nav-actions:focus-within #navlinks');
+    expect(nav).toMatch(/\.topnav\s*\{[^}]*position:\s*static;[^}]*flex-wrap:\s*wrap;/);
+    expect(nav).toMatch(/:global\(\.js\) \.topnav\s*\{[^}]*position:\s*fixed;/);
     expect(nav).toMatch(/\.menubtn\s*\{[^}]*display:\s*none;/);
     expect(nav).toMatch(/:global\(\.js\) \.menubtn\s*\{[^}]*display:\s*block;/);
-    expect(nav).toMatch(/#navlinks\s*\{[\s\S]*?visibility:\s*visible;[\s\S]*?pointer-events:\s*auto;/);
-    expect(nav).toMatch(/:global\(\.js\) #navlinks\s*\{[\s\S]*?visibility:\s*hidden;[\s\S]*?pointer-events:\s*none;/);
+    expect(nav).toMatch(/#navlinks\s*\{[^}]*position:\s*static;[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap;[^}]*visibility:\s*visible;[^}]*pointer-events:\s*auto;/);
+    expect(nav).toMatch(/:global\(\.js\) #navlinks\s*\{[^}]*position:\s*absolute;[^}]*display:\s*grid;[^}]*visibility:\s*hidden;[^}]*pointer-events:\s*none;/);
     expect(nav).toMatch(/:global\(\.js\) #navlinks\.open\s*\{[\s\S]*?visibility:\s*visible;/);
   });
 

@@ -17,20 +17,27 @@ import LangToggle from './LangToggle.astro';
 
 <style>
   .topnav {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px var(--page-pad) 0;
+  }
+
+  :global(.js) .topnav {
     position: fixed;
     top: 20px;
     right: var(--page-pad);
     left: var(--page-pad);
     z-index: 50;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
+    flex-wrap: nowrap;
+    padding: 0;
     pointer-events: none;
   }
 
-  .index-label,
-  .nav-actions {
+  .index-label {
     border: var(--stroke);
     background: var(--paper-card);
     box-shadow: var(--shadow-control);
@@ -51,16 +58,30 @@ import LangToggle from './LangToggle.astro';
   }
 
   .nav-actions {
-    position: relative;
+    position: static;
     display: flex;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    padding: 6px;
-    transform: rotate(1deg);
+    padding: 0;
+    pointer-events: auto;
   }
 
-  .topnav.scrolled .index-label,
-  .topnav.scrolled .nav-actions {
+  :global(.js) .nav-actions {
+    position: relative;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    padding: 6px;
+    border: var(--stroke);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-control);
+    transform: rotate(1deg);
+    transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
+  }
+
+  :global(.js) .topnav.scrolled .index-label,
+  :global(.js) .topnav.scrolled .nav-actions {
     box-shadow: 1px 1px 0 var(--ink);
     transform: translate(2px, 2px) rotate(0);
   }
@@ -82,11 +103,12 @@ import LangToggle from './LangToggle.astro';
   .talk { background: var(--green); }
 
   #navlinks {
-    position: absolute;
-    top: calc(100% + 10px);
-    right: 0;
-    display: grid;
-    min-width: 190px;
+    position: static;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
     border: var(--stroke);
     background: var(--paper-card);
     box-shadow: var(--shadow-control);
@@ -97,6 +119,12 @@ import LangToggle from './LangToggle.astro';
   }
 
   :global(.js) #navlinks {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    display: grid;
+    width: auto;
+    min-width: 190px;
     visibility: hidden;
     opacity: 0;
     transform: translateY(-8px);
@@ -114,6 +142,7 @@ import LangToggle from './LangToggle.astro';
 
   #navlinks a {
     display: flex;
+    flex: 1 1 120px;
     min-height: 40px;
     align-items: center;
     border-bottom: 1px dashed var(--outline);
@@ -151,10 +180,15 @@ import LangToggle from './LangToggle.astro';
 
   @media (max-width: 700px) {
     .topnav {
+      gap: 8px;
+      padding: 12px;
+    }
+
+    :global(.js) .topnav {
       top: 12px;
       right: 12px;
       left: 12px;
-      gap: 8px;
+      padding: 0;
     }
 
     .index-label {
@@ -164,7 +198,8 @@ import LangToggle from './LangToggle.astro';
       font-size: 8px;
     }
 
-    .nav-actions { gap: 4px; padding: 4px; }
+    .nav-actions { gap: 4px; }
+    :global(.js) .nav-actions { padding: 4px; }
     .menubtn, .talk { min-height: 40px; padding: 7px; font-size: 8px; }
     .nav-actions :global(.langtoggle) { min-height: 40px; padding: 2px; }
     .nav-actions :global(.seg) { padding: 4px; font-size: 9px; }
