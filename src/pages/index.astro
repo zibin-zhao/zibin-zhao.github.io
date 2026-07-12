@@ -1,6 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
+import StitchShell from '../layouts/StitchShell.astro';
 import Hero from '../components/Hero.astro';
 import About from '../components/About.astro';
 import PubList from '../components/PubList.astro';
@@ -9,17 +8,14 @@ import Vibe from '../components/Vibe.astro';
 import CvTimeline from '../components/CvTimeline.astro';
 import Contact from '../components/Contact.astro';
 ---
-<Base>
-  <Nav />
+<StitchShell home>
   <Hero />
-  <main id="main-content" class="content" tabindex="-1">
+  <div class="content">
     <About />
     <PubList />
     <Projects />
     <Vibe />
     <CvTimeline />
-  </main>
+  </div>
   <Contact />
-  <script>import '../scripts/hero.ts';</script>
-  <script>import '../scripts/lang.ts';</script>
-</Base>
+</StitchShell>

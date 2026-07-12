@@ -1,0 +1,77 @@
+---
+import LangToggle from './LangToggle.astro';
+import T from './T.astro';
+import { profile } from '../data/profile';
+---
+<header class="stitch-header">
+  <a class="site-stamp" href="/">ZIBINZHAO.COM · <T en="UNFINISHED INDEX" zh="未完成索引" /></a>
+  <div class="header-actions">
+    <LangToggle />
+    <a class="talk btn-primary" href={`mailto:${profile.email}`}><T en="LET'S TALK ↗" zh="联系我 ↗" /></a>
+  </div>
+</header>
+
+<style>
+  .stitch-header {
+    position: sticky;
+    z-index: 50;
+    top: 0;
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px var(--page-pad);
+    pointer-events: none;
+  }
+
+  .site-stamp,
+  .header-actions {
+    pointer-events: auto;
+  }
+
+  .site-stamp {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    padding: 8px;
+    border: var(--stroke);
+    background: var(--surface);
+    box-shadow: var(--shadow-2);
+    font: 500 11px/1.25 var(--font-note);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    transform: rotate(-1deg);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .talk {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    padding: 8px 16px;
+    border: var(--stroke);
+    background: var(--green);
+    box-shadow: var(--shadow-4);
+    font: 500 11px/1.25 var(--font-note);
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    transform: rotate(-2deg);
+  }
+
+  @media (max-width: 560px) {
+    .stitch-header { gap: 8px; padding-block: 12px; }
+    .site-stamp { max-width: 52vw; font-size: 8px; }
+    .header-actions { gap: 6px; }
+    .talk { padding-inline: 8px; font-size: 8px; }
+  }
+
+  @media (max-width: 390px) {
+    .talk { display: none; }
+  }
+</style>

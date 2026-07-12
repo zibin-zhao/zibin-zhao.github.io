@@ -1,0 +1,167 @@
+---
+import T from './T.astro';
+import { profile } from '../data/profile';
+
+interface Props {
+  active?: string;
+}
+
+const { active } = Astro.props;
+const routes = [
+  { key: 'about', href: '/about/', en: 'About', zh: '关于', tone: '' },
+  { key: 'research', href: '/research/', en: 'Research', zh: '研究', tone: 'green' },
+  { key: 'projects', href: '/projects/', en: 'Projects', zh: '项目', tone: '' },
+  { key: 'vibe', href: '/#vibe', en: 'Vibe', zh: '随性', tone: 'orange' },
+  { key: 'cv', href: '/cv/', en: 'CV', zh: '简历', tone: '' },
+  { key: 'contact', href: '/contact/', en: 'Contact', zh: '联系', tone: 'mint' },
+];
+const socials = profile.socials.slice(0, 3);
+const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools for care ↔ ';
+---
+<footer class="stitch-footer" aria-label="Site index">
+  <div class="footer-socials">
+    {socials.map((social, index) => (
+      <a class:list={['footer-pill', `social-${index + 1}`]} href={social.href} target="_blank" rel="noopener">
+        <span aria-hidden="true">↗</span>{social.label}
+      </a>
+    ))}
+  </div>
+
+  <nav class="footer-routes" aria-label="Portfolio sections">
+    {routes.map((route, index) => (
+      <span class:list={['route-angle', `route-angle-${index + 1}`]}>
+        <a
+          class:list={['footer-pill', 'glitch-hover', route.tone]}
+          href={route.href}
+          aria-current={active === route.key ? 'page' : undefined}
+        ><T en={route.en} zh={route.zh} /></a>
+      </span>
+    ))}
+  </nav>
+
+  <div class="footer-decoration" aria-hidden="true">
+    <div class="marquee"><span>{tape}{tape}</span></div>
+  </div>
+
+  <a class="draw-control" href="/prompts/" aria-label="Open Prompt Archive">✎</a>
+</footer>
+
+<style>
+  .stitch-footer {
+    position: fixed;
+    z-index: 40;
+    inset: auto 0 0;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  .footer-socials,
+  .footer-routes,
+  .draw-control {
+    pointer-events: auto;
+  }
+
+  .footer-socials {
+    position: absolute;
+    bottom: calc(60px + env(safe-area-inset-bottom));
+    left: var(--page-pad);
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    transform: rotate(-1deg);
+  }
+
+  .footer-routes {
+    position: absolute;
+    right: var(--page-pad);
+    bottom: calc(60px + env(safe-area-inset-bottom));
+    display: flex;
+    width: min(250px, calc(100vw - 40px));
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .footer-pill {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: var(--stroke);
+    background: var(--surface);
+    box-shadow: var(--shadow-2);
+    font: 500 10px/1 var(--font-note);
+    text-transform: uppercase;
+  }
+
+  .footer-pill:hover,
+  .footer-pill[aria-current='page'] { background: var(--surface-container); }
+  .footer-pill.green { background: var(--green-bright); }
+  .footer-pill.orange { background: var(--orange); }
+  .footer-pill.mint { background: color-mix(in srgb, var(--green-bright) 60%, var(--surface)); }
+
+  .social-2 { transform: rotate(2deg); }
+  .social-3 { transform: rotate(-1deg); }
+  .route-angle { display: inline-flex; }
+  .route-angle-2 { transform: rotate(-2deg); }
+  .route-angle-3 { transform: rotate(2deg); }
+  .route-angle-6 { transform: rotate(-1deg); }
+
+  .footer-decoration {
+    overflow: hidden;
+    width: 100%;
+    border-top: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--surface);
+    pointer-events: none;
+    transform: rotate(1deg) scale(1.05);
+    transform-origin: bottom;
+  }
+
+  .marquee {
+    overflow: hidden;
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+    font: 500 11px/1.2 var(--font-note);
+    letter-spacing: .1em;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .marquee span {
+    display: inline-block;
+    min-width: max-content;
+    padding-left: 100%;
+  }
+
+  .draw-control {
+    position: absolute;
+    z-index: 50;
+    right: 20px;
+    bottom: calc(45px + env(safe-area-inset-bottom));
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ef4444;
+    border-radius: 50%;
+    background: var(--surface);
+    box-shadow: 2px 2px 0 #ef4444;
+    color: #ef4444;
+    font: 700 23px/1 var(--font-note);
+    transform: rotate(-12deg);
+  }
+
+  @media (max-width: 700px) {
+    .footer-socials { left: 12px; }
+    .footer-routes { right: 12px; }
+    .footer-pill { min-height: 30px; padding-inline: 7px; font-size: 8px; }
+  }
+
+  @media (max-width: 520px) {
+    .footer-socials { display: none; }
+    .footer-routes { width: calc(100% - 70px); }
+  }
+</style>

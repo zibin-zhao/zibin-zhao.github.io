@@ -1,23 +1,39 @@
 :root {
-  --paper: #fffae0;
-  --paper-deep: #f3eed4;
-  --paper-card: #f9f4d9;
+  --surface: #fffae0;
+  --surface-low: #f9f4d9;
+  --surface-container: #f3eed4;
+  --surface-high: #eee9ce;
   --ink: #003322;
+  --on-surface: #1d1c0c;
   --muted: #414944;
+  --outline: #717973;
+  --outline-variant: #c0c8c2;
   --green: #a2d39c;
   --green-bright: #bdf0b6;
   --orange: #ffb95f;
-  --outline: #717973;
+  --blue: #87ceeb;
   --grid-line: rgba(0, 51, 34, .1);
   --grid-size: 20px;
+  --page-pad: clamp(20px, 5.2vw, 40px);
+  --canvas-max: 1024px;
   --stroke: 2px solid var(--ink);
-  --shadow-card: 6px 6px 0 var(--ink);
-  --shadow-control: 3px 3px 0 var(--ink);
-  --page-pad: clamp(20px, 4vw, 40px);
-  --content-max: 1120px;
+  --shadow-2: 2px 2px 0 var(--ink);
+  --shadow-4: 4px 4px 0 var(--ink);
+  --shadow-6: 6px 6px 0 var(--ink);
+  --shadow-8: 8px 8px 0 var(--ink);
+  --footer-reserve: 150px;
   --font-display: 'Anton', 'Arial Narrow', sans-serif;
   --font-body: 'Space Grotesk', 'PingFang SC', sans-serif;
   --font-note: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Compatibility aliases retained until the archive renderers move to Index Sheets. */
+  --paper: var(--surface);
+  --paper-deep: var(--surface-container);
+  --paper-card: var(--surface-low);
+  --shadow-card: var(--shadow-6);
+  --shadow-control: var(--shadow-4);
+  --content-max: var(--canvas-max);
+  --hair: var(--outline-variant);
   --motion-fast: 160ms;
   --motion-slow: 700ms;
   --ease-press: cubic-bezier(.2, .8, .2, 1);
