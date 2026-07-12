@@ -27,7 +27,7 @@ const personSchema = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline>document.documentElement.classList.add('js');try{if(localStorage.getItem('lang')==='zh'){var d=document.documentElement;d.dataset.lang='zh';d.setAttribute('lang','zh');}}catch(e){}</script>
+    <script is:inline>document.documentElement.classList.add('js');try{if(localStorage.getItem('lang')==='zh'){const d=document.documentElement;d.dataset.lang='zh';d.setAttribute('lang','zh');}}catch{/* Local storage may be unavailable. */}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Zibin Zhao" />
@@ -47,7 +47,7 @@ const personSchema = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personSchema)} />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>

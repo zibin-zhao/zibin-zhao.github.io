@@ -5,7 +5,9 @@ describe('Index menu state helper', () => {
     let menuModule: typeof import('../src/scripts/menu') | undefined;
     try {
       menuModule = await import('../src/scripts/menu');
-    } catch {}
+    } catch {
+      // The assertion below reports a failed import with a focused message.
+    }
     expect(menuModule).toBeDefined();
     if (!menuModule) return;
 

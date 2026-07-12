@@ -1,5 +1,18 @@
 ---
 import T from './T.astro';
+
+interface Props {
+  title: string;
+  titleZh?: string;
+  blurb: string;
+  blurbZh?: string;
+  tags?: string[];
+  href?: string;
+  screenshot?: string;
+  preview?: 'medit';
+  comingSoon?: boolean;
+}
+
 const { title, titleZh, blurb, blurbZh, tags = [], href, screenshot, preview, comingSoon } = Astro.props;
 const Tag = href ? 'a' : 'div';
 ---

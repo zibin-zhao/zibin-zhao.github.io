@@ -61,7 +61,7 @@ import { promptPack as P } from '../data/prompts';
           const pre = btn.parentElement && btn.parentElement.querySelector('.ptext');
           const text = pre ? pre.textContent : '';
           try { await navigator.clipboard.writeText(text); }
-          catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
+          catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch { /* Copy is best-effort. */ } ta.remove(); }
           btn.classList.add('copied');
           setTimeout(() => btn.classList.remove('copied'), 1600);
         });
