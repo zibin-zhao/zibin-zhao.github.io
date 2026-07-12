@@ -99,4 +99,19 @@ describe('Stitch lab-notebook foundation', () => {
     expect(contact).toContain('target="_blank" rel="noopener"');
     expect(contact).not.toContain('position:fixed');
   });
+
+  it('adopts the lab archive language on the Prompts route', () => {
+    const prompts = read('src/pages/prompts.astro');
+    expect(prompts).toContain('class="prompt-index-label"');
+    expect(prompts).toContain('class="prompt-hero"');
+    expect(prompts).toContain("['stage-card', 'stage']");
+    expect(prompts).not.toContain('border-radius:22px');
+    expect(prompts).not.toContain('backdrop-filter:blur');
+  });
+
+  it('keeps the Prompts skip link off-canvas until keyboard focus', () => {
+    const prompts = read('src/pages/prompts.astro');
+    expect(prompts).toContain(':global(.skip-link)');
+    expect(prompts).toContain(':global(.skip-link:focus-visible)');
+  });
 });
