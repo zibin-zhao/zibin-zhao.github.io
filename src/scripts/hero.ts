@@ -1,32 +1,45 @@
-import { mountFieldMotion } from './field-motion';
+import { isMenuOpen, setMenuOpen, shouldDismissMenu } from './menu';
 
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const heroCore = document.getElementById('heroCore');
-const fieldRoot = document.querySelector<HTMLElement>('[data-field-motion]');
 const topnav = document.getElementById('topnav');
+const menu = document.getElementById('menubtn');
+const links = document.getElementById('navlinks');
 
-function onScroll() {
-  if (!heroCore || !topnav) return;
-  const progress = Math.min(Math.max(window.scrollY / window.innerHeight, 0), 1);
-  if (!reduce) {
-    heroCore.style.transform = `translateY(${-46 * progress}px) rotate(${-3 + progress * 3}deg)`;
-    heroCore.style.opacity = String(Math.max(1 - 1.25 * progress, 0));
+const updateNav = () => topnav?.classList.toggle('scrolled', window.scrollY > 24);
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
+
+const closeMenu = ({ returnFocus = false } = {}) => setMenuOpen(menu, links, false, { returnFocus });
+
+menu?.addEventListener('click', () => setMenuOpen(menu, links, !isMenuOpen(links)));
+
+links?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeMenu()));
+
+document.addEventListener('click', (event) => {
+  if (!(event.target instanceof Node)) return;
+  const insideButton = menu?.contains(event.target) ?? false;
+  const insidePanel = links?.contains(event.target) ?? false;
+
+  if (shouldDismissMenu(isMenuOpen(links), insideButton, insidePanel)) closeMenu();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && isMenuOpen(links)) closeMenu({ returnFocus: true });
+});
+
+if (!reduce && 'IntersectionObserver' in window) {
+  try {
+    const nodes = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    }), { threshold: .12 });
+
+    nodes.forEach((node) => observer.observe(node));
+    document.documentElement.classList.add('motion-ready');
+  } catch {
+    document.documentElement.classList.remove('motion-ready');
   }
-  topnav.classList.toggle('show', progress > 0.55);
 }
-
-let ticking = false;
-window.addEventListener('scroll', () => {
-  if (ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => { onScroll(); ticking = false; });
-}, { passive: true });
-onScroll();
-
-const observer = new IntersectionObserver(
-  (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add('in')),
-  { threshold: 0.18 },
-);
-document.querySelectorAll('.reveal').forEach((section) => observer.observe(section));
-
-if (fieldRoot) mountFieldMotion(fieldRoot);

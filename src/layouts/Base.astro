@@ -27,7 +27,7 @@ const personSchema = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline>try{if(localStorage.getItem('lang')==='zh'){var d=document.documentElement;d.dataset.lang='zh';d.setAttribute('lang','zh');}}catch(e){}</script>
+    <script is:inline>document.documentElement.classList.add('js');try{if(localStorage.getItem('lang')==='zh'){var d=document.documentElement;d.dataset.lang='zh';d.setAttribute('lang','zh');}}catch(e){}</script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Zibin Zhao" />
@@ -51,6 +51,7 @@ const personSchema = {
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="paper-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>
     <slot />
   </body>
 </html>

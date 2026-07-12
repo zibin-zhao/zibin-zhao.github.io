@@ -6,5 +6,5 @@ blurbZh: "可安装的 PWA，自动识别当前时辰与节气，提供个性化
 tags: ["PWA", "HTML/JS", "Wellness", "Claude Code"]
 href: "https://zibin-zhao.github.io/Yaos/"
 screenshot: "/vibe-yaos.jpg"
-order: 1
+order: 3
 ---

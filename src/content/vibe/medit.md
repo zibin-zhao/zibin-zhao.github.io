@@ -6,5 +6,5 @@ blurbZh: "一个安静、私密的空间，用来书写、感受与安定自己 
 tags: ["PWA", "Journaling", "Meditation", "Local-first"]
 href: "/medit/"
 preview: "medit"
-order: 3
+order: 2
 ---

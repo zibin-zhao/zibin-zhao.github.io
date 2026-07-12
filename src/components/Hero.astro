@@ -1,86 +1,199 @@
 ---
 import { profile } from '../data/profile';
-import SocialIcon from './SocialIcon.astro';
 import T from './T.astro';
-import LangToggle from './LangToggle.astro';
 ---
-<div class="heroPin">
-  <section class="field-hero" id="top" data-field-motion aria-labelledby="hero-name">
-    <div class="field-grid" aria-hidden="true"></div>
-    <div class="field-orb field-orb-blue" aria-hidden="true"></div>
-    <div class="field-orb field-orb-green" aria-hidden="true"></div>
-    <div class="field-orb field-orb-orange" aria-hidden="true"></div>
-    <div class="field-orbit" aria-hidden="true"></div>
+<section class="hero" id="top" aria-labelledby="hero-name">
+  <span class="collab"><T en={profile.status.en} zh={profile.status.zh} /></span>
+  <h1 class="hero-name" id="hero-name"><span>{profile.firstName}</span><span>{profile.lastName}</span></h1>
+  <aside class="formula" aria-hidden="true">f(x) = ∫(CRISPR + AI)dx</aside>
+  <article class="hero-specimen">
+    <h2><T en={profile.role.en} zh={profile.role.zh} /></h2>
+    <p class="hero-thesis"><T en="AIing, caring, learning, and everyday wellbeing." zh="人工智能、关怀、学习与日常健康。" /></p>
+    <p><T en={profile.tagline.en} zh={profile.tagline.zh} /></p>
+    <div class="specimen-meta"><img src="/hero-portrait.jpg" alt="Watercolor profile portrait of Zibin Zhao" width="64" height="64" fetchpriority="high" /><span>v1.0.4 // Active</span></div>
+  </article>
+  <a class="scroll-cue" href="#about"><T en="Scroll for updates ↓" zh="向下查看更新 ↓" /></a>
+</section>
 
-    <div class="field-top">
-      <span class="field-meta">zibinzhao.com · <T en="unfinished index" zh="未完成索引" /></span>
-      <div class="field-actions">
-        <LangToggle />
-        <a class="field-talk" href={`mailto:${profile.email}`}><T en="Let's talk ↗" zh="联系我 ↗" /></a>
-      </div>
-    </div>
-
-    <span class="field-sticker"><T en={profile.status.en} zh={profile.status.zh} /></span>
-    <h1 id="hero-name" class="field-name"><span>{profile.firstName}</span><span>{profile.lastName}</span></h1>
-
-    <div class="experiment-holder" data-field-target>
-      <T en="Image / experiment holder — waiting for an original visual" zh="图像 / 实验占位区 —— 等待原创视觉素材" />
-    </div>
-
-    <div class="field-copy" id="heroCore">
-      <p class="field-role"><T en={profile.role.en} zh={profile.role.zh} /></p>
-      <p class="field-statement"><T en="Tools for care, learning, and everyday wellbeing." zh="为关怀、学习与日常健康打造工具。" /></p>
-      <p class="field-detail"><T en={profile.tagline.en} zh={profile.tagline.zh} /></p>
-    </div>
-
-    <nav class="field-routes" aria-label="Primary">
-      {profile.navLinks.filter((link) => link.href !== '/prompts').map((link, index) => (
-        <a class:list={['field-route', `route-${index + 1}`]} href={link.href}><T en={link.en} zh={link.zh} /></a>
-      ))}
-    </nav>
-
-    <div class="field-socials" aria-label="Social links">
-      {profile.socials.slice(0, 4).map((social) => (
-        <a href={social.href} target="_blank" rel="noopener" aria-label={social.label}><SocialIcon icon={social.icon} /><span>{social.label}</span></a>
-      ))}
-    </div>
-    <p class="field-loop" aria-hidden="true"><span>molecules ↔ models ↔ small habits ↔ field notes ↔ tools for care ↔ </span><span>molecules ↔ models ↔ small habits ↔ field notes ↔ tools for care ↔ </span></p>
-  </section>
-</div>
 <style>
-  .heroPin{height:180vh;position:relative}
-  .field-hero{isolation:isolate;position:sticky;top:0;min-height:100svh;overflow:hidden;border-bottom:2px solid var(--ink);background:var(--paper-warm);will-change:transform,opacity}
-  .field-grid{position:absolute;inset:0;z-index:-4;opacity:.55;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:24px 24px}
-  .field-orb{position:absolute;z-index:-3;border:1.5px solid var(--ink);border-radius:50%;animation:float 5.8s ease-in-out infinite}
-  .field-orb-blue{top:-88px;right:-82px;width:295px;height:295px;background:var(--blue)}
-  .field-orb-green{right:20%;bottom:-54px;width:128px;height:128px;background:var(--green-light);animation-delay:-3.7s}
-  .field-orb-orange{bottom:-78px;left:-42px;width:184px;height:184px;background:var(--orange);animation-delay:-2.1s}
-  .field-orbit{position:absolute;top:34%;left:51%;z-index:-2;width:clamp(155px,18vw,240px);height:clamp(155px,18vw,240px);border:1.5px solid var(--ink);border-radius:50%;animation:orbit 18s linear infinite}
-  .field-orbit::before,.field-orbit::after{position:absolute;border:1.5px solid var(--ink);border-radius:50%;content:""}
-  .field-orbit::before{top:38%;left:-15px;width:32px;height:32px;background:var(--orange)}
-  .field-orbit::after{top:10%;right:-20px;width:44px;height:44px;background:var(--blue)}
-  .field-top{position:absolute;top:clamp(18px,3vw,38px);right:clamp(18px,4vw,58px);left:clamp(18px,4vw,58px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:20px}
-  .field-meta{font:700 clamp(9px,1vw,12px)/1 var(--font-note);letter-spacing:.07em;text-transform:uppercase}
-  .field-actions{display:flex;align-items:center;gap:10px}.field-actions :global(.langtoggle){border-color:var(--ink);border-radius:0;background:var(--paper)}
-  .field-actions :global(.seg){color:var(--ink)}.field-actions :global([data-lang="en"] .seg-en),.field-actions :global([data-lang="zh"] .seg-zh){background:var(--ink);color:var(--paper)}
-  .field-talk{border:1.5px solid var(--ink);background:var(--green-light);box-shadow:3px 3px 0 var(--ink);padding:9px 11px;font:700 10px/1 var(--font-note);letter-spacing:.05em;text-transform:uppercase;transition:transform var(--motion-fast) var(--ease-spring)}
-  .field-talk:hover{transform:translate(-3px,-3px) rotate(-2deg)}
-  .field-sticker{position:absolute;top:clamp(88px,16vh,150px);right:clamp(9%,14vw,20%);z-index:3;border:1.5px solid var(--ink);background:var(--green-light);box-shadow:var(--shadow-sticker);padding:10px 12px;font:700 clamp(9px,1vw,12px)/1.1 var(--font-note);letter-spacing:.04em;text-transform:uppercase;transform:rotate(8deg)}
-  .field-name{position:absolute;top:clamp(132px,21vh,220px);left:clamp(7%,11vw,16%);z-index:1;font-family:var(--font-display);font-size:clamp(72px,13vw,188px);font-weight:700;letter-spacing:-.09em;line-height:.7;text-transform:uppercase;transform:rotate(-4deg)}
-  .field-name span{display:block}.field-name span:last-child{color:var(--green);transform:translateX(clamp(20px,4vw,62px)) rotate(2deg)}
-  .experiment-holder{position:absolute;top:clamp(275px,44vh,470px);left:clamp(7%,12vw,20%);z-index:2;display:flex;align-items:center;justify-content:center;width:clamp(185px,23vw,300px);min-height:clamp(120px,17vw,180px);border:1.5px dashed var(--ink);background:rgba(255,253,246,.75);padding:18px;text-align:center;font:700 clamp(9px,1.1vw,12px)/1.45 var(--font-note);letter-spacing:.05em;text-transform:uppercase;transform:rotate(4deg);transition:background var(--motion-fast),transform var(--motion-fast) var(--ease-spring)}
-  .experiment-holder:hover{background:var(--green-light);transform:rotate(-3deg) scale(1.04)}
-  .field-copy{position:absolute;right:clamp(7%,11vw,16%);bottom:clamp(112px,18vh,190px);z-index:2;max-width:min(340px,35vw);transform:rotate(-3deg);will-change:transform,opacity}
-  .field-role{font:700 clamp(19px,2.2vw,31px)/.98 Georgia,'Times New Roman',serif}.field-statement{margin-top:14px;font:700 clamp(12px,1.25vw,15px)/1.35 var(--font-note)}.field-detail{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.48}
-  .field-routes{position:absolute;right:clamp(7%,10vw,15%);bottom:clamp(43px,8vh,76px);z-index:3;display:flex;max-width:390px;flex-wrap:wrap;justify-content:flex-end;gap:8px;transform:rotate(3deg)}
-  .field-route{border:1.5px solid var(--ink);background:var(--paper);padding:7px 9px;font:700 10px/1 var(--font-note);text-transform:uppercase;transition:transform var(--motion-fast) var(--ease-spring),background var(--motion-fast)}
-  .field-route:nth-child(2n){background:var(--blue)}.field-route:nth-child(3n){background:var(--green-light)}.field-route:hover{background:var(--orange-light);transform:translate(-5px,-5px) rotate(-5deg);box-shadow:var(--shadow-sticker)}
-  .field-socials{position:absolute;bottom:clamp(42px,7vh,70px);left:clamp(7%,10vw,15%);z-index:3;display:flex;gap:8px;transform:rotate(-3deg)}
-  .field-socials a{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ink);background:var(--paper);padding:6px 8px;font:700 9px/1 var(--font-note)}.field-socials :global(svg){width:13px;height:13px}
-  .field-loop{position:absolute;bottom:14px;left:-10%;z-index:1;white-space:nowrap;font:700 10px/1 var(--font-note);letter-spacing:.06em;text-transform:uppercase;animation:marquee 20s linear infinite}.field-loop span{display:inline-block;margin-right:38px}
-  @keyframes float{50%{transform:translateY(-18px) rotate(8deg)}}@keyframes orbit{to{transform:rotate(360deg)}}@keyframes marquee{to{transform:translateX(-22%)}}
-  @media (prefers-reduced-motion:reduce){.field-orb,.field-orbit,.field-loop{animation:none}}
-  @media (max-width:760px){
-    .heroPin{height:auto}.field-hero{position:relative;display:flex;min-height:100svh;flex-direction:column;padding:96px 22px 48px;overflow:clip}.field-top{position:absolute;top:20px;right:22px;left:22px}.field-meta{max-width:140px;line-height:1.35}.field-sticker{position:relative;top:auto;right:auto;align-self:flex-end;margin:8px 16px 44px 0}.field-name{position:relative;top:auto;left:auto;font-size:clamp(70px,23vw,120px);margin-left:4%;transform:rotate(-4deg)}.experiment-holder{position:relative;top:auto;left:auto;align-self:flex-start;width:min(220px,70vw);min-height:142px;margin:42px 0 0 8%;transform:rotate(4deg)}.field-copy{position:relative;right:auto;bottom:auto;max-width:330px;margin:38px 0 0 16%;transform:rotate(-2deg)}.field-routes{position:relative;right:auto;bottom:auto;justify-content:flex-start;margin:34px 0 0 7%;transform:rotate(2deg)}.field-socials{position:relative;bottom:auto;left:auto;margin:32px 0 0 7%;flex-wrap:wrap}.field-socials a span{display:none}.field-orbit{top:38%;left:auto;right:-65px}.field-orb-blue{right:-105px}.field-loop{position:relative;bottom:auto;left:auto;margin-top:36px}.field-actions{gap:5px}.field-talk{padding:8px}.field-actions :global(.seg){padding:4px 6px}
+  .hero {
+    position: relative;
+    display: grid;
+    min-height: 100svh;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto minmax(460px, 1fr) auto;
+    align-items: center;
+    gap: 20px;
+    overflow: clip;
+    border-bottom: var(--stroke);
+    padding: clamp(112px, 15vh, 160px) var(--page-pad) 40px;
+  }
+
+  .collab {
+    z-index: 3;
+    grid-column: 8 / 11;
+    justify-self: center;
+    border: var(--stroke);
+    background: var(--green);
+    box-shadow: var(--shadow-control);
+    padding: 10px 14px;
+    font: 500 clamp(9px, 1vw, 12px)/1.2 var(--font-note);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    transform: rotate(7deg);
+  }
+
+  .hero-name {
+    z-index: 1;
+    grid-column: 1 / 9;
+    grid-row: 2;
+    align-self: center;
+    font-family: var(--font-display);
+    font-size: clamp(86px, 16vw, 236px);
+    font-weight: 400;
+    letter-spacing: -.04em;
+    line-height: .72;
+    text-transform: uppercase;
+    transform: rotate(-2deg);
+  }
+
+  .hero-name span { display: block; }
+  .hero-name span:last-child {
+    color: var(--green);
+    -webkit-text-stroke: 2px var(--ink);
+    transform: translateX(clamp(18px, 4vw, 60px));
+  }
+
+  .formula {
+    grid-column: 2 / 7;
+    grid-row: 3;
+    justify-self: center;
+    border-bottom: 1px solid var(--ink);
+    font: 500 clamp(10px, 1.1vw, 13px)/1.4 var(--font-note);
+    transform: rotate(-3deg);
+  }
+
+  .hero-specimen {
+    position: relative;
+    z-index: 2;
+    grid-column: 7 / 12;
+    grid-row: 2;
+    align-self: end;
+    width: min(100%, 450px);
+    border: var(--stroke);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-card);
+    padding: clamp(22px, 3vw, 38px);
+    transform: rotate(2deg);
+  }
+
+  .hero-specimen::before {
+    position: absolute;
+    top: -14px;
+    left: 38%;
+    width: 88px;
+    height: 24px;
+    background: color-mix(in srgb, var(--orange) 72%, transparent);
+    content: '';
+    transform: rotate(-4deg);
+  }
+
+  .hero-specimen h2 {
+    max-width: 11ch;
+    font-family: var(--font-body);
+    font-size: clamp(30px, 4vw, 52px);
+    letter-spacing: -.045em;
+    line-height: .92;
+  }
+
+  .hero-specimen > p {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: clamp(12px, 1.25vw, 15px);
+    line-height: 1.55;
+  }
+
+  .hero-specimen .hero-thesis {
+    color: var(--ink);
+    font-size: clamp(15px, 1.7vw, 20px);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .specimen-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    border-top: 1px dashed var(--outline);
+    padding-top: 16px;
+    font: 500 10px/1.3 var(--font-note);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .specimen-meta img {
+    display: block;
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--ink);
+    background: var(--green);
+    color: var(--ink);
+    object-fit: cover;
+    font: 500 8px/1.1 var(--font-note);
+  }
+
+  .scroll-cue {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    grid-column: 10 / 13;
+    grid-row: 3;
+    justify-self: end;
+    border: 1px solid var(--ink);
+    background: var(--orange);
+    box-shadow: var(--shadow-control);
+    padding: 9px 12px;
+    font: 500 10px/1.2 var(--font-note);
+    text-transform: uppercase;
+    transform: rotate(2deg);
+    transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
+  }
+
+  .scroll-cue:hover {
+    box-shadow: 1px 1px 0 var(--ink);
+    transform: translate(2px, 2px) rotate(0);
+  }
+
+  @media (max-width: 780px) {
+    .hero {
+      min-height: auto;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+      gap: 32px;
+      padding: 118px 20px 60px;
+    }
+
+    .collab,
+    .hero-name,
+    .formula,
+    .hero-specimen,
+    .scroll-cue {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .collab { justify-self: end; margin-right: 6vw; }
+    .hero-name { font-size: clamp(82px, 27vw, 150px); }
+    .formula { justify-self: end; margin-right: 4vw; }
+    .hero-specimen { justify-self: center; width: min(88vw, 450px); }
+    .scroll-cue { justify-self: end; }
+  }
+
+  @media (max-width: 440px) {
+    .hero-name { font-size: clamp(76px, 26vw, 116px); }
+    .hero-specimen { width: 94%; padding: 24px; }
   }
 </style>

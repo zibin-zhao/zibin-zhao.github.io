@@ -4,57 +4,209 @@ import T from './T.astro';
 import LangToggle from './LangToggle.astro';
 ---
 <header class="topnav" id="topnav">
-  <a class="logo" href="#top">{profile.name}</a>
-  <nav id="navlinks">{profile.navLinks.map(l => <a href={l.href}><T en={l.en} zh={l.zh} /></a>)}</nav>
-  <div class="navright">
+  <a class="index-label" href="#top">ZIBINZHAO.COM · <span class="t-en">UNFINISHED INDEX</span><span class="t-zh">未完成索引</span></a>
+  <div class="nav-actions">
+    <button class="menubtn" id="menubtn" type="button" aria-expanded="false" aria-controls="navlinks"><T en="Index" zh="索引" /></button>
+    <nav id="navlinks" aria-label="Site chapters">
+      {profile.navLinks.map((link) => <a href={link.href}><T en={link.en} zh={link.zh} /></a>)}
+    </nav>
     <LangToggle />
-    <a class="cta" href={`mailto:${profile.email}`}><T en="Let's Talk ↗" zh="联系我 ↗" /></a>
-    <button class="menubtn" id="menubtn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navlinks">
-      <span></span><span></span><span></span>
-    </button>
+    <a class="talk" href={`mailto:${profile.email}`}><T en="Let's talk ↗" zh="联系我 ↗" /></a>
   </div>
 </header>
-<script is:inline>
-  (() => {
-    const btn = document.getElementById('menubtn');
-    const nav = document.getElementById('navlinks');
-    if (!btn || !nav) return;
-    const close = () => { nav.classList.remove('open'); btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const open = nav.classList.toggle('open');
-      btn.classList.toggle('open', open);
-      btn.setAttribute('aria-expanded', String(open));
-    });
-    nav.addEventListener('click', (e) => { if (e.target.closest('a')) close(); });
-    document.addEventListener('click', (e) => { if (!e.target.closest('#topnav')) close(); });
-  })();
-</script>
+
 <style>
-  .topnav{position:fixed;top:var(--gap);left:var(--gap);right:var(--gap);z-index:50;display:flex;justify-content:space-between;align-items:center;
-    padding:10px 12px 10px 18px;border:1.5px solid var(--ink);background:var(--paper-warm);box-shadow:var(--shadow-sticker);
-    opacity:0;transform:translateY(-14px) rotate(-.6deg);transition:opacity .45s,transform .45s;pointer-events:none}
-  .topnav.show{opacity:1;transform:rotate(-.6deg);pointer-events:auto}
-  .topnav .logo{font-family:var(--font-display);font-weight:800;letter-spacing:-1.2px;font-size:17px;text-transform:uppercase}
-  .topnav nav{display:flex;gap:7px;font:700 10px/1 var(--font-note);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
-  .topnav nav a{border-bottom:1px solid transparent;padding:5px 3px;transition:transform var(--motion-fast) var(--ease-spring),border-color var(--motion-fast)}
-  .topnav nav a:hover{border-color:var(--ink);transform:rotate(-4deg)}
-  .navright{display:flex;align-items:center;gap:10px}
-  .topnav :global(.langtoggle){border:1px solid var(--ink);border-radius:0;background:var(--paper)}
-  .topnav :global(.seg){color:var(--ink)}.topnav :global([data-lang="en"] .seg-en),.topnav :global([data-lang="zh"] .seg-zh){background:var(--ink);color:var(--paper)}
-  .topnav .cta{border:1px solid var(--ink);background:var(--green-light);box-shadow:2px 2px 0 var(--ink);padding:8px 10px;font:700 10px/1 var(--font-note);letter-spacing:.04em;text-transform:uppercase}
-  .menubtn{display:none;flex-direction:column;justify-content:center;gap:4px;width:34px;height:34px;padding:0 7px;border:1px solid var(--ink);border-radius:0;background:var(--blue);cursor:pointer}
-  .menubtn span{display:block;height:2px;background:var(--ink);transition:transform .25s,opacity .25s}
-  .menubtn.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-  .menubtn.open span:nth-child(2){opacity:0}
-  .menubtn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-  @media (max-width:640px){
-    .menubtn{display:flex}
-    .topnav nav{position:absolute;top:calc(100% + 8px);right:0;left:0;flex-direction:column;gap:0;
-      border:1.5px solid var(--ink);background:var(--paper);box-shadow:var(--shadow-sticker);
-      padding:6px;opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .2s,transform .2s}
-    .topnav nav.open{opacity:1;transform:none;pointer-events:auto}
-    .topnav nav a{padding:11px 12px}
-    .topnav nav a:hover{background:var(--orange-light)}
+  .topnav {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px var(--page-pad) 0;
+  }
+
+  :global(.js) .topnav {
+    position: fixed;
+    top: 20px;
+    right: var(--page-pad);
+    left: var(--page-pad);
+    z-index: 50;
+    flex-wrap: nowrap;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .index-label {
+    border: var(--stroke);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-control);
+    pointer-events: auto;
+    transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
+  }
+
+  .index-label {
+    display: flex;
+    max-width: min(50vw, 390px);
+    min-height: 40px;
+    align-items: center;
+    padding: 10px 14px;
+    font: 500 clamp(9px, 1.1vw, 12px)/1.25 var(--font-note);
+    letter-spacing: .035em;
+    text-transform: uppercase;
+    transform: rotate(-1deg);
+  }
+
+  .nav-actions {
+    position: static;
+    display: flex;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    pointer-events: auto;
+  }
+
+  :global(.js) .nav-actions {
+    position: relative;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    padding: 6px;
+    border: var(--stroke);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-control);
+    transform: rotate(1deg);
+    transition: transform var(--motion-fast) var(--ease-press), box-shadow var(--motion-fast) var(--ease-press);
+  }
+
+  :global(.js) .topnav.scrolled .index-label,
+  :global(.js) .topnav.scrolled .nav-actions {
+    box-shadow: 1px 1px 0 var(--ink);
+    transform: translate(2px, 2px) rotate(0);
+  }
+
+  .menubtn,
+  .talk {
+    min-height: 40px;
+    border: 1px solid var(--ink);
+    padding: 8px 10px;
+    background: var(--paper);
+    cursor: pointer;
+    font: 500 10px/1 var(--font-note);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .menubtn { display: none; }
+  :global(.js) .menubtn { display: block; }
+  .talk { background: var(--green); }
+
+  #navlinks {
+    position: static;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    border: var(--stroke);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-control);
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  :global(.js) #navlinks {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    display: grid;
+    width: auto;
+    min-width: 190px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity var(--motion-fast), transform var(--motion-fast), visibility 0s linear var(--motion-fast);
+    pointer-events: none;
+  }
+
+  :global(.js) #navlinks.open {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s, 0s, 0s;
+    pointer-events: auto;
+  }
+
+  #navlinks a {
+    display: flex;
+    flex: 1 1 120px;
+    min-height: 40px;
+    align-items: center;
+    border-bottom: 1px dashed var(--outline);
+    padding: 10px 14px;
+    font: 500 10px/1.2 var(--font-note);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  #navlinks a:last-child { border-bottom: 0; }
+  #navlinks a:hover { background: var(--green); }
+
+  .nav-actions :global(.langtoggle) {
+    display: none;
+    min-height: 40px;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: var(--paper);
+  }
+
+  :global(.js) .nav-actions :global(.langtoggle) { display: inline-flex; }
+
+  .nav-actions :global(.seg) {
+    border-radius: 0;
+    color: var(--ink);
+    font-family: var(--font-note);
+    font-size: 10px;
+  }
+
+  .nav-actions :global([data-lang='en'] .seg-en),
+  .nav-actions :global([data-lang='zh'] .seg-zh) {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  @media (max-width: 700px) {
+    .topnav {
+      gap: 8px;
+      padding: 12px;
+    }
+
+    :global(.js) .topnav {
+      top: 12px;
+      right: 12px;
+      left: 12px;
+      padding: 0;
+    }
+
+    .index-label {
+      max-width: 44vw;
+      min-height: 40px;
+      padding: 8px 9px;
+      font-size: 8px;
+    }
+
+    .nav-actions { gap: 4px; }
+    :global(.js) .nav-actions { padding: 4px; }
+    .menubtn, .talk { min-height: 40px; padding: 7px; font-size: 8px; }
+    .nav-actions :global(.langtoggle) { min-height: 40px; padding: 2px; }
+    .nav-actions :global(.seg) { padding: 4px; font-size: 9px; }
+  }
+
+  @media (max-width: 470px) {
+    .index-label { max-width: 42vw; }
+    .talk { display: none; }
   }
 </style>
