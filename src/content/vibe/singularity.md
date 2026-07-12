@@ -6,5 +6,5 @@ blurbZh: "40 万 GPU 粒子组成的实时宇宙 —— 在星系、黑洞、DNA
 tags: ["Three.js", "GLSL", "WebGL", "Claude Code"]
 href: "/singularity/"
 screenshot: "/vibe-singularity.jpg"
-order: 0
+order: 1
 ---

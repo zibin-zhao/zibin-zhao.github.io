@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const root = new URL('..', import.meta.url);
@@ -34,10 +34,32 @@ describe('Stitch lab-notebook foundation', () => {
     expect(prompts).toMatch(/\.stage-number\s*\{[^}]*color:\s*var\(--ink\);[^}]*background:\s*var\(--orange\);/);
   });
 
-  it('keeps chapter content visible without JavaScript-triggered reveal classes', () => {
+  it('enhances visible-by-default chapters only after motion setup succeeds', () => {
     const global = read('src/styles/global.css');
+    const script = read('src/scripts/hero.ts');
     expect(global).toMatch(/\.reveal\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*none;/);
     expect(global).not.toMatch(/\.reveal\s*\{[^}]*opacity:\s*0;/);
+    expect(global).toMatch(/\.motion-ready \.reveal\s*\{[^}]*opacity:\s*\.01;[^}]*transform:\s*translateY\(18px\);/);
+    expect(global).toMatch(/\.motion-ready \.reveal\.in\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*none;/);
+    expect(global).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.motion-ready \.reveal\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*none;/);
+    expect(script).toContain("document.documentElement.classList.add('motion-ready')");
+    expect(script).toContain("if (!reduce && 'IntersectionObserver' in window)");
+    expect(script).toContain('try {');
+    expect(script).toContain('catch');
+  });
+
+  it('styles exactly three restrained atmospheric decorations with reduced-motion fallbacks', () => {
+    const layout = read('src/layouts/Base.astro');
+    const global = read('src/styles/global.css');
+    expect(layout).toContain('<div class="paper-atmosphere" aria-hidden="true"><i></i><i></i><i></i></div>');
+    expect(global).toMatch(/\.paper-atmosphere\s*\{[^}]*position:\s*fixed;[^}]*pointer-events:\s*none;/);
+    expect(global).toContain('.paper-atmosphere i:nth-child(1)');
+    expect(global).toContain('.paper-atmosphere i:nth-child(2)');
+    expect(global).toContain('.paper-atmosphere i:nth-child(3)');
+    expect(global).toContain('@keyframes atmosphere-guide');
+    expect(global).toContain('@keyframes atmosphere-blob');
+    expect(global).toContain('@keyframes atmosphere-note');
+    expect(global).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.paper-atmosphere i\s*\{[^}]*animation:\s*none !important;/);
   });
 
   it('uses the Stitch index navigation and physical hero card', () => {
@@ -63,6 +85,12 @@ describe('Stitch lab-notebook foundation', () => {
     expect(nav).toMatch(/#navlinks\s*\{[^}]*position:\s*static;[^}]*display:\s*flex;[^}]*flex-wrap:\s*wrap;[^}]*visibility:\s*visible;[^}]*pointer-events:\s*auto;/);
     expect(nav).toMatch(/:global\(\.js\) #navlinks\s*\{[^}]*position:\s*absolute;[^}]*display:\s*grid;[^}]*visibility:\s*hidden;[^}]*pointer-events:\s*none;/);
     expect(nav).toMatch(/:global\(\.js\) #navlinks\.open\s*\{[\s\S]*?visibility:\s*visible;/);
+    expect(script).toContain("import { isMenuOpen, setMenuOpen, shouldDismissMenu } from './menu';");
+    expect(script).toContain("links?.querySelectorAll('a').forEach");
+    expect(script).toContain("document.addEventListener('click'");
+    expect(script).toContain("document.addEventListener('keydown'");
+    expect(script).toContain("event.key === 'Escape'");
+    expect(script).toContain('returnFocus: true');
   });
 
   it('renders dossier and evidence-card chapter variants', () => {
@@ -104,6 +132,41 @@ describe('Stitch lab-notebook foundation', () => {
     expect(vibe).toContain('class="vibe-board"');
     expect(vibeCard).toContain('class="shot-fallback"');
     expect(vibeCard).toContain('width="800" height="600"');
+  });
+
+  it('cross-lists authoritative CasMD data in deterministic Vibe order', () => {
+    const casmdPath = new URL('src/content/vibe/casmd.md', root);
+    const casmdExists = existsSync(casmdPath);
+    const casmd = casmdExists ? readFileSync(casmdPath, 'utf8') : '';
+    const project = read('src/content/projects/hsingmd.md');
+    const vibe = read('src/components/Vibe.astro');
+    expect(casmdExists).toBe(true);
+    for (const fact of [
+      'title: "CasMD"',
+      'blurb: "Protein–nucleic acid molecular dynamics, made simple. Interactive demo."',
+      'blurbZh: "蛋白质–核酸分子动力学，化繁为简。交互式演示。"',
+      'tags: ["Spaces", "MD"]',
+      'href: "https://huggingface.co/spaces/zzhaobz/HsingMD"',
+    ]) {
+      expect(project).toContain(fact);
+      expect(casmd).toContain(fact);
+    }
+    expect(casmd).not.toContain('screenshot:');
+    expect(vibe).toContain("a.data.order-b.data.order || a.id.localeCompare(b.id)");
+  });
+
+  it('keeps chapter headings semantic and subordinate content at h3', () => {
+    const section = read('src/components/Section.astro');
+    const projects = read('src/components/Projects.astro');
+    const vibe = read('src/components/Vibe.astro');
+    const vibeCard = read('src/components/VibeCard.astro');
+    const prompts = read('src/pages/prompts.astro');
+    expect(section).toContain('<h2 class="chapter-banner">');
+    expect(projects).toContain('<h3 class="big">');
+    expect(projects).not.toContain('<h2 class="big">');
+    expect(vibe).toContain('<h3 class="big">');
+    expect(vibeCard).toContain('<h3 class="ttl">');
+    expect(prompts).toContain('<h2 class="dlabel">{P.disciplineTitle}</h2>');
   });
 
   it('collapses every chapter evidence layout to one column at the 768px tablet width', () => {

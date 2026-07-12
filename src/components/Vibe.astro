@@ -3,10 +3,10 @@ import Section from './Section.astro';
 import VibeCard from './VibeCard.astro';
 import T from './T.astro';
 import { getCollection } from 'astro:content';
-const items = (await getCollection('vibe')).sort((a,b)=>a.data.order-b.data.order);
+const items = (await getCollection('vibe')).sort((a,b)=>a.data.order-b.data.order || a.id.localeCompare(b.id));
 ---
 <Section id="vibe" num="04" label="Vibe Coding" labelZh="随性编程" variant="scrap">
-  <h2 class="big"><T en="Built for the joy of it" zh="为热爱而造" /></h2>
+  <h3 class="big"><T en="Built for the joy of it" zh="为热爱而造" /></h3>
   <p class="muted t-en">Things I've vibe-coded — shipped fast with AI pair-programming. Side projects where curiosity leads and the build follows.</p>
   <p class="muted t-zh">我随性编写的小项目 —— 借助 AI 结对编程快速落地。好奇心在前，代码随后。</p>
   <div class="vibe-board">

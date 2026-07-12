@@ -12,7 +12,7 @@ const Tag = href ? 'a' : 'div';
         : <span class="shot-fallback" aria-hidden="true"><i></i><i></i><i></i><b>EXPERIMENT PREVIEW</b></span>}
   </div>
   <div class="body">
-    <div class="ttl">{title} {titleZh && <span class="zh">{titleZh}</span>}</div>
+    <h3 class="ttl">{title} {titleZh && <span class="zh">{titleZh}</span>}</h3>
     <p class="desc"><T en={blurb} zh={blurbZh ?? blurb} /></p>
     <div class="tags">{tags.map(t => <span class="t">{t}</span>)}</div>
     <span class="go">{comingSoon ? <T en="Coming soon" zh="即将上线" /> : <T en="View →" zh="查看 →" />}</span>

@@ -6,7 +6,7 @@ import { getCollection } from 'astro:content';
 const items = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.order);
 ---
 <Section id="projects" num="03" label="Projects & Demos" labelZh="项目与演示" variant="scrap">
-  <h2 class="big"><T en="Things I've built" zh="我做过的东西" /></h2>
+  <h3 class="big"><T en="Things I've built" zh="我做过的东西" /></h3>
   <div class="project-board">{items.map((project) => <ProjectCard {...project.data} />)}</div>
 </Section>
 <style>
