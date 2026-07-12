@@ -36,6 +36,10 @@ describe('production quality gates', () => {
     expect(pkg.engines.node).toBe('>=22.13.0');
   });
 
+  it('keeps generated files from sibling worktrees outside the lint boundary', () => {
+    expect(read('eslint.config.js')).toContain("'.worktrees/**'");
+  });
+
   it('documents the ESLint 10 accessibility-tooling decision', () => {
     const decision = read('docs/quality-gates.md');
     expect(decision).toContain('eslint-plugin-jsx-a11y');

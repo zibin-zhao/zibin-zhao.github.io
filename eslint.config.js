@@ -6,6 +6,7 @@ export default [
   {
     ignores: [
       '.astro/**',
+      '.worktrees/**',
       'dist/**',
       'public/medit/**',
       'public/singularity/**',
