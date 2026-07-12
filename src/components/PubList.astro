@@ -57,29 +57,46 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
 
   .pub-index {
     position: absolute;
-    top: 14px;
-    right: 18px;
+    top: 22px;
+    right: 22px;
+    display: grid;
+    width: 46px;
+    height: 46px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    place-items: center;
     color: var(--ink);
-    font: 400 clamp(54px, 8vw, 92px)/1 var(--font-display);
-    opacity: .12;
+    background: var(--orange);
+    box-shadow: 2px 2px 0 var(--ink);
+    font: 400 24px/1 var(--font-display);
+    opacity: 1;
   }
 
   .pub-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px 12px;
-    max-width: calc(100% - 32px);
+    width: fit-content;
+    max-width: calc(100% - 58px);
     margin-bottom: 22px;
+    border: 1px solid var(--ink);
     color: var(--muted);
+    background: var(--paper);
     font: 500 10px/1.35 var(--font-note);
     letter-spacing: .04em;
     text-transform: uppercase;
   }
 
+  .pub-meta span {
+    padding: 6px 8px;
+  }
+
   .pub-meta span:first-child {
-    padding: 3px 6px;
     color: var(--paper);
     background: var(--ink);
+  }
+
+  .pub-meta span + span {
+    border-left: 1px solid var(--ink);
   }
 
   .pub h3 {

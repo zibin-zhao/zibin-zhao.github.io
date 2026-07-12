@@ -20,6 +20,8 @@ import T from './T.astro';
     border: var(--stroke);
     background: var(--paper-card);
     box-shadow: var(--shadow-card);
+    transform: rotate(-.35deg);
+    transform-origin: center;
   }
 
   .dossier::after {
@@ -75,6 +77,7 @@ import T from './T.astro';
   @media (max-width: 640px) {
     .dossier {
       box-shadow: 4px 4px 0 var(--ink);
+      transform: none;
     }
 
     .dossier::after {

@@ -50,4 +50,23 @@ describe('Stitch lab-notebook foundation', () => {
     expect(pubs).toContain("p.featured ? 'pub--featured' : 'pub--archive'");
     expect(pubs).toContain('Object.entries(p.links)');
   });
+
+  it('styles featured publication indices as clear bordered circles', () => {
+    const pubs = read('src/components/PubList.astro');
+    expect(pubs).toMatch(/\.pub-index\s*\{[^}]*width:\s*46px;[^}]*height:\s*46px;[^}]*border:\s*2px solid var\(--ink\);[^}]*border-radius:\s*50%;/);
+    expect(pubs).toMatch(/\.pub-index\s*\{[^}]*opacity:\s*1;/);
+  });
+
+  it('presents publication years and venues as a shared metadata strip', () => {
+    const pubs = read('src/components/PubList.astro');
+    expect(pubs).toContain('<div class="pub-meta"><span>{p.year}</span>{p.venue && <span>{p.venue}</span>}</div>');
+    expect(pubs).toMatch(/\.pub-meta\s*\{[^}]*border:\s*1px solid var\(--ink\);[^}]*background:\s*var\(--paper\);/);
+    expect(pubs).toMatch(/\.pub-meta span \+ span\s*\{[^}]*border-left:\s*1px solid var\(--ink\);/);
+  });
+
+  it('uses a restrained dossier rotation that is neutralized on narrow screens', () => {
+    const about = read('src/components/About.astro');
+    expect(about).toMatch(/\.dossier\s*\{[^}]*transform:\s*rotate\(-\.35deg\);/);
+    expect(about).toMatch(/@media \(max-width: 640px\)[\s\S]*?\.dossier\s*\{[\s\S]*?transform:\s*none;/);
+  });
 });
