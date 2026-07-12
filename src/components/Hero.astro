@@ -10,7 +10,7 @@ import T from './T.astro';
     <h2><T en={profile.role.en} zh={profile.role.zh} /></h2>
     <p class="hero-thesis"><T en="AIing, caring, learning, and everyday wellbeing." zh="人工智能、关怀、学习与日常健康。" /></p>
     <p><T en={profile.tagline.en} zh={profile.tagline.zh} /></p>
-    <div class="specimen-meta"><img src="https://lh3.googleusercontent.com/aida/AP1WRLvnukA4djZtHJYJuWsaZFrOqcFIe7eDBqp2l-uqnngfE35Yu431xhsySJ-xfgYyVQpaAMK1jT2Lkh-kvlBh_QPfNZLqVojrX1XVhONFJ3MOsOx3C9PFRlBaRaRNX0DN_STRU5g-EOqzWfCuhBic6SUNgFWepL1jIqgVZub30ZLjxvf58xtk6Jz7stroLGL-AGASWPw18JxYw-H1jSzVLIN_JIYN4LKF9IIe3ltrt9PjfLEKRKro_y7OEuk" alt="Small illustrated specimen cart" width="64" height="64" fetchpriority="high" /><span>v1.0.4 // Active</span></div>
+    <div class="specimen-meta"><img src="/hero-portrait.jpg" alt="Watercolor profile portrait of Zibin Zhao" width="64" height="64" fetchpriority="high" /><span>v1.0.4 // Active</span></div>
   </article>
   <a class="scroll-cue" href="#about"><T en="Scroll for updates ↓" zh="向下查看更新 ↓" /></a>
 </section>
@@ -51,7 +51,7 @@ import T from './T.astro';
     font-family: var(--font-display);
     font-size: clamp(86px, 16vw, 236px);
     font-weight: 400;
-    letter-spacing: -.055em;
+    letter-spacing: -.04em;
     line-height: .72;
     text-transform: uppercase;
     transform: rotate(-2deg);
@@ -146,6 +146,9 @@ import T from './T.astro';
   }
 
   .scroll-cue {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
     grid-column: 10 / 13;
     grid-row: 3;
     justify-self: end;

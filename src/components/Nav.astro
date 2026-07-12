@@ -39,7 +39,10 @@ import LangToggle from './LangToggle.astro';
   }
 
   .index-label {
+    display: flex;
     max-width: min(50vw, 390px);
+    min-height: 40px;
+    align-items: center;
     padding: 10px 14px;
     font: 500 clamp(9px, 1.1vw, 12px)/1.25 var(--font-note);
     letter-spacing: .035em;
@@ -64,7 +67,7 @@ import LangToggle from './LangToggle.astro';
 
   .menubtn,
   .talk {
-    min-height: 34px;
+    min-height: 40px;
     border: 1px solid var(--ink);
     padding: 8px 10px;
     background: var(--paper);
@@ -101,6 +104,9 @@ import LangToggle from './LangToggle.astro';
   }
 
   #navlinks a {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
     border-bottom: 1px dashed var(--outline);
     padding: 10px 14px;
     font: 500 10px/1.2 var(--font-note);
@@ -112,7 +118,7 @@ import LangToggle from './LangToggle.astro';
   #navlinks a:hover { background: var(--green); }
 
   .nav-actions :global(.langtoggle) {
-    min-height: 34px;
+    min-height: 40px;
     border: 1px solid var(--ink);
     border-radius: 0;
     background: var(--paper);
@@ -141,13 +147,14 @@ import LangToggle from './LangToggle.astro';
 
     .index-label {
       max-width: 44vw;
+      min-height: 40px;
       padding: 8px 9px;
       font-size: 8px;
     }
 
     .nav-actions { gap: 4px; padding: 4px; }
-    .menubtn, .talk { min-height: 30px; padding: 7px; font-size: 8px; }
-    .nav-actions :global(.langtoggle) { min-height: 30px; padding: 2px; }
+    .menubtn, .talk { min-height: 40px; padding: 7px; font-size: 8px; }
+    .nav-actions :global(.langtoggle) { min-height: 40px; padding: 2px; }
     .nav-actions :global(.seg) { padding: 4px; font-size: 9px; }
   }
 

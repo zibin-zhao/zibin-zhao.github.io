@@ -133,6 +133,9 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
   }
 
   .pub-links a {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
     padding: 7px 9px;
     border: 1px solid var(--ink);
     background: var(--orange);
@@ -153,7 +156,7 @@ const pubs = sortPubs(entries.map(e => ({ ...e.data })));
     }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 780px) {
     .pubs {
       display: block;
     }

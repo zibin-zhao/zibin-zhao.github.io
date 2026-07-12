@@ -23,6 +23,14 @@ describe('Stitch lab-notebook foundation', () => {
     expect(layout).toContain('class="skip-link" href="#main-content"');
     expect(layout).toContain('class="paper-atmosphere"');
     expect(global).toContain('background-size: var(--grid-size) var(--grid-size)');
+    expect(global).toMatch(/\.skip-link\s*\{[^}]*position:\s*fixed;[^}]*transform:\s*translateY\(calc\(-100% - 24px\)\);/);
+    expect(global).toMatch(/\.skip-link:focus-visible\s*\{[^}]*transform:\s*none;/);
+  });
+
+  it('keeps chapter content visible without JavaScript-triggered reveal classes', () => {
+    const global = read('src/styles/global.css');
+    expect(global).toMatch(/\.reveal\s*\{[^}]*opacity:\s*1;[^}]*transform:\s*none;/);
+    expect(global).not.toMatch(/\.reveal\s*\{[^}]*opacity:\s*0;/);
   });
 
   it('uses the Stitch index navigation and physical hero card', () => {
@@ -34,6 +42,8 @@ describe('Stitch lab-notebook foundation', () => {
     expect(hero).toContain('id="hero-name"');
     expect(hero).toContain('class="hero-specimen"');
     expect(hero).toContain('class="scroll-cue"');
+    expect(hero).toContain('src="/hero-portrait.jpg"');
+    expect(hero).not.toContain('lh3.googleusercontent.com');
     expect(hero).not.toContain('experiment-holder');
     expect(script).not.toContain('field-motion');
     expect(nav).not.toContain('.nav-actions:focus-within #navlinks');
@@ -80,6 +90,37 @@ describe('Stitch lab-notebook foundation', () => {
     expect(vibe).toContain('class="vibe-board"');
     expect(vibeCard).toContain('class="shot-fallback"');
     expect(vibeCard).toContain('width="800" height="600"');
+  });
+
+  it('collapses every chapter evidence layout to one column at the 768px tablet width', () => {
+    const pubs = read('src/components/PubList.astro');
+    const projects = read('src/components/Projects.astro');
+    const vibe = read('src/components/Vibe.astro');
+    const cv = read('src/components/CvTimeline.astro');
+    expect(pubs).toMatch(/@media \(max-width: 780px\)[\s\S]*?\.pubs\s*\{\s*display:\s*block;/);
+    expect(projects).toMatch(/@media \(max-width: 780px\)[\s\S]*?\.project-board\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\);/);
+    expect(vibe).toMatch(/@media \(max-width: 780px\)[\s\S]*?\.vibe-board\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\);/);
+    expect(cv).toMatch(/@media \(max-width: 780px\)[\s\S]*?\.cv-layout\s*\{\s*grid-template-columns:\s*1fr;/);
+  });
+
+  it('keeps clustered navigation and copy controls at least 40px tall', () => {
+    const nav = read('src/components/Nav.astro');
+    const prompts = read('src/pages/prompts.astro');
+    const promptBlock = read('src/components/PromptBlock.astro');
+    expect(nav).toMatch(/\.index-label\s*\{[^}]*min-height:\s*40px;/);
+    expect(nav).toMatch(/\.menubtn,\s*\.talk\s*\{[^}]*min-height:\s*40px;/);
+    expect(nav).toMatch(/\.nav-actions :global\(\.langtoggle\)\s*\{[^}]*min-height:\s*40px;/);
+    expect(nav).not.toContain('min-height: 34px');
+    expect(nav).not.toContain('min-height: 30px');
+    expect(prompts).toMatch(/\.prompt-index-label,\s*\.back\s*\{[^}]*min-height:\s*40px;/);
+    expect(prompts).toMatch(/\.stagenav a\s*\{[^}]*min-height:\s*40px;/);
+    expect(promptBlock).toMatch(/\.copy\s*\{[^}]*min-height:\s*40px;/);
+  });
+
+  it('keeps the condensed hero display spacing within the legibility floor', () => {
+    const hero = read('src/components/Hero.astro');
+    expect(hero).toMatch(/\.hero-name\s*\{[^}]*letter-spacing:\s*-.04em;/);
+    expect(hero).not.toContain('letter-spacing: -.055em');
   });
 
   it('keeps CV download and in-flow closing index', () => {
