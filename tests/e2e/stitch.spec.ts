@@ -439,6 +439,37 @@ test('1024px restores readable text and interaction sizing without overflow', as
   expect(sizing.paperLinkHeight).toBeGreaterThanOrEqual(24);
 });
 
+test('Contact and draw controls remain disjoint and actionable at every footer tier', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'canonical-768', 'Footer-tier geometry is retained once across representative widths.');
+  for (const width of [390, 600, 768, 1_024, 1_440]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await expectNoHorizontalOverflow(page);
+    await expect(page.locator('.footer-routes a')).toHaveCount(6);
+    await expect(page.locator('.draw-control')).toBeVisible();
+    for (const anchor of await page.locator('.footer-routes a').all()) await expect(anchor).toBeVisible();
+
+    const contact = await page.locator('.footer-routes a[href="/contact/"]').boundingBox();
+    const draw = await page.locator('.draw-control').boundingBox();
+    if (!contact || !draw) throw new Error(`Footer geometry was unavailable at ${width}px`);
+    const horizontalOverlap = Math.max(0, Math.min(contact.x + contact.width, draw.x + draw.width) - Math.max(contact.x, draw.x));
+    const verticalOverlap = Math.max(0, Math.min(contact.y + contact.height, draw.y + draw.height) - Math.max(contact.y, draw.y));
+    expect(horizontalOverlap * verticalOverlap, `${width}px Contact/draw intersection`).toBe(0);
+    if (verticalOverlap > 0) {
+      const gap = contact.x + contact.width <= draw.x
+        ? draw.x - (contact.x + contact.width)
+        : contact.x - (draw.x + draw.width);
+      expect(gap, `${width}px Contact/draw gap`).toBeGreaterThanOrEqual(4);
+    }
+  }
+
+  await page.locator('.footer-routes a[href="/contact/"]').click();
+  await expect(page).toHaveURL(/\/contact\/$/);
+  await page.goto('/');
+  await page.locator('.draw-control').click();
+  await expect(page).toHaveURL(/\/prompts\/$/);
+});
+
 test('mobile without JavaScript keeps English content and every ordinary destination', async ({ browser }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'No-JS contract is intentionally retained once at the target mobile viewport.');
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });

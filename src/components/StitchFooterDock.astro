@@ -76,7 +76,7 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
 
   .footer-routes {
     position: absolute;
-    right: var(--page-pad);
+    right: calc(var(--page-pad) + 12px);
     bottom: calc(60px + env(safe-area-inset-bottom));
     display: flex;
     width: min(250px, calc(100vw - 40px));
@@ -145,7 +145,7 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
     --resting-transform: rotate(-12deg);
     position: absolute;
     z-index: 50;
-    right: 20px;
+    right: 0;
     bottom: calc(45px + env(safe-area-inset-bottom));
     display: inline-flex;
     width: 40px;
@@ -170,7 +170,7 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
 
   @media (max-width: 700px) {
     .footer-socials { left: 12px; }
-    .footer-routes { right: 12px; }
+    .footer-routes { right: 56px; }
     .footer-pill { min-height: 30px; padding-inline: 7px; font-size: 8px; }
   }
 
@@ -185,7 +185,7 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
       transform: none;
     }
     .footer-routes {
-      right: 52px;
+      right: 60px;
       bottom: calc(58px + env(safe-area-inset-bottom));
       left: 8px;
       width: auto;
