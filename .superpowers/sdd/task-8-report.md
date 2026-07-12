@@ -7,6 +7,7 @@
 - `tests/e2e/stitch.spec.ts` runs only in `canonical-768`, `desktop`, and `mobile`. Final inventory: 78 discovered, 74 passed, 4 intentional project-specific skips.
 - All seven routes return 200 with one `h1`, semantic shell landmarks, no duplicate IDs, no console/page errors, no horizontal overflow, visible fixed controls, and end content clear of the runtime dock.
 - Canonical homepage density was refined from a 3716px runtime document to 2157–2178px during final measurement. The review artifact is exactly 768×2079, matching the normalized 591×1600 source ratio while keeping the runtime footer fixed.
+- Canonical footer controls now match the compact source footprint: the social stack is constrained near x=24/right≤120 and the 150px route dock renders as two columns by three rows near x=602–752. The draw control and non-canonical breakpoints are unchanged.
 
 ## RED / GREEN
 
@@ -15,6 +16,7 @@
 3. RED: forced `/stitch/casmd.png` failure had no retained contract. GREEN: request abort reveals `.vibe-image-fallback` and preserves the CasMD title, description, and action.
 4. RED: canonical runtime document height was 3716px, with hero/research/Vibe at y=120/979/2033 and section heights 819/926/1417. GREEN: source-density contract passes with hero bottom 630, research y=670 and h≈565, Vibe y≈1235 and h≈743, runtime document ≈2160px, and 2079px canonical artifact.
 5. RED: normalized horizontal overlay showed hero card w346, banner w477, research cards w574/475/408, and an over-wide Singularity/lower pair. GREEN: final ranges are hero card x236 w296; banner w395; research w515/427/369; Vibe heading w241; note w295; Singularity x≈92 w≈285; Medit w≈276; Yaos/Zen x≈105/388 w≈274/276.
+6. RED follow-up: canonical social controls began at x≈39 and route controls formed a wide three-column/two-row cluster starting near x≈519. GREEN: retained geometry asserts social left 20–30/right≤120 and route left 590–610, width 145–155, height 72–90, with all 3 social and 6 route anchors visible.
 
 ## Production-preview browser coverage
 
@@ -39,6 +41,8 @@ Tracked artifacts:
 - `artifacts/stitch/prompts-390-full.png` — 390×8865
 
 The canonical artifact retains the 15% left and right-24% guide lines, asymmetric wordmark/card/formula/scroll grouping, green research banner and overlapping 85/70/60 roles, orange Vibe heading, LOL note, overlapping CasMD/Singularity/Medit composition, centered Yaos/Zen pair, and bottom footer dock. Animations are disabled only while capturing via reduced motion; normal-mode motion and shared transform ownership are unchanged and retained tests pass.
+
+At 701–1100px only, canonical footer pills use a 24px minimum height, compact 7px technical labels, and reduced padding/gaps. Socials begin near x=24; the route dock is a 150px two-column grid with three rows and preserves all fixed pointer/interaction behavior. The 390px and >1100px footer layouts are unchanged.
 
 The fixed footer appeared across the research banner in an ordinary 768×1024 full-page capture. The artifact test now raises the capture viewport to the normalized 2079px source height and uses a normal screenshot, so the runtime remains fixed while the artifact dock appears once at the document bottom.
 

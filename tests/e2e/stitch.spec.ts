@@ -190,6 +190,8 @@ test('canonical homepage matches the source-normalized vertical density and anch
     };
     return {
       documentHeight: document.documentElement.scrollHeight,
+      footerRoutes: box('.footer-routes'),
+      footerSocials: box('.footer-socials'),
       hero: box('.stitch-hero'),
       heroCard: box('.hero-card'),
       research: box('#research'),
@@ -252,6 +254,20 @@ test('canonical homepage matches the source-normalized vertical density and anch
   expect(yaos.left).toBeLessThanOrEqual(125);
   expect(zen.left).toBeGreaterThanOrEqual(375);
   expect(zen.left).toBeLessThanOrEqual(415);
+  expect(geometry.footerSocials.left).toBeGreaterThanOrEqual(20);
+  expect(geometry.footerSocials.left).toBeLessThanOrEqual(30);
+  expect(geometry.footerSocials.width).toBeGreaterThanOrEqual(70);
+  expect(geometry.footerSocials.width).toBeLessThanOrEqual(100);
+  expect(geometry.footerSocials.left + geometry.footerSocials.width).toBeLessThanOrEqual(120);
+  expect(geometry.footerRoutes.left).toBeGreaterThanOrEqual(590);
+  expect(geometry.footerRoutes.left).toBeLessThanOrEqual(610);
+  expect(geometry.footerRoutes.width).toBeGreaterThanOrEqual(145);
+  expect(geometry.footerRoutes.width).toBeLessThanOrEqual(155);
+  expect(geometry.footerRoutes.height).toBeGreaterThanOrEqual(72);
+  expect(geometry.footerRoutes.height).toBeLessThanOrEqual(90);
+  await expect(page.locator('.footer-socials a')).toHaveCount(3);
+  await expect(page.locator('.footer-routes a')).toHaveCount(6);
+  for (const anchor of await page.locator('.footer-socials a, .footer-routes a').all()) await expect(anchor).toBeVisible();
 });
 
 test('mobile without JavaScript keeps English content and every ordinary destination', async ({ browser }, testInfo) => {
