@@ -3,9 +3,82 @@ import Section from './Section.astro';
 import { profile } from '../data/profile';
 import T from './T.astro';
 ---
-<Section id="about" num="01" label="About" labelZh="关于" variant="note">
-  <h2 class="big"><T en="A short story" zh="我的故事" /></h2>
-  <p class="muted t-en">PhD candidate in Bioengineering at the Hong Kong University of Science and Technology (Hsing Lab), HKPFS + Redbird awardee. BSc Biomedical Engineering, University of Melbourne (First Class Honours). I build deep-learning methods at the interface of molecular biology and AI — one-pot CRISPR diagnostics, structure-aware aptamer selection, and molecular-dynamics tooling.</p>
-  <p class="muted t-zh">香港科技大学生物工程博士候选人（Hsing 实验室），香港博士研究生奖学金（HKPFS）+ Redbird 奖得主；本科毕业于墨尔本大学生物医学工程（一等荣誉）。我在分子生物学与人工智能的交叉处构建深度学习方法 —— 一锅式 CRISPR 诊断、结构感知的适体筛选，以及分子动力学工具。</p>
-  <div class="chips">{profile.focus.map(f => <span class="chip"><T en={f.en} zh={f.zh} /></span>)}</div>
+<Section id="about" num="01" label="About" labelZh="关于" variant="dossier">
+  <article class="dossier">
+    <p class="dossier-code">RESEARCHER FILE / ACTIVE</p>
+    <h3><T en="A short story" zh="我的故事" /></h3>
+    <p class="t-en">PhD candidate in Bioengineering at the Hong Kong University of Science and Technology (Hsing Lab), HKPFS + Redbird awardee. BSc Biomedical Engineering, University of Melbourne (First Class Honours). I build deep-learning methods at the interface of molecular biology and AI — one-pot CRISPR diagnostics, structure-aware aptamer selection, and molecular-dynamics tooling.</p>
+    <p class="t-zh">香港科技大学生物工程博士候选人（Hsing 实验室），香港博士研究生奖学金（HKPFS）+ Redbird 奖得主；本科毕业于墨尔本大学生物医学工程（一等荣誉）。我在分子生物学与人工智能的交叉处构建深度学习方法 —— 一锅式 CRISPR 诊断、结构感知的适体筛选，以及分子动力学工具。</p>
+    <div class="chips">{profile.focus.map((focus) => <span class="chip"><T en={focus.en} zh={focus.zh} /></span>)}</div>
+  </article>
 </Section>
+<style>
+  .dossier {
+    position: relative;
+    max-width: 900px;
+    padding: clamp(28px, 5vw, 58px);
+    border: var(--stroke);
+    background: var(--paper-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .dossier::after {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 46px;
+    height: 18px;
+    border: 1px solid var(--ink);
+    background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 5px);
+    content: '';
+    opacity: .72;
+  }
+
+  .dossier-code {
+    margin-bottom: clamp(22px, 4vw, 42px);
+    color: var(--muted);
+    font: 500 11px/1.3 var(--font-note);
+    letter-spacing: .1em;
+  }
+
+  h3 {
+    max-width: 680px;
+    margin-bottom: 20px;
+    font: 400 clamp(36px, 7vw, 74px)/.95 var(--font-display);
+    letter-spacing: .01em;
+    text-transform: uppercase;
+  }
+
+  .dossier > :global(p:not(.dossier-code)) {
+    max-width: 760px;
+    color: var(--muted);
+    font-size: clamp(15px, 2vw, 18px);
+    line-height: 1.72;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 32px;
+  }
+
+  .chip {
+    padding: 8px 11px;
+    border: 1px solid var(--ink);
+    background: var(--green-bright);
+    box-shadow: 2px 2px 0 var(--ink);
+    font: 500 11px/1.2 var(--font-note);
+    letter-spacing: .02em;
+  }
+
+  @media (max-width: 640px) {
+    .dossier {
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .dossier::after {
+      display: none;
+    }
+  }
+</style>

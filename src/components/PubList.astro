@@ -2,32 +2,152 @@
 import Section from './Section.astro';
 import { getCollection } from 'astro:content';
 import { sortPubs } from '../data/pubs';
-import T from './T.astro';
 const entries = await getCollection('publications');
 const pubs = sortPubs(entries.map(e => ({ ...e.data })));
 ---
 <Section id="research" num="02" label="Research & Publications" labelZh="研究与论文" variant="folder">
-  <h2 class="big"><T en="Selected work" zh="代表性成果" /></h2>
-  <ul class="pubs">
-    {pubs.map(p => (
-      <li class="pub">
-        <span class="yr">{p.year}</span>
-        <div>
-          <h4>{p.title}{p.featured && <span class="star">★</span>}</h4>
-          {p.venue && <div class="venue">{p.venue}</div>}
-          {p.authors && <div class="auth">{p.authors}</div>}
-          {p.links && <div class="links">{Object.entries(p.links).filter(([,v]) => v).map(([k,v]) => <a href={v} target="_blank" rel="noopener">{k.toUpperCase()}</a>)}</div>}
-        </div>
+  <ol class="pubs">
+    {pubs.map((p, index) => (
+      <li class:list={['pub', p.featured ? 'pub--featured' : 'pub--archive']}>
+        {p.featured && <span class="pub-index" aria-hidden="true">{index + 1}</span>}
+        <div class="pub-meta"><span>{p.year}</span>{p.venue && <span>{p.venue}</span>}</div>
+        <h3>{p.title}{p.featured && <span class="star" aria-label="Featured">★</span>}</h3>
+        {p.authors && <p class="pub-authors">{p.authors}</p>}
+        {p.links && <div class="pub-links">{Object.entries(p.links).filter(([, value]) => value).map(([key, value]) => <a href={value} target="_blank" rel="noopener">{key.toUpperCase()} ↗</a>)}</div>}
       </li>
     ))}
-  </ul>
+  </ol>
 </Section>
 <style>
-  .pubs{position:relative;list-style:none;margin-top:22px}
-  .pub{display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--ink)}
-  .pub:last-child{border-bottom:1px solid var(--ink)}
-  .yr{min-width:52px;color:var(--green);font:700 12px/1.2 var(--font-note)}
-  .pub h4{font-size:16px;font-weight:600;line-height:1.4}.star{color:var(--orange);margin-left:6px}
-  .venue{margin-top:3px;color:var(--muted);font-size:12px}.auth{margin-top:3px;color:var(--muted);font:11px/1.4 var(--font-note)}
-  .links{display:flex;gap:12px;margin-top:8px;font:700 11px/1 var(--font-note)}.links a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+  .pubs {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 18px;
+    list-style: none;
+    counter-reset: publication;
+  }
+
+  .pub {
+    position: relative;
+    grid-column: span 4;
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid var(--ink);
+    background: var(--paper-card);
+    counter-increment: publication;
+  }
+
+  .pub--featured {
+    grid-column: span 6;
+    min-height: 290px;
+    padding: clamp(28px, 4vw, 44px);
+    border: var(--stroke);
+    background: var(--green-bright);
+    box-shadow: var(--shadow-card);
+  }
+
+  .pub--archive::before {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: var(--outline);
+    content: counter(publication, decimal-leading-zero);
+    font: 500 10px/1 var(--font-note);
+  }
+
+  .pub-index {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    color: var(--ink);
+    font: 400 clamp(54px, 8vw, 92px)/1 var(--font-display);
+    opacity: .12;
+  }
+
+  .pub-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px 12px;
+    max-width: calc(100% - 32px);
+    margin-bottom: 22px;
+    color: var(--muted);
+    font: 500 10px/1.35 var(--font-note);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  .pub-meta span:first-child {
+    padding: 3px 6px;
+    color: var(--paper);
+    background: var(--ink);
+  }
+
+  .pub h3 {
+    position: relative;
+    font-size: clamp(17px, 2vw, 23px);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .pub--featured h3 {
+    max-width: 660px;
+    font-size: clamp(23px, 3.2vw, 38px);
+    line-height: 1.12;
+  }
+
+  .star {
+    margin-left: 8px;
+    color: var(--ink);
+    font-size: .65em;
+    vertical-align: top;
+  }
+
+  .pub-authors {
+    margin-top: 16px;
+    color: var(--muted);
+    font: 500 11px/1.55 var(--font-note);
+  }
+
+  .pub-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .pub-links a {
+    padding: 7px 9px;
+    border: 1px solid var(--ink);
+    background: var(--orange);
+    box-shadow: 2px 2px 0 var(--ink);
+    font: 500 10px/1 var(--font-note);
+    letter-spacing: .05em;
+  }
+
+  .pub-links a:hover {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+
+  @media (max-width: 860px) {
+    .pub,
+    .pub--featured {
+      grid-column: span 6;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .pubs {
+      display: block;
+    }
+
+    .pub {
+      margin-bottom: 16px;
+    }
+
+    .pub--featured {
+      min-height: 0;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+  }
 </style>

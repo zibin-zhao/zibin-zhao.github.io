@@ -40,4 +40,14 @@ describe('Stitch lab-notebook foundation', () => {
     expect(nav).toMatch(/#navlinks\s*\{[\s\S]*?visibility: hidden;/);
     expect(nav).toMatch(/#navlinks\.open\s*\{[\s\S]*?visibility: visible;/);
   });
+
+  it('renders dossier and evidence-card chapter variants', () => {
+    const section = read('src/components/Section.astro');
+    const about = read('src/components/About.astro');
+    const pubs = read('src/components/PubList.astro');
+    expect(section).toContain('chapter-banner');
+    expect(about).toContain('class="dossier"');
+    expect(pubs).toContain("p.featured ? 'pub--featured' : 'pub--archive'");
+    expect(pubs).toContain('Object.entries(p.links)');
+  });
 });

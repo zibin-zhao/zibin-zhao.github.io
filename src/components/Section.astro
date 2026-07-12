@@ -2,18 +2,56 @@
 import T from './T.astro';
 const { id, num, label, labelZh, variant = 'note' } = Astro.props;
 ---
-<section id={id} class:list={['reveal', 'sec', `section--${variant}`]}>
-  <div class="label">{num} — <T en={label} zh={labelZh ?? label} /></div>
-  <slot />
+<section id={id} class:list={['reveal', 'chapter', `chapter--${variant}`]}>
+  <header class="chapter-heading">
+    <h2 class="chapter-banner"><span>{num}</span> — <T en={label} zh={labelZh ?? label} /></h2>
+  </header>
+  <div class="chapter-content"><slot /></div>
 </section>
 <style>
-  .sec{position:relative;padding:clamp(62px,10vw,110px) clamp(22px,6vw,70px);max-width:1100px;margin:0 auto}
-  .sec + :global(.sec){border-top:1px dashed var(--hair)}
-  .label{display:inline-block;margin-bottom:10px;border-bottom:1px solid currentColor;color:var(--muted);font:700 10px/1.2 var(--font-note);letter-spacing:.12em;text-transform:uppercase}
-  .section--note::before,.section--folder::before,.section--scrap::before,.section--strip::before{position:absolute;z-index:-1;content:""}
-  .section--note::before{inset:12% 4% 13% 3%;background:rgba(255,253,246,.72);border:1px solid var(--hair);transform:rotate(-1deg)}
-  .section--folder::before{top:12%;right:4%;left:7%;height:67%;background:rgba(141,211,241,.3);border:1px solid var(--ink);transform:rotate(1deg)}
-  .section--scrap::before{top:17%;right:7%;left:5%;height:60%;background:rgba(199,239,145,.26);border:1px dashed var(--ink);transform:rotate(-1.5deg)}
-  .section--strip::before{top:19%;right:0;left:0;height:41%;background:rgba(245,177,129,.35);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);transform:rotate(.5deg)}
-  @media(max-width:760px){.sec{padding:68px 22px}.section--note::before,.section--folder::before,.section--scrap::before,.section--strip::before{right:2%;left:2%;transform:none}}
+  .chapter {
+    position: relative;
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: clamp(64px, 9vw, 108px) var(--page-pad);
+  }
+
+  .chapter + :global(.chapter) {
+    border-top: 1px dashed var(--outline);
+  }
+
+  .chapter-heading {
+    margin-bottom: clamp(24px, 4vw, 42px);
+  }
+
+  .chapter-banner {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .55em;
+    padding: 10px 14px 9px;
+    color: var(--paper);
+    background: var(--ink);
+    box-shadow: var(--shadow-control);
+    font: 500 clamp(12px, 1.5vw, 15px)/1.2 var(--font-note);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .chapter-banner span {
+    color: var(--orange);
+  }
+
+  .chapter-content {
+    position: relative;
+  }
+
+  @media (max-width: 640px) {
+    .chapter {
+      padding-block: 64px;
+    }
+
+    .chapter-banner {
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+  }
 </style>
