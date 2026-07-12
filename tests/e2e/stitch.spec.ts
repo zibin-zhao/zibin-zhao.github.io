@@ -368,12 +368,12 @@ test('canonical homepage matches the source-normalized vertical density and anch
   expect(geometry.footerSocials.width).toBeGreaterThanOrEqual(70);
   expect(geometry.footerSocials.width).toBeLessThanOrEqual(100);
   expect(geometry.footerSocials.left + geometry.footerSocials.width).toBeLessThanOrEqual(120);
-  expect(geometry.footerRoutes.left).toBeGreaterThanOrEqual(590);
-  expect(geometry.footerRoutes.left).toBeLessThanOrEqual(610);
-  expect(geometry.footerRoutes.width).toBeGreaterThanOrEqual(145);
-  expect(geometry.footerRoutes.width).toBeLessThanOrEqual(155);
-  expect(geometry.footerRoutes.height).toBeGreaterThanOrEqual(72);
-  expect(geometry.footerRoutes.height).toBeLessThanOrEqual(90);
+  expect(geometry.footerRoutes.left).toBeGreaterThanOrEqual(535);
+  expect(geometry.footerRoutes.left).toBeLessThanOrEqual(545);
+  expect(geometry.footerRoutes.width).toBeGreaterThanOrEqual(174);
+  expect(geometry.footerRoutes.width).toBeLessThanOrEqual(178);
+  expect(geometry.footerRoutes.height).toBeGreaterThanOrEqual(124);
+  expect(geometry.footerRoutes.height).toBeLessThanOrEqual(132);
   await expect(page.locator('.footer-socials a')).toHaveCount(3);
   await expect(page.locator('.footer-routes a')).toHaveCount(6);
   for (const anchor of await page.locator('.footer-socials a, .footer-routes a').all()) await expect(anchor).toBeVisible();
@@ -449,6 +449,57 @@ test('Contact and draw controls remain disjoint and actionable at every footer t
     await expect(page.locator('.draw-control')).toBeVisible();
     for (const anchor of await page.locator('.footer-routes a').all()) await expect(anchor).toBeVisible();
 
+    const footerContract = await page.evaluate(() => {
+      const metrics = (selector: string) => {
+        const element = document.querySelector<HTMLElement>(selector);
+        if (!element) throw new Error(`Missing footer rail: ${selector}`);
+        const style = getComputedStyle(element);
+        return {
+          clientWidth: element.clientWidth,
+          flexWrap: style.flexWrap,
+          overflowX: style.overflowX,
+          scrollLeft: element.scrollLeft,
+          scrollWidth: element.scrollWidth,
+        };
+      };
+      return {
+        controls: [...document.querySelectorAll<HTMLElement>('.footer-pill, .draw-control')].map((control) => {
+          const box = control.getBoundingClientRect();
+          return { height: box.height, width: box.width };
+        }),
+        routes: metrics('.footer-routes'),
+        socials: metrics('.footer-socials'),
+      };
+    });
+    for (const control of footerContract.controls) {
+      expect(control.height, `${width}px footer target height`).toBeGreaterThanOrEqual(40);
+      expect(control.width, `${width}px footer target width`).toBeGreaterThanOrEqual(40);
+    }
+    if (width <= 600) {
+      for (const [name, rail] of Object.entries({ routes: footerContract.routes, socials: footerContract.socials })) {
+        expect(rail.flexWrap, `${width}px ${name} wrapping`).toBe('nowrap');
+        expect(rail.overflowX, `${width}px ${name} horizontal overflow`).toBe('auto');
+        expect(rail.scrollWidth, `${width}px ${name} scroll range`).toBeGreaterThanOrEqual(rail.clientWidth);
+      }
+      const lastRoute = page.locator('.footer-routes a').last();
+      await lastRoute.focus();
+      await expect(lastRoute).toBeFocused();
+      const routeRail = page.locator('.footer-routes');
+      await routeRail.focus();
+      await expect(routeRail).toBeFocused();
+      if (footerContract.routes.scrollWidth > footerContract.routes.clientWidth + 4) {
+        await page.keyboard.press('ArrowRight');
+        await expect.poll(() => routeRail.evaluate((rail) => rail.scrollLeft)).toBeGreaterThan(0);
+      }
+      const socialRail = page.locator('.footer-socials');
+      await socialRail.focus();
+      await expect(socialRail).toBeFocused();
+      if (footerContract.socials.scrollWidth > footerContract.socials.clientWidth + 4) {
+        await page.keyboard.press('ArrowRight');
+        await expect.poll(() => socialRail.evaluate((rail) => rail.scrollLeft)).toBeGreaterThan(0);
+      }
+    }
+
     const contact = await page.locator('.footer-routes a[href="/contact/"]').boundingBox();
     const draw = await page.locator('.draw-control').boundingBox();
     if (!contact || !draw) throw new Error(`Footer geometry was unavailable at ${width}px`);
@@ -460,6 +511,15 @@ test('Contact and draw controls remain disjoint and actionable at every footer t
         ? draw.x - (contact.x + contact.width)
         : contact.x - (draw.x + draw.width);
       expect(gap, `${width}px Contact/draw gap`).toBeGreaterThanOrEqual(4);
+    }
+
+    if (width <= 768) {
+      await page.locator('.footer-routes a[href="/contact/"]').click();
+      await expect(page).toHaveURL(/\/contact\/$/);
+      await page.goto('/');
+      await page.locator('.draw-control').click();
+      await expect(page).toHaveURL(/\/prompts\/$/);
+      await page.goto('/');
     }
   }
 

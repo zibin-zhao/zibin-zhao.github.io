@@ -11,6 +11,17 @@ const motionState = (locator: Locator) => locator.evaluate((element) => {
   };
 });
 
+const paintState = (locator: Locator) => locator.evaluate((element) => {
+  const style = getComputedStyle(element);
+  return {
+    background: style.backgroundColor,
+    border: style.borderTopColor,
+    color: style.color,
+    shadow: style.boxShadow,
+    transitionDuration: style.transitionDuration,
+  };
+});
+
 const activeState = async (page: Page, locator: Locator) => {
   const box = await locator.boundingBox();
   if (!box) throw new Error('Control has no rendered box');
@@ -278,7 +289,7 @@ test('applies exact normal-mode button and draw interactions', async ({ page }) 
   expect(await motionState(draw)).toMatchObject({ angle: 12, tx: 0, ty: 0 });
 });
 
-test('keeps button and draw resting geometry invariant under reduced motion', async ({ page }) => {
+test('keeps reduced-motion geometry static while retaining immediate interaction feedback', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
 
@@ -287,13 +298,48 @@ test('keeps button and draw resting geometry invariant under reduced motion', as
 
   const talk = page.locator('.talk');
   const talkResting = await motionState(talk);
+  const talkRestingPaint = await paintState(talk);
   expect(talkResting).toMatchObject({ angle: 0, tx: 0, ty: 0 });
-  expect(await activeState(page, talk)).toEqual(talkResting);
+  expect((await activeState(page, talk))).toEqual(talkResting);
+  const talkBox = await talk.boundingBox();
+  if (!talkBox) throw new Error('Talk control has no rendered box');
+  await page.mouse.move(talkBox.x + talkBox.width / 2, talkBox.y + talkBox.height / 2);
+  await page.mouse.down();
+  const talkActivePaint = await paintState(talk);
+  await page.mouse.up();
+  expect(talkActivePaint.transitionDuration).toBe('0s');
+  expect(talkActivePaint).not.toEqual(talkRestingPaint);
   expect(await motionState(page.locator('.talk-angle'))).toMatchObject({ angle: -2, tx: 0, ty: 0 });
 
   const draw = page.locator('.draw-control');
   const drawResting = await motionState(draw);
+  const drawDisc = draw.locator('.draw-disc');
+  const drawRestingPaint = await paintState(drawDisc);
   expect(drawResting).toMatchObject({ angle: -12, tx: 0, ty: 0 });
   await draw.hover();
   expect(await motionState(draw)).toEqual(drawResting);
+  expect(await paintState(drawDisc)).not.toEqual(drawRestingPaint);
+
+  const footerPill = page.locator('.footer-routes .footer-pill').first();
+  const footerResting = await motionState(footerPill);
+  const footerRestingPaint = await paintState(footerPill);
+  await footerPill.hover();
+  expect(await motionState(footerPill)).toMatchObject({
+    angle: footerResting.angle,
+    tx: footerResting.tx,
+    ty: footerResting.ty,
+  });
+  expect(await paintState(footerPill)).not.toEqual(footerRestingPaint);
+
+  const publication = page.locator('.pub-card').first();
+  const publicationResting = await motionState(publication);
+  const icon = publication.locator('.magnify-icon');
+  const iconRestingPaint = await paintState(icon);
+  await publication.hover();
+  expect(await motionState(publication)).toMatchObject({
+    angle: publicationResting.angle,
+    tx: publicationResting.tx,
+    ty: publicationResting.ty,
+  });
+  expect(await paintState(icon)).not.toEqual(iconRestingPaint);
 });

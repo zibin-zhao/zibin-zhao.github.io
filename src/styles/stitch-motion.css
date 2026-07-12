@@ -102,8 +102,11 @@
 
   .btn-primary,
   .pub-card,
-  .draw-control {
-    transition: none;
+  .pub-card .magnify-icon,
+  .draw-control,
+  .draw-control .draw-disc,
+  .footer-pill {
+    transition: none !important;
   }
 
   .glitch-hover:hover {
@@ -114,29 +117,39 @@
 
   .btn-primary:active {
     box-shadow: var(--resting-shadow, none);
+    background-color: var(--surface) !important;
+    border-color: var(--green) !important;
+    color: var(--ink) !important;
     transform: var(--resting-transform, none);
   }
 
   .pub-card:hover {
+    border-color: var(--green) !important;
     box-shadow: var(--resting-shadow, none);
     transform: var(--resting-transform, none);
   }
 
   .pub-card:hover .magnify-icon {
-    color: inherit;
+    color: var(--green) !important;
     transform: none;
   }
 
   .draw-control:hover {
     box-shadow: var(--resting-shadow, none);
-    color: inherit;
     transform: var(--resting-transform, none);
   }
 
+  .draw-control:hover .draw-disc {
+    background-color: color-mix(in srgb, #ef4444 18%, var(--surface)) !important;
+    box-shadow: none !important;
+    color: #b91c1c !important;
+  }
+
   .footer-pill:hover {
-    background-color: var(--resting-background, inherit);
-    box-shadow: var(--resting-shadow, none);
-    color: inherit;
+    background-color: var(--ink) !important;
+    border-color: var(--ink) !important;
+    box-shadow: none !important;
+    color: var(--surface) !important;
     transform: var(--resting-transform, none);
   }
 }
