@@ -135,6 +135,85 @@ test('keeps the asymmetric research stack legible without overflow at 390px', as
   expect(headingBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height + 12);
 });
 
+test('renders canonical Vibe content, assets, and action semantics', async ({ page }) => {
+  await page.goto('/#vibe');
+
+  const cards = page.locator('[data-vibe-role]');
+  await expect(cards).toHaveCount(5);
+  await expect(cards.locator('.vibe-title')).toHaveText(['CasMD', 'Singularity奇点', 'Medit静处', 'Yaos药师法门 · 养生', 'Zen禅德 · Zende']);
+  await expect(cards.locator('.vibe-description .t-en')).toHaveCount(5);
+  await expect(cards.locator('.vibe-description .t-zh')).toHaveCount(5);
+  await expect(cards.nth(0).locator('img')).toHaveAttribute('src', '/stitch/casmd.png');
+  await expect(cards.nth(1).locator('img')).toHaveAttribute('src', '/stitch/singularity.png');
+  expect(await cards.locator('img').evaluateAll((images) => images.map((image) => (image as HTMLImageElement).naturalWidth))).toEqual([512, 512]);
+  await expect(cards.locator('.vibe-image')).toHaveCount(2);
+  await expect(cards.nth(2).locator('.vibe-image')).toHaveCount(0);
+  await expect(cards.nth(4)).toHaveCSS('border-top-style', 'dashed');
+  await expect(cards.nth(4).locator('a')).toHaveCount(0);
+  await expect(cards.nth(4).locator('.vibe-coming-soon')).toBeVisible();
+  await expect(cards.locator('a.vibe-action')).toHaveCount(4);
+  await expect(cards.nth(0).locator('a.vibe-action')).toHaveAttribute('target', '_blank');
+  await expect(cards.nth(0).locator('a.vibe-action')).toHaveAttribute('rel', 'noopener noreferrer');
+  await expect(cards.nth(1).locator('a.vibe-action')).not.toHaveAttribute('target', '_blank');
+  await expect(cards.nth(3).locator('a.vibe-action')).toHaveAttribute('target', '_blank');
+});
+
+test('preserves authored Vibe geometry, overlap, and rotation at 768px', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#vibe');
+
+  const mosaic = page.locator('.vibe-mosaic');
+  const slots = page.locator('.vibe-mosaic > .fade-slot');
+  const cards = page.locator('[data-vibe-role]');
+  const mosaicBox = await mosaic.boundingBox();
+  const boxes = await Promise.all([0, 1, 2].map((index) => slots.nth(index).boundingBox()));
+  const cardBoxes = await Promise.all([0, 1, 2].map((index) => cards.nth(index).boundingBox()));
+  if (!mosaicBox || boxes.some((box) => !box) || cardBoxes.some((box) => !box)) throw new Error('Vibe geometry was not rendered');
+  const [casmd, singularity, medit] = boxes as NonNullable<(typeof boxes)[number]>[];
+  const [casmdCard, singularityCard, meditCard] = cardBoxes as NonNullable<(typeof cardBoxes)[number]>[];
+
+  expect(casmd.width / mosaicBox.width).toBeCloseTo(8 / 12, 1);
+  expect(singularity.width / mosaicBox.width).toBeCloseTo(6 / 12, 1);
+  expect(medit.width / mosaicBox.width).toBeCloseTo(5 / 12, 1);
+  expect(singularity.x).toBeGreaterThan(casmd.x);
+  expect(singularityCard.y).toBeLessThan(casmdCard.y + casmdCard.height);
+  expect(medit.x).toBeGreaterThan(singularity.x);
+  expect(meditCard.y).toBeLessThan(singularityCard.y + singularityCard.height);
+  for (const [index, angle] of [1, -2, 3, -1, 2].entries()) {
+    expect(await motionState(cards.nth(index))).toMatchObject({ angle });
+  }
+});
+
+test('keeps Vibe source order, bounded overlap, and anchor clearance at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#vibe');
+
+  const cards = page.locator('[data-vibe-role]');
+  expect(await cards.evaluateAll((elements) => elements.map((element) => element.getAttribute('data-vibe-role')))).toEqual(
+    ['casmd', 'singularity', 'medit', 'yaos', 'zen'],
+  );
+  const boxes = await cards.evaluateAll((elements) => elements.map((element) => {
+    const box = element.getBoundingClientRect();
+    return { bottom: box.bottom, left: box.left, right: box.right, top: box.top };
+  }));
+  for (let index = 1; index < boxes.length; index += 1) {
+    expect(boxes[index].top).toBeGreaterThan(boxes[index - 1].top);
+    expect(boxes[index].top).toBeGreaterThan(boxes[index - 1].bottom - 70);
+  }
+  for (const box of boxes) {
+    expect(box.left).toBeGreaterThanOrEqual(0);
+    expect(box.right).toBeLessThanOrEqual(390);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+
+  const headerBox = await page.locator('.stitch-header').boundingBox();
+  const vibeBox = await page.locator('#vibe').boundingBox();
+  if (!headerBox || !vibeBox) throw new Error('Vibe anchor clearance geometry was not rendered');
+  expect(vibeBox.y).toBeGreaterThanOrEqual(headerBox.y + headerBox.height + 12);
+});
+
 test('keeps keyboard navigation, CV destination, and Prompts behavior usable', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Tab');

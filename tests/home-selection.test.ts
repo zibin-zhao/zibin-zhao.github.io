@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HOME_RESEARCH_TITLES, selectByTitles } from '../src/data/home';
+import { HOME_RESEARCH_TITLES, HOME_VIBE_TITLES, selectByTitles } from '../src/data/home';
 
 describe('selectByTitles', () => {
   it('selects named records in authored order', () => {
@@ -28,5 +28,9 @@ describe('selectByTitles', () => {
       'Structure-enhanced deep learning accelerates aptamer selection for small molecule families like steroids',
       'Transforming ECG diagnosis: an in-depth review of transformer-based deep-learning models in cardiovascular disease detection',
     ]);
+  });
+
+  it('fixes canonical Vibe order', () => {
+    expect(HOME_VIBE_TITLES).toEqual(['CasMD', 'Singularity', 'Medit', 'Yaos', 'Zen']);
   });
 });

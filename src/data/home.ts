@@ -4,6 +4,14 @@ export const HOME_RESEARCH_TITLES = [
   'Transforming ECG diagnosis: an in-depth review of transformer-based deep-learning models in cardiovascular disease detection',
 ] as const;
 
+export const HOME_VIBE_TITLES = [
+  'CasMD',
+  'Singularity',
+  'Medit',
+  'Yaos',
+  'Zen',
+] as const;
+
 export function selectByTitles<T extends { title: string }>(items: T[], titles: readonly string[]): T[] {
   const byTitle = new Map<string, T>();
   for (const item of items) {

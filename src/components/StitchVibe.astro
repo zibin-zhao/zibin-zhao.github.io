@@ -1,0 +1,160 @@
+---
+import { getCollection } from 'astro:content';
+import { HOME_VIBE_TITLES, selectByTitles } from '../data/home';
+import StitchVibeCard from './StitchVibeCard.astro';
+import T from './T.astro';
+
+const vibeEntries = await getCollection('vibe');
+const selected = selectByTitles(vibeEntries.map((entry) => entry.data), HOME_VIBE_TITLES);
+const [casmd, singularity, medit, yaos, zen] = selected;
+const casmdImage = '/stitch/casmd.png';
+const singularityImage = '/stitch/singularity.png';
+---
+
+<section class="stitch-vibe" id="vibe" aria-labelledby="vibe-title">
+  <h2 id="vibe-title">04 — Vibe Codings</h2>
+  <aside class="lol-note">
+    <strong>LOL</strong>
+    <T en="Things I've vibe-coded. (Exclude CasMD, it's for my PhD work...)" zh="我随性编写的小项目。（CasMD 除外，那是我的博士课题……）" />
+  </aside>
+
+  <div class="vibe-mosaic">
+    <div class="fade-slot animate-fade-up-1" data-vibe-slot="casmd">
+      <StitchVibeCard item={casmd} role="casmd" image={casmdImage} />
+    </div>
+    <div class="fade-slot animate-fade-up-2" data-vibe-slot="singularity">
+      <StitchVibeCard item={singularity} role="singularity" image={singularityImage} dark />
+    </div>
+    <div class="fade-slot animate-fade-up-3" data-vibe-slot="medit">
+      <StitchVibeCard item={medit} role="medit" />
+    </div>
+    <div class="vibe-lower animate-fade-up-4">
+      <StitchVibeCard item={yaos} role="yaos" />
+      <StitchVibeCard item={zen} role="zen" />
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  .stitch-vibe {
+    position: relative;
+    z-index: 20;
+    width: min(var(--canvas-max), calc(100% - (2 * var(--page-pad))));
+    margin: 0 auto 96px;
+    padding-top: 56px;
+    scroll-margin-top: 96px;
+  }
+
+  .stitch-vibe > h2 {
+    position: absolute;
+    z-index: 30;
+    top: 0;
+    right: -8px;
+    padding: 10px 16px;
+    border: var(--stroke);
+    background: var(--orange);
+    box-shadow: var(--shadow-4);
+    color: var(--ink);
+    font: 400 clamp(28px, 4.7vw, 48px)/1 var(--font-display);
+    text-transform: uppercase;
+    transform: rotate(-1deg);
+  }
+
+  .lol-note {
+    position: relative;
+    z-index: 10;
+    display: block;
+    width: min(58%, 520px);
+    margin: 0 0 40px;
+    padding: 10px 14px;
+    border: var(--stroke);
+    background: var(--surface);
+    box-shadow: var(--shadow-2);
+    font: 500 10px/1.5 var(--font-note);
+    transform: rotate(1deg);
+  }
+
+  .lol-note strong {
+    display: block;
+    margin-bottom: 7px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--ink);
+    font-size: 11px;
+  }
+
+  .vibe-mosaic {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 40px;
+  }
+
+  .vibe-mosaic > .fade-slot { position: relative; width: 100%; min-width: 0; }
+
+  [data-vibe-slot='casmd'] { z-index: 20; grid-column: span 8; }
+  [data-vibe-slot='singularity'] { z-index: 30; grid-column: span 6; margin-top: -40px; margin-left: 20%; }
+  [data-vibe-slot='medit'] { z-index: 40; grid-column: span 5; margin-top: -80px; margin-left: auto; }
+
+  .vibe-lower {
+    position: relative;
+    z-index: 30;
+    display: flex;
+    grid-column: 1 / -1;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 40px;
+  }
+
+  .vibe-lower > .vibe-card { flex: 1; max-width: 440px; }
+
+  .vibe-card--casmd { --resting-transform: rotate(1deg); }
+  .vibe-card--singularity { --resting-transform: rotate(-2deg); }
+  .vibe-card--medit { --resting-transform: rotate(3deg); }
+  .vibe-card--yaos { --resting-transform: rotate(-1deg); }
+  .vibe-card--zen { --resting-transform: rotate(2deg); }
+
+  @media (max-width: 700px) {
+    .stitch-vibe {
+      width: min(100% - 36px, 440px);
+      margin-bottom: 72px;
+      padding-top: 76px;
+      scroll-margin-top: 88px;
+    }
+
+    .stitch-vibe > h2 {
+      right: -4px;
+      max-width: calc(100% + 4px);
+      padding: 9px 12px;
+      font-size: clamp(27px, 9.4vw, 38px);
+    }
+
+    .lol-note {
+      width: 86%;
+      margin-bottom: 26px;
+      padding: 9px 11px;
+      font-size: 9px;
+    }
+
+    .vibe-mosaic {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0 3px 10px;
+    }
+
+    .vibe-mosaic > .fade-slot,
+    .vibe-lower { width: 100%; margin-left: 0; }
+    [data-vibe-slot='casmd'] { z-index: 20; }
+    [data-vibe-slot='singularity'] { z-index: 30; margin-top: -24px; }
+    [data-vibe-slot='medit'] { z-index: 40; margin-top: -18px; }
+
+    .vibe-lower {
+      flex-direction: column;
+      gap: 0;
+      margin-top: 16px;
+    }
+
+    .vibe-lower > .vibe-card { max-width: none; }
+    .vibe-lower > .vibe-card + .vibe-card { margin-top: -10px; }
+  }
+</style>

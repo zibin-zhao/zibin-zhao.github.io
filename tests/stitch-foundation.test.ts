@@ -41,6 +41,59 @@ describe('Stitch shell', () => {
     expect(archive).toContain('<PubList />');
   });
 
+  it('renders the five authored Vibe roles from canonical records', () => {
+    expect(existsSync(new URL('src/components/StitchVibe.astro', root))).toBe(true);
+    expect(existsSync(new URL('src/components/StitchVibeCard.astro', root))).toBe(true);
+    const vibe = read('src/components/StitchVibe.astro');
+    const card = read('src/components/StitchVibeCard.astro');
+    const home = read('src/pages/index.astro');
+
+    expect(vibe).toContain("getCollection('vibe')");
+    expect(vibe).toContain('selectByTitles');
+    expect(vibe).toContain('HOME_VIBE_TITLES');
+    for (const role of ['casmd', 'singularity', 'medit', 'yaos', 'zen']) {
+      expect(vibe).toContain(`vibe-card--${role}`);
+    }
+    expect(vibe).toContain('04 —');
+    expect(vibe).toContain('LOL');
+    expect(vibe).toContain('id="vibe"');
+    expect(card).toContain("role: 'casmd' | 'singularity' | 'medit' | 'yaos' | 'zen'");
+    expect(home).toContain('<StitchVibe />');
+    expect(home.indexOf('<StitchVibe />')).toBeGreaterThan(home.indexOf('<FeaturedResearch />'));
+  });
+
+  it('owns rotation inside fade wrappers and preserves canonical Vibe geometry', () => {
+    const vibe = read('src/components/StitchVibe.astro');
+    const card = read('src/components/StitchVibeCard.astro');
+
+    expect(vibe).toContain('class="fade-slot animate-fade-up-1"');
+    expect(vibe).toContain('class="fade-slot animate-fade-up-2"');
+    expect(vibe).toContain('class="fade-slot animate-fade-up-3"');
+    expect(vibe).toContain('class="vibe-lower animate-fade-up-4"');
+    expect(vibe).toMatch(/\.vibe-card--casmd\s*\{[^}]*--resting-transform:\s*rotate\(1deg\);/);
+    expect(vibe).toMatch(/\.vibe-card--singularity\s*\{[^}]*--resting-transform:\s*rotate\(-2deg\);/);
+    expect(vibe).toMatch(/\.vibe-card--medit\s*\{[^}]*--resting-transform:\s*rotate\(3deg\);/);
+    expect(vibe).toMatch(/\.vibe-card--yaos\s*\{[^}]*--resting-transform:\s*rotate\(-1deg\);/);
+    expect(vibe).toMatch(/\.vibe-card--zen\s*\{[^}]*--resting-transform:\s*rotate\(2deg\);/);
+    expect(vibe).toMatch(/\[data-vibe-slot='casmd'\]\s*\{[^}]*grid-column:\s*span 8;/);
+    expect(vibe).toMatch(/\[data-vibe-slot='singularity'\]\s*\{[^}]*grid-column:\s*span 6;[^}]*margin-top:\s*-40px;[^}]*margin-left:\s*20%;/);
+    expect(vibe).toMatch(/\[data-vibe-slot='medit'\]\s*\{[^}]*grid-column:\s*span 5;[^}]*margin-top:\s*-80px;[^}]*margin-left:\s*auto;/);
+    expect(card).toContain("class:list={['vibe-card'");
+  });
+
+  it('uses local image-led Vibe assets with explicit intrinsic dimensions and fallbacks', () => {
+    const vibe = read('src/components/StitchVibe.astro');
+    const card = read('src/components/StitchVibeCard.astro');
+    expect(existsSync(new URL('public/stitch/casmd.png', root))).toBe(true);
+    expect(existsSync(new URL('public/stitch/singularity.png', root))).toBe(true);
+    expect(vibe).toContain("const casmdImage = '/stitch/casmd.png'");
+    expect(vibe).toContain("const singularityImage = '/stitch/singularity.png'");
+    expect(card).toContain('width="512"');
+    expect(card).toMatch(/height=\{role === 'casmd' \? '286' : '384'\}/);
+    expect(card).toContain('onerror=');
+    expect(card).toContain('vibe-image-fallback');
+  });
+
   it('defines exact motion timings', () => {
     const css = read('src/styles/stitch-motion.css');
     expect(css).toContain('parallax-slow 20s linear infinite alternate');
