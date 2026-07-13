@@ -22,6 +22,10 @@ export default defineConfig({
   },
   webServer: {
     command: `npm run build && npm run preview -- --host ${host} --port ${port}`,
+    env: {
+      ...process.env,
+      GITHUB_PROJECTS_OFFLINE: '1',
+    },
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120_000,

@@ -28,10 +28,13 @@ interface GithubRepository {
 const GITHUB_OWNER = 'zibin-zhao';
 const GITHUB_API = 'https://api.github.com';
 const REQUEST_TIMEOUT_MS = 8_000;
+const REPOSITORIES_PER_PAGE = 100;
+const MAX_REPOSITORY_PAGES = 100;
 const EXCLUDED_REPOSITORIES = new Set(['zibin-zhao.github.io', 'handle_mutation']);
 const FEATURED_ORDER = ['CasMD', 'DL-SELEX', 'Yaos'] as const;
 const fallbackProjects: GithubProject[] = fallbackSnapshot;
 const curatedProjects = new Map(fallbackProjects.map((project) => [project.name, project]));
+let defaultProjectsPromise: Promise<GithubProject[]> | undefined;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => (
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -134,6 +137,31 @@ const fetchJson = async (
   }
 };
 
+const fetchRepositoryPages = async (
+  fetcher: typeof globalThis.fetch,
+  headers: HeadersInit,
+): Promise<GithubRepository[]> => {
+  const repositories: GithubRepository[] = [];
+
+  for (let page = 1; page <= MAX_REPOSITORY_PAGES; page += 1) {
+    const response = await fetchJson(
+      fetcher,
+      `${GITHUB_API}/users/${GITHUB_OWNER}/repos?type=owner&sort=updated&per_page=${REPOSITORIES_PER_PAGE}&page=${page}`,
+      headers,
+    );
+    if (!Array.isArray(response)) throw new Error('GitHub repository list was not an array');
+
+    const parsedPage = response.map(parseRepository);
+    if (!parsedPage.every((repository): repository is GithubRepository => repository !== undefined)) {
+      throw new Error('GitHub repository list contained a malformed record');
+    }
+    repositories.push(...parsedPage);
+    if (response.length < REPOSITORIES_PER_PAGE) return repositories;
+  }
+
+  throw new Error('GitHub repository pagination exceeded its safety limit');
+};
+
 const parseLanguages = (value: unknown): Array<[string, number]> | undefined => {
   if (!isRecord(value)) return undefined;
 
@@ -202,24 +230,18 @@ const sortProjects = (projects: GithubProject[]): GithubProject[] => {
   });
 };
 
-export async function getGithubProjects(options: {
+interface GithubProjectsOptions {
   fetch?: typeof globalThis.fetch;
   token?: string;
-} = {}): Promise<GithubProject[]> {
+}
+
+const loadGithubProjects = async (options: GithubProjectsOptions): Promise<GithubProject[]> => {
   const fetcher = options.fetch ?? globalThis.fetch;
   const headers = requestHeaders(options.token ?? process.env.GITHUB_TOKEN);
   let repositories: GithubRepository[];
 
   try {
-    const response = await fetchJson(
-      fetcher,
-      `${GITHUB_API}/users/${GITHUB_OWNER}/repos?type=owner&sort=updated&per_page=100`,
-      headers,
-    );
-    if (!Array.isArray(response)) return cloneFallback();
-    repositories = response
-      .map(parseRepository)
-      .filter((repository): repository is GithubRepository => repository !== undefined)
+    repositories = (await fetchRepositoryPages(fetcher, headers))
       .filter((repository) => (
         !repository.fork
         && !repository.archived
@@ -246,4 +268,14 @@ export async function getGithubProjects(options: {
   }));
 
   return sortProjects(projects);
+};
+
+export function getGithubProjects(options: GithubProjectsOptions = {}): Promise<GithubProject[]> {
+  const hasInjectedDependency = options.fetch !== undefined || options.token !== undefined;
+  if (hasInjectedDependency) return loadGithubProjects(options);
+
+  defaultProjectsPromise ??= process.env.GITHUB_PROJECTS_OFFLINE === '1'
+    ? Promise.resolve(cloneFallback())
+    : loadGithubProjects(options);
+  return defaultProjectsPromise;
 }

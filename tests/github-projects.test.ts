@@ -57,6 +57,76 @@ const fetchStub = (
 }) as unknown as typeof globalThis.fetch;
 
 describe('getGithubProjects', () => {
+  it('memoizes one promise and one GitHub transaction for default build-time calls', async () => {
+    const requests: string[] = [];
+    const defaultFetch = vi.fn(async (input: string | URL | Request) => {
+      const url = requestUrl(input);
+      requests.push(url);
+      return jsonResponse(url.endsWith('/languages')
+        ? { TypeScript: 100 }
+        : [repository('FutureLab')]);
+    }) as unknown as typeof globalThis.fetch;
+    vi.resetModules();
+    vi.stubGlobal('fetch', defaultFetch);
+
+    try {
+      const { getGithubProjects: getDefaultProjects } = await import('../src/data/github-projects');
+      const first = getDefaultProjects();
+      const second = getDefaultProjects();
+
+      expect(first).toBe(second);
+      const [firstProjects, secondProjects] = await Promise.all([first, second]);
+      expect(firstProjects).toBe(secondProjects);
+      expect(firstProjects.map(({ name }) => name)).toEqual(['FutureLab']);
+      expect(requests).toHaveLength(2);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('does not cache explicitly injected fetch or token calls', async () => {
+    const injectedFetch = fetchStub([repository('FutureLab')]);
+
+    const first = getGithubProjects({ fetch: injectedFetch, token: 'test-token' });
+    const second = getGithubProjects({ fetch: injectedFetch, token: 'test-token' });
+    await Promise.all([first, second]);
+
+    expect(injectedFetch).toHaveBeenCalledTimes(4);
+  });
+
+  it('returns a cloned fallback without fetching in private offline build mode', async () => {
+    const offlineFetch = vi.fn(async () => jsonResponse([])) as unknown as typeof globalThis.fetch;
+    vi.resetModules();
+    vi.stubGlobal('fetch', offlineFetch);
+    vi.stubEnv('GITHUB_PROJECTS_OFFLINE', '1');
+
+    try {
+      const { getGithubProjects: getOfflineProjects } = await import('../src/data/github-projects');
+      const projects = await getOfflineProjects();
+
+      expect(projects).toEqual(fallbackProjects);
+      expect(projects).not.toBe(fallbackProjects);
+      expect(projects[0].stack).not.toBe(fallbackProjects[0].stack);
+      expect(offlineFetch).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it('keeps explicit injected behavior active when offline build mode is set', async () => {
+    const injectedFetch = fetchStub([repository('FutureLab')]);
+    vi.stubEnv('GITHUB_PROJECTS_OFFLINE', '1');
+
+    try {
+      const projects = await getGithubProjects({ fetch: injectedFetch });
+      expect(projects.map(({ name }) => name)).toEqual(['FutureLab']);
+      expect(injectedFetch).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it('uses the private build environment token when no explicit token is supplied', async () => {
     const token = 'environment-build-token';
     const requests: Array<{ authorization: string | null; url: string }> = [];
@@ -222,6 +292,68 @@ describe('getGithubProjects', () => {
       'DL-SELEX-web-explain',
       'ECG_analysing_app',
     ]);
+  });
+
+  it.each([
+    ['first entry', [null, repository('FutureLab')]],
+    ['mixed entry', [repository('FutureLab'), { name: 'BrokenLab' }]],
+  ])('returns the complete fallback when a list page has a malformed %s', async (_label, body) => {
+    const malformedFetch = vi.fn(async () => jsonResponse(body)) as unknown as typeof globalThis.fetch;
+
+    const projects = await getGithubProjects({ fetch: malformedFetch });
+
+    expect(projects).toEqual(fallbackProjects);
+    expect(malformedFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns the complete fallback when a later list page contains a malformed record', async () => {
+    const fullPage = Array.from({ length: 100 }, (_, index) => repository(`PageOne-${index}`));
+    const laterMalformedFetch = vi.fn(async (input: string | URL | Request) => {
+      const page = new URL(requestUrl(input)).searchParams.get('page');
+      return jsonResponse(page === '1' ? fullPage : [repository('FutureLab'), null]);
+    }) as unknown as typeof globalThis.fetch;
+
+    const projects = await getGithubProjects({ fetch: laterMalformedFetch });
+
+    expect(projects).toEqual(fallbackProjects);
+    expect(laterMalformedFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('aggregates repository pages before filtering, sorting, and enrichment', async () => {
+    const pageOne = Array.from({ length: 100 }, (_, index) => repository(`Archive-${index}`, {
+      updated_at: `2025-01-${String(index % 28 + 1).padStart(2, '0')}T00:00:00Z`,
+    }));
+    const future = repository('FuturePageProject', { updated_at: '2027-01-01T00:00:00Z' });
+    const requests: string[] = [];
+    const paginatedFetch = vi.fn(async (input: string | URL | Request) => {
+      const url = requestUrl(input);
+      requests.push(url);
+      if (url.includes('/languages')) return jsonResponse({ TypeScript: 100 });
+      const page = new URL(url).searchParams.get('page');
+      if (page === '1') return jsonResponse(pageOne);
+      if (page === '2') return jsonResponse([future]);
+      return jsonResponse([]);
+    }) as unknown as typeof globalThis.fetch;
+
+    const projects = await getGithubProjects({ fetch: paginatedFetch });
+
+    expect(projects).toHaveLength(101);
+    expect(projects[0].name).toBe('FuturePageProject');
+    expect(requests.filter((url) => url.includes('/users/'))).toEqual([
+      'https://api.github.com/users/zibin-zhao/repos?type=owner&sort=updated&per_page=100&page=1',
+      'https://api.github.com/users/zibin-zhao/repos?type=owner&sort=updated&per_page=100&page=2',
+    ]);
+    expect(requests).toHaveLength(103);
+  });
+
+  it('bounds pagination and falls back if GitHub never returns a final short page', async () => {
+    const fullPage = Array.from({ length: 100 }, (_, index) => repository(`Loop-${index}`));
+    const loopingFetch = vi.fn(async () => jsonResponse(fullPage)) as unknown as typeof globalThis.fetch;
+
+    const projects = await getGithubProjects({ fetch: loopingFetch });
+
+    expect(projects).toEqual(fallbackProjects);
+    expect(loopingFetch).toHaveBeenCalledTimes(100);
   });
 
   it('fills missing descriptions and curated bilingual, demo, and featured metadata', async () => {
