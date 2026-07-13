@@ -1,0 +1,67 @@
+[
+  {
+    "name": "CasMD",
+    "description": "Protein–nucleic acid molecular dynamics, made simple.",
+    "descriptionZh": "蛋白质–核酸分子动力学，化繁为简。",
+    "githubUrl": "https://github.com/zibin-zhao/CasMD",
+    "demoUrl": "https://huggingface.co/spaces/zzhaobz/HsingMD",
+    "stack": ["Python", "HTML", "Shell"],
+    "updatedAt": "2026-07-06T07:14:00Z",
+    "featured": true
+  },
+  {
+    "name": "DL-SELEX",
+    "description": "Structure-enhanced deep learning for aptamer selection.",
+    "descriptionZh": "结构增强的深度学习，用于适体筛选。",
+    "githubUrl": "https://github.com/zibin-zhao/DL-SELEX",
+    "stack": ["Python", "Jupyter Notebook", "Dockerfile"],
+    "updatedAt": "2025-11-05T04:19:16Z",
+    "featured": true
+  },
+  {
+    "name": "Yaos",
+    "description": "A time-aware Medicine Buddha wellness PWA.",
+    "descriptionZh": "自动识别时辰与节气的药师法门养生 PWA。",
+    "githubUrl": "https://github.com/zibin-zhao/Yaos",
+    "demoUrl": "https://zibin-zhao.github.io/Yaos/",
+    "stack": ["JavaScript", "CSS", "HTML"],
+    "updatedAt": "2026-05-16T09:31:00Z",
+    "featured": true
+  },
+  {
+    "name": "TEMPO",
+    "description": "Supplementary toolkit for one-pot CRISPR molecular diagnostics.",
+    "descriptionZh": "一锅式 CRISPR 分子诊断的配套工具包。",
+    "githubUrl": "https://github.com/zibin-zhao/TEMPO",
+    "stack": ["JavaScript", "Vue", "Python"],
+    "updatedAt": "2026-06-16T05:37:35Z",
+    "featured": false
+  },
+  {
+    "name": "Cembra_AI",
+    "description": "Cross-ancestry polygenic risk score pipeline for osteoarthritis.",
+    "descriptionZh": "用于骨关节炎的跨祖源多基因风险评分流程。",
+    "githubUrl": "https://github.com/zibin-zhao/Cembra_AI",
+    "stack": ["Python", "Shell", "Dockerfile"],
+    "updatedAt": "2026-03-13T12:47:53Z",
+    "featured": false
+  },
+  {
+    "name": "DL-SELEX-web-explain",
+    "description": "Interactive website explaining the DL-SELEX research and workflow.",
+    "descriptionZh": "介绍 DL-SELEX 研究与工作流程的互动网站。",
+    "githubUrl": "https://github.com/zibin-zhao/DL-SELEX-web-explain",
+    "stack": ["TypeScript", "HTML"],
+    "updatedAt": "2025-12-22T00:29:01Z",
+    "featured": false
+  },
+  {
+    "name": "ECG_analysing_app",
+    "description": "ECG signal processing and deep-learning classification app.",
+    "descriptionZh": "结合信号处理与深度学习分类的心电图应用。",
+    "githubUrl": "https://github.com/zibin-zhao/ECG_analysing_app",
+    "stack": ["Python"],
+    "updatedAt": "2025-06-05T11:07:09Z",
+    "featured": false
+  }
+]
