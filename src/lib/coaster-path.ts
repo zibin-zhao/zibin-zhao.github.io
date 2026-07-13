@@ -17,14 +17,14 @@ export const MOBILE_COASTER_MAX_WIDTH = 700;
 const MOBILE_CONFIGURATION: CoasterConfiguration = {
   carCount: 1,
   sleeperCount: 18,
-  trackOpacity: .12,
+  trackOpacity: .07,
   trainSpan: .07,
 };
 
 const DESKTOP_CONFIGURATION: CoasterConfiguration = {
   carCount: 2,
   sleeperCount: 34,
-  trackOpacity: .16,
+  trackOpacity: .12,
   trainSpan: .12,
 };
 

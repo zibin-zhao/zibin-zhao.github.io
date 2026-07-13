@@ -56,6 +56,8 @@ describe('roller-coaster path geometry', () => {
     expect(mobile.carCount).toBe(1);
     expect(desktop.carCount).toBe(2);
     expect(mobile.sleeperCount).toBeLessThan(desktop.sleeperCount);
+    expect(mobile.trackOpacity).toBeCloseTo(.07);
+    expect(desktop.trackOpacity).toBeCloseTo(.12);
     expect(mobile.trainSpan).toBeCloseTo(.07);
     expect(desktop.trainSpan).toBeCloseTo(.12);
   });

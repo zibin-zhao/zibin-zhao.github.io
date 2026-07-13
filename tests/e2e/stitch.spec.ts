@@ -90,9 +90,53 @@ const collectRuntimeErrors = (page: Page) => {
 const installAnimationFrameProbe = async (page: Page) => {
   await page.addInitScript(() => {
     const pending = new Set<number>();
+    const listenerSets = new Map<string, Set<EventListenerOrEventListenerObject>>();
     const nativeRequest = window.requestAnimationFrame.bind(window);
     const nativeCancel = window.cancelAnimationFrame.bind(window);
+    const nativeClearRect = CanvasRenderingContext2D.prototype.clearRect;
+    const nativeTranslate = CanvasRenderingContext2D.prototype.translate;
+    let awaitingFirstCoasterCar = false;
+    let coasterCarY: number | null = null;
     let requests = 0;
+
+    const monitorTarget = (target: EventTarget, label: string, types: readonly string[]) => {
+      const nativeAdd = target.addEventListener.bind(target);
+      const nativeRemove = target.removeEventListener.bind(target);
+      target.addEventListener = ((
+        type: string,
+        callback: EventListenerOrEventListenerObject | null,
+        options?: boolean | AddEventListenerOptions,
+      ) => {
+        if (callback && types.includes(type)) {
+          const listeners = listenerSets.get(`${label}:${type}`) ?? new Set();
+          listeners.add(callback);
+          listenerSets.set(`${label}:${type}`, listeners);
+        }
+        nativeAdd(type, callback, options);
+      }) as typeof target.addEventListener;
+      target.removeEventListener = ((
+        type: string,
+        callback: EventListenerOrEventListenerObject | null,
+        options?: boolean | EventListenerOptions,
+      ) => {
+        if (callback && types.includes(type)) listenerSets.get(`${label}:${type}`)?.delete(callback);
+        nativeRemove(type, callback, options);
+      }) as typeof target.removeEventListener;
+    };
+
+    monitorTarget(document, 'document', [
+      'DOMContentLoaded',
+      'astro:before-swap',
+      'astro:page-load',
+      'visibilitychange',
+    ]);
+    monitorTarget(window, 'window', ['pagehide', 'pageshow', 'resize']);
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    window.matchMedia = ((query: string) => {
+      const result = nativeMatchMedia(query);
+      if (query === '(prefers-reduced-motion: reduce)') monitorTarget(result, 'media', ['change']);
+      return result;
+    }) as typeof window.matchMedia;
 
     window.requestAnimationFrame = (callback) => {
       let id = 0;
@@ -108,10 +152,31 @@ const installAnimationFrameProbe = async (page: Page) => {
       pending.delete(id);
       nativeCancel(id);
     };
+    CanvasRenderingContext2D.prototype.clearRect = function (...args) {
+      if (this.canvas instanceof HTMLCanvasElement && this.canvas.matches('[data-coaster-atmosphere]')) {
+        awaitingFirstCoasterCar = true;
+      }
+      return nativeClearRect.apply(this, args);
+    };
+    CanvasRenderingContext2D.prototype.translate = function (x, y) {
+      if (
+        awaitingFirstCoasterCar
+        && this.canvas instanceof HTMLCanvasElement
+        && this.canvas.matches('[data-coaster-atmosphere]')
+      ) {
+        awaitingFirstCoasterCar = false;
+        coasterCarY = y;
+      }
+      return nativeTranslate.call(this, x, y);
+    };
     Object.defineProperty(window, '__coasterRafProbe', {
       configurable: true,
       value: {
         get active() { return pending.size; },
+        get coasterCarY() { return coasterCarY; },
+        get listeners() {
+          return Object.fromEntries([...listenerSets].map(([name, listeners]) => [name, listeners.size]));
+        },
         get requests() { return requests; },
       },
     });
@@ -120,10 +185,20 @@ const installAnimationFrameProbe = async (page: Page) => {
 
 const animationFrameProbe = (page: Page) => page.evaluate(() => {
   const probe = (window as typeof window & {
-    __coasterRafProbe?: { active: number; requests: number };
+    __coasterRafProbe?: {
+      active: number;
+      coasterCarY: number | null;
+      listeners: Record<string, number>;
+      requests: number;
+    };
   }).__coasterRafProbe;
   if (!probe) throw new Error('Animation-frame probe was not installed');
-  return { active: probe.active, requests: probe.requests };
+  return {
+    active: probe.active,
+    coasterCarY: probe.coasterCarY,
+    listeners: probe.listeners,
+    requests: probe.requests,
+  };
 });
 
 const expectNoHorizontalOverflow = async (page: Page) => {
@@ -314,6 +389,70 @@ test('coaster canvas stays singular above fallback and leaves pointer links acti
   await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
 });
 
+test('coaster module reevaluation replaces its loop and orchestration listeners', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Cache-busted lifecycle is covered once at desktop width.');
+  await installAnimationFrameProbe(page);
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+
+  await page.evaluate(async () => {
+    const script = [...document.scripts].find(({ src }) => src.includes('RollerCoasterAtmosphere'));
+    if (!script) throw new Error('Built coaster module was not found');
+    await import(`${script.src}?coaster-reinit=${Date.now()}`);
+  });
+
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+  const { listeners } = await animationFrameProbe(page);
+  for (const name of [
+    'document:astro:before-swap',
+    'document:astro:page-load',
+    'document:visibilitychange',
+    'window:pagehide',
+    'window:pageshow',
+    'window:resize',
+    'media:change',
+  ]) expect(listeners[name], name).toBe(1);
+});
+
+test('coaster persisted page lifecycle restores normal and reduced states', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Persisted lifecycle is covered once at desktop width.');
+  await installAnimationFrameProbe(page);
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const coaster = page.locator('[data-coaster-atmosphere]');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+
+  const stateWhilePersisted = await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+    return document.querySelector<HTMLCanvasElement>('[data-coaster-atmosphere]')?.dataset.motionState;
+  });
+  expect.soft(stateWhilePersisted).toBe('paused');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
+  await expect(coaster).toHaveAttribute('data-motion-state', 'running');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(coaster).toHaveAttribute('data-motion-state', 'reduced');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
+  const reducedRequests = (await animationFrameProbe(page)).requests;
+  const reducedStateWhilePersisted = await page.evaluate(() => {
+    window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+    const state = document.querySelector<HTMLCanvasElement>('[data-coaster-atmosphere]')?.dataset.motionState;
+    window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+    return state;
+  });
+  expect(reducedStateWhilePersisted).toBe('reduced');
+  await expect(coaster).toHaveAttribute('data-motion-state', 'reduced');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
+  expect((await animationFrameProbe(page)).requests).toBe(reducedRequests);
+
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false })));
+  await expect(coaster).toHaveAttribute('data-motion-state', 'paused');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
+});
+
 test('coaster pauses and resumes one loop across visibility changes', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Visibility lifecycle is covered once at desktop width.');
   await installAnimationFrameProbe(page);
@@ -327,6 +466,9 @@ test('coaster pauses and resumes one loop across visibility changes', async ({ p
   });
   await expect(coaster).toHaveAttribute('data-motion-state', 'paused');
   await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
+  const pausedCarY = (await animationFrameProbe(page)).coasterCarY;
+  if (pausedCarY === null) throw new Error('Paused coaster position was not captured');
+  await page.waitForTimeout(350);
 
   await page.evaluate(() => {
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
@@ -334,6 +476,10 @@ test('coaster pauses and resumes one loop across visibility changes', async ({ p
   });
   await expect(coaster).toHaveAttribute('data-motion-state', 'running');
   await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+  await page.waitForTimeout(100);
+  const resumedCarY = (await animationFrameProbe(page)).coasterCarY;
+  if (resumedCarY === null) throw new Error('Resumed coaster position was not captured');
+  expect(Math.abs(resumedCarY - pausedCarY)).toBeLessThan(20);
 });
 
 test('coaster switches between desktop and mobile configurations without overflow', async ({ page }, testInfo) => {

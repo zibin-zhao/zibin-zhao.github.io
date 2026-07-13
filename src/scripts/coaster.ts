@@ -12,10 +12,16 @@ const MAX_DEVICE_PIXEL_RATIO = 1.5;
 const LOOP_DURATION_MS = 22_000;
 const PARKED_PROGRESS = .58;
 const CANVAS_SELECTOR = '[data-coaster-atmosphere]';
+const REGISTRY_KEY = Symbol.for('zibin.roller-coaster-atmosphere');
 
 type Cleanup = () => void;
 
-let cleanupActiveController: Cleanup | undefined;
+interface CoasterRegistry {
+  cleanupController?: Cleanup;
+  dispose: Cleanup;
+  mount: () => void;
+  unmount: Cleanup;
+}
 
 const createController = (canvas: HTMLCanvasElement): Cleanup | undefined => {
   const context = canvas.getContext('2d');
@@ -222,26 +228,56 @@ const createController = (canvas: HTMLCanvasElement): Cleanup | undefined => {
   return () => {
     destroyed = true;
     cancelFrame();
+    canvas.dataset.motionState = motionPreference.matches ? 'reduced' : 'paused';
     window.removeEventListener('resize', onResize);
     document.removeEventListener('visibilitychange', onVisibilityChange);
     motionPreference.removeEventListener('change', onMotionPreferenceChange);
   };
 };
 
-const unmount = () => {
-  cleanupActiveController?.();
-  cleanupActiveController = undefined;
+const registryWindow = window as typeof window & Record<symbol, CoasterRegistry | undefined>;
+registryWindow[REGISTRY_KEY]?.dispose();
+
+const registry: CoasterRegistry = {
+  cleanupController: undefined,
+  dispose: () => {},
+  mount: () => {},
+  unmount: () => {},
 };
 
-const mount = () => {
-  unmount();
+registry.unmount = () => {
+  registry.cleanupController?.();
+  registry.cleanupController = undefined;
+};
+
+registry.mount = () => {
+  registry.unmount();
   const canvas = document.querySelector<HTMLCanvasElement>(CANVAS_SELECTOR);
-  if (canvas) cleanupActiveController = createController(canvas);
+  if (canvas) registry.cleanupController = createController(canvas);
 };
 
+const mount = () => registry.mount();
+const unmount = () => registry.unmount();
+const onPageHide = () => unmount();
+const onPageShow = (event: PageTransitionEvent) => {
+  if (event.persisted) mount();
+};
+
+registry.dispose = () => {
+  unmount();
+  document.removeEventListener('DOMContentLoaded', mount);
+  document.removeEventListener('astro:before-swap', unmount);
+  document.removeEventListener('astro:page-load', mount);
+  window.removeEventListener('pagehide', onPageHide);
+  window.removeEventListener('pageshow', onPageShow);
+  if (registryWindow[REGISTRY_KEY] === registry) delete registryWindow[REGISTRY_KEY];
+};
+
+registryWindow[REGISTRY_KEY] = registry;
 document.addEventListener('astro:before-swap', unmount);
 document.addEventListener('astro:page-load', mount);
-window.addEventListener('pagehide', unmount);
+window.addEventListener('pagehide', onPageHide);
+window.addEventListener('pageshow', onPageShow);
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', mount, { once: true });
