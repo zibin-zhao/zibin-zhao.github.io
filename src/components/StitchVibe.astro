@@ -1,12 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
+import { getGithubProjects } from '../data/github-projects';
 import { HOME_VIBE_TITLES, selectByTitles } from '../data/home';
 import { profile } from '../data/profile';
+import GithubProjectShelf from './GithubProjectShelf.astro';
 import StitchVibeCard from './StitchVibeCard.astro';
 import T from './T.astro';
 
 const vibeEntries = await getCollection('vibe');
 const selected = selectByTitles(vibeEntries.map((entry) => entry.data), HOME_VIBE_TITLES);
+const githubProjects = await getGithubProjects();
 const [casmd, singularity, medit, yaos, zen] = selected;
 const casmdImage = '/stitch/casmd.png';
 const singularityImage = '/stitch/singularity.png';
@@ -34,6 +37,8 @@ const singularityImage = '/stitch/singularity.png';
       <StitchVibeCard item={zen} role="zen" />
     </div>
   </div>
+
+  <GithubProjectShelf projects={githubProjects} />
 
   <div class="beyond-lab" role="region" aria-labelledby="beyond-lab-title">
     <h3 id="beyond-lab-title"><T en="Beyond the lab" zh="实验室之外" /></h3>

@@ -44,6 +44,7 @@ describe('Stitch shell', () => {
   it('renders the five authored Vibe roles from canonical records', () => {
     expect(existsSync(new URL('src/components/StitchVibe.astro', root))).toBe(true);
     expect(existsSync(new URL('src/components/StitchVibeCard.astro', root))).toBe(true);
+    expect(existsSync(new URL('src/components/GithubProjectShelf.astro', root))).toBe(true);
     const vibe = read('src/components/StitchVibe.astro');
     const card = read('src/components/StitchVibeCard.astro');
     const home = read('src/pages/index.astro');
@@ -57,6 +58,9 @@ describe('Stitch shell', () => {
     expect(vibe).toContain('Side Quests');
     expect(vibe).toContain('Beyond the lab');
     expect(vibe).toContain('id="vibe"');
+    expect(vibe).toContain('<GithubProjectShelf projects={githubProjects} />');
+    expect(vibe.indexOf('<GithubProjectShelf')).toBeGreaterThan(vibe.indexOf('class="vibe-mosaic"'));
+    expect(vibe.indexOf('<GithubProjectShelf')).toBeLessThan(vibe.indexOf('class="beyond-lab"'));
     expect(card).toContain("role: 'casmd' | 'singularity' | 'medit' | 'yaos' | 'zen'");
     expect(home).toContain('<StitchVibe />');
     expect(home.indexOf('<StitchVibe />')).toBeGreaterThan(home.indexOf('<FeaturedResearch />'));

@@ -55,8 +55,11 @@ describe('playful researcher refinement', () => {
 
     expect(research).toContain('paper-primary-link');
     expect(vibeCard).toContain('vibe-primary-link');
+    expect(vibeCard).toContain('vibe-secondary-actions');
     expect(research).toMatch(/\.paper-primary-link::after\s*\{[^}]*position:\s*absolute;[^}]*inset:\s*0;/);
     expect(vibeCard).toMatch(/\.vibe-primary-link::after\s*\{[^}]*position:\s*absolute;[^}]*inset:\s*0;/);
+    expect(vibeCard).toMatch(/\.vibe-secondary-actions\s*\{[^}]*position:\s*relative;[^}]*z-index:\s*2;/);
+    expect(vibeCard).toMatch(/\.vibe-action\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/);
     expect(footer).toContain('draw-label');
     expect(footer).toMatch(/@media \(max-width: 700px\)[\s\S]*?\.stitch-footer\s*\{[^}]*position:\s*relative;/);
   });

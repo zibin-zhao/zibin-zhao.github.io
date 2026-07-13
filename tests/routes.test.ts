@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { cv } from '../src/data/cv';
 import { profile } from '../src/data/profile';
 import { promptPack } from '../src/data/prompts';
+import fallbackProjects from '../src/data/github-projects.fallback.json';
 
 const root = new URL('..', import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
@@ -74,7 +75,7 @@ describe('complete archive source contracts', () => {
     expect(publications).not.toMatch(/\.slice\(|filter\([^)]*featured/);
   });
 
-  it('renders every project identity and canonical external link', () => {
+  it('retains legacy project records while rendering every normalized GitHub project', () => {
     const projectFiles = files('src/content/projects/');
     const records = projectFiles.map((name) => {
       const source = read(`src/content/projects/${name}`);
@@ -87,7 +88,18 @@ describe('complete archive source contracts', () => {
       { title: 'TEMPO', href: 'https://github.com/zibin-zhao/TEMPO' },
     ]);
     const projects = read('src/components/Projects.astro');
-    expect(projects).toContain('items.map((project)');
+    expect(fallbackProjects.map(({ name }) => name)).toEqual([
+      'CasMD',
+      'DL-SELEX',
+      'Yaos',
+      'TEMPO',
+      'Cembra_AI',
+      'DL-SELEX-web-explain',
+      'ECG_analysing_app',
+    ]);
+    expect(projects).toContain('githubProjects.map((project)');
+    expect(projects).toContain('getGithubProjects');
+    expect(projects).not.toContain("getCollection('projects')");
     expect(projects).not.toContain('.slice(');
   });
 

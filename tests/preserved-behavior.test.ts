@@ -64,6 +64,7 @@ describe('preserved portfolio behavior', () => {
 
   it('keeps authoritative CasMD data cross-listed in deterministic Vibe order', () => {
     const vibe = read('src/components/StitchVibe.astro');
+    const projects = read('src/components/Projects.astro');
     const home = read('src/data/home.ts');
     const project = read('src/content/projects/hsingmd.md');
     const casmd = read('src/content/vibe/casmd.md');
@@ -78,6 +79,8 @@ describe('preserved portfolio behavior', () => {
     expect(vibe).toContain("getCollection('vibe')");
     expect(vibe).toContain('selectByTitles');
     expect(vibe).toContain('HOME_VIBE_TITLES');
+    expect(projects).toContain('getGithubProjects');
+    expect(projects).not.toContain("getCollection('projects')");
     expect(home).toContain("'CasMD',\n  'Singularity',\n  'Medit',\n  'Yaos',\n  'Zen',");
   });
 });

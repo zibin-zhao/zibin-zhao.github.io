@@ -8,6 +8,7 @@ interface VibeItem {
   blurbZh?: string;
   tags: string[];
   href?: string;
+  githubUrl?: string;
   comingSoon: boolean;
 }
 
@@ -64,12 +65,24 @@ const imageAlt = `${item.title} project interface preview`;
       {item.tags.map((tag) => <li>{tag}</li>)}
     </ul>
     {item.href ? (
-      <a
-        class="vibe-action"
-        href={item.href}
-        target={isExternal ? '_blank' : undefined}
-        rel={isExternal ? 'noopener noreferrer' : undefined}
-      ><T en="View →" zh="查看 →" /></a>
+      <div class="vibe-secondary-actions">
+        {item.githubUrl && (
+          <a
+            class="vibe-action"
+            href={item.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          ><T en="GitHub ↗" zh="GitHub ↗" /></a>
+        )}
+        <a
+          class="vibe-action"
+          href={item.href}
+          target={isExternal ? '_blank' : undefined}
+          rel={isExternal ? 'noopener noreferrer' : undefined}
+        >{item.githubUrl
+          ? <T en="Live demo ↗" zh="在线演示 ↗" />
+          : <T en="View →" zh="查看 →" />}</a>
+      </div>
     ) : (
       <span class="vibe-coming-soon"><T en={item.comingSoon ? 'Coming soon' : 'Unavailable'} zh={item.comingSoon ? '即将上线' : '暂不可用'} /></span>
     )}
@@ -244,12 +257,24 @@ const imageAlt = `${item.title} project interface preview`;
     font: 500 var(--text-meta)/1.35 var(--font-note);
   }
 
-  .vibe-action,
+  .vibe-secondary-actions,
   .vibe-coming-soon {
     margin-top: 16px;
+  }
+
+  .vibe-action,
+  .vibe-coming-soon {
     font: 500 var(--text-action)/1.4 var(--font-note);
     letter-spacing: var(--tracking-utility);
     text-transform: uppercase;
+  }
+
+  .vibe-secondary-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .vibe-action {
@@ -324,6 +349,7 @@ const imageAlt = `${item.title} project interface preview`;
     .vibe-tags { gap: 5px; margin-top: 8px; }
     .vibe-tags li { padding: 3px 5px; font-size: var(--text-meta); }
     .vibe-action { margin-top: 4px; }
+    .vibe-secondary-actions { margin-top: 4px; }
     .vibe-action,
     .vibe-coming-soon { font-size: var(--text-action); }
     .vibe-coming-soon { margin-top: 8px; }

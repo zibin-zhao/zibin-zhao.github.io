@@ -5,6 +5,7 @@ blurb: "An installable PWA that auto-detects your current 时辰 & 节气 to sur
 blurbZh: "可安装的 PWA，自动识别当前时辰与节气，提供个性化的药师法门养生建议，并附经文阅读与日历。"
 tags: ["PWA", "HTML/JS", "Wellness", "Claude Code"]
 href: "https://zibin-zhao.github.io/Yaos/"
+githubUrl: "https://github.com/zibin-zhao/Yaos"
 screenshot: "/vibe-yaos.jpg"
 order: 3
 ---
