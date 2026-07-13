@@ -45,7 +45,7 @@ describe('sticker constellation', () => {
     expect(figures[1]).toContain('<T en="Violin · piano · guitar · drums" zh="小提琴 · 钢琴 · 吉他 · 架子鼓" />');
     for (const [index, figure] of figures.entries()) {
       expect(existsSync(new URL(`public${sources[index]}`, root))).toBe(true);
-      expect(figure).toMatch(/<img\b[^>]*width="1254"[^>]*height="1254"/);
+      expect(figure).toMatch(/<img\b[^>]*width="768"[^>]*height="768"/);
       expect(figure).toContain('loading="lazy"');
       expect(figure).toContain('decoding="async"');
       const alt = figure.match(/alt="([^"]+)"/)?.[1] ?? '';
