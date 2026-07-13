@@ -162,11 +162,116 @@ test('renders canonical Vibe content, assets, and action semantics', async ({ pa
   await expect(cards.nth(4)).toHaveCSS('border-top-style', 'dashed');
   await expect(cards.nth(4).locator('a')).toHaveCount(0);
   await expect(cards.nth(4).locator('.vibe-coming-soon')).toBeVisible();
-  await expect(cards.locator('a.vibe-action')).toHaveCount(4);
-  await expect(cards.nth(0).locator('a.vibe-action')).toHaveAttribute('target', '_blank');
-  await expect(cards.nth(0).locator('a.vibe-action')).toHaveAttribute('rel', 'noopener noreferrer');
+  await expect(cards.locator('a.vibe-action')).toHaveCount(6);
+  await expect(cards.nth(0).locator('a.vibe-action')).toHaveCount(2);
+  await expect(cards.nth(1).locator('a.vibe-action')).toHaveCount(1);
+  await expect(cards.nth(2).locator('a.vibe-action')).toHaveCount(1);
+  await expect(cards.nth(3).locator('a.vibe-action')).toHaveCount(2);
   await expect(cards.nth(1).locator('a.vibe-action')).not.toHaveAttribute('target', '_blank');
-  await expect(cards.nth(3).locator('a.vibe-action')).toHaveAttribute('target', '_blank');
+});
+
+test('renders five authored cards, five deduplicated repository cards, and independent CasMD and Yaos actions', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/#vibe');
+
+  await expect(page.locator('.vibe-mosaic [data-vibe-role]')).toHaveCount(5);
+  const shelfCards = page.locator('.github-project-shelf [data-github-project]');
+  await expect(shelfCards).toHaveCount(5);
+  expect(await shelfCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-github-project')))).toEqual([
+    'DL-SELEX',
+    'TEMPO',
+    'Cembra_AI',
+    'DL-SELEX-web-explain',
+    'ECG_analysing_app',
+  ]);
+
+  const authoredProjects = [
+    {
+      role: 'casmd',
+      primary: 'https://huggingface.co/spaces/zzhaobz/HsingMD',
+      actions: [
+        'https://github.com/zibin-zhao/CasMD',
+        'https://huggingface.co/spaces/zzhaobz/HsingMD',
+      ],
+    },
+    {
+      role: 'yaos',
+      primary: 'https://zibin-zhao.github.io/Yaos/',
+      actions: [
+        'https://github.com/zibin-zhao/Yaos',
+        'https://zibin-zhao.github.io/Yaos/',
+      ],
+    },
+  ] as const;
+
+  const allSecondaryActions = page.locator(
+    '[data-vibe-role="casmd"] .vibe-action, [data-vibe-role="yaos"] .vibe-action',
+  );
+  await expect(allSecondaryActions).toHaveCount(4);
+
+  for (const project of authoredProjects) {
+    const card = page.locator(`[data-vibe-role="${project.role}"]`);
+    await expect(card.locator('.vibe-primary-link')).toHaveAttribute('href', project.primary);
+    const actions = card.locator('.vibe-action');
+    await expect(actions).toHaveCount(2);
+    expect(await actions.evaluateAll((links) => links.map((link) => link.getAttribute('href')))).toEqual([...project.actions]);
+    await expect(card.locator('.vibe-secondary-actions')).toHaveCSS('z-index', '2');
+  }
+
+  for (const action of await allSecondaryActions.all()) {
+    await expect(action).toHaveAttribute('target', '_blank');
+    await expect(action).toHaveAttribute('rel', 'noopener noreferrer');
+    const box = await action.boundingBox();
+    if (!box) throw new Error('Authored project action did not render');
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+
+    await action.focus();
+    await expect(action).toBeFocused();
+    const focusPaint = await action.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth),
+        shadow: style.boxShadow,
+      };
+    });
+    expect(focusPaint.outlineStyle).toBe('solid');
+    expect(focusPaint.outlineWidth).toBeGreaterThanOrEqual(3);
+    expect(focusPaint.shadow).not.toBe('none');
+  }
+
+  await page.evaluate(() => {
+    const auditWindow = window as typeof window & {
+      __vibeActionAudit?: { actions: string[]; primary: string[] };
+    };
+    auditWindow.__vibeActionAudit = { actions: [], primary: [] };
+
+    for (const role of ['casmd', 'yaos']) {
+      const card = document.querySelector(`[data-vibe-role="${role}"]`);
+      const primary = card?.querySelector<HTMLAnchorElement>('.vibe-primary-link');
+      primary?.addEventListener('click', (event) => {
+        event.preventDefault();
+        auditWindow.__vibeActionAudit?.primary.push(role);
+      });
+      for (const action of card?.querySelectorAll<HTMLAnchorElement>('.vibe-action') ?? []) {
+        action.addEventListener('click', (event) => {
+          event.preventDefault();
+          auditWindow.__vibeActionAudit?.actions.push(action.href);
+        });
+      }
+    }
+  });
+
+  const startingUrl = page.url();
+  for (const action of await allSecondaryActions.all()) await action.click();
+  expect(await page.evaluate(() => (
+    window as typeof window & { __vibeActionAudit?: { actions: string[]; primary: string[] } }
+  ).__vibeActionAudit)).toEqual({
+    actions: authoredProjects.flatMap((project) => [...project.actions]),
+    primary: [],
+  });
+  expect(page.url()).toBe(startingUrl);
 });
 
 test('preserves authored Vibe geometry, overlap, and rotation at 768px', async ({ page }) => {

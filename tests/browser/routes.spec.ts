@@ -81,10 +81,21 @@ const publications = [
 ] as const;
 
 const projects = [
-  { title: 'CasMD', href: 'https://huggingface.co/spaces/zzhaobz/HsingMD' },
-  { title: 'DL-SELEX', href: 'https://github.com/zibin-zhao/DL-SELEX' },
-  { title: 'TEMPO', href: 'https://github.com/zibin-zhao/TEMPO' },
-  { title: 'ECG App', href: 'https://github.com/zibin-zhao/ECG_analysing_app' },
+  {
+    name: 'CasMD',
+    githubUrl: 'https://github.com/zibin-zhao/CasMD',
+    demoUrl: 'https://huggingface.co/spaces/zzhaobz/HsingMD',
+  },
+  { name: 'DL-SELEX', githubUrl: 'https://github.com/zibin-zhao/DL-SELEX' },
+  {
+    name: 'Yaos',
+    githubUrl: 'https://github.com/zibin-zhao/Yaos',
+    demoUrl: 'https://zibin-zhao.github.io/Yaos/',
+  },
+  { name: 'TEMPO', githubUrl: 'https://github.com/zibin-zhao/TEMPO' },
+  { name: 'Cembra_AI', githubUrl: 'https://github.com/zibin-zhao/Cembra_AI' },
+  { name: 'DL-SELEX-web-explain', githubUrl: 'https://github.com/zibin-zhao/DL-SELEX-web-explain' },
+  { name: 'ECG_analysing_app', githubUrl: 'https://github.com/zibin-zhao/ECG_analysing_app' },
 ] as const;
 
 const cvEntries = [...cv.education, ...cv.experience, ...cv.leadership];
@@ -92,7 +103,7 @@ const cvEntries = [...cv.education, ...cv.experience, ...cv.leadership];
 const routes = [
   { path: '/about/', active: 'about', selector: '[data-focus]', attribute: 'data-focus', identities: profile.focus.map((item) => item.en) },
   { path: '/research/', active: 'research', selector: '[data-publication]', attribute: 'data-publication', identities: publications.map((item) => item.title) },
-  { path: '/projects/', active: 'projects', selector: '[data-project]', attribute: 'data-project', identities: projects.map((item) => item.title) },
+  { path: '/projects/', active: 'projects', selector: '[data-github-project]', attribute: 'data-github-project', identities: projects.map((item) => item.name) },
   { path: '/cv/', active: 'cv', selector: '[data-cv-entry]', attribute: 'data-cv-entry', identities: cvEntries.map((item) => item.title.en) },
   { path: '/contact/', active: 'contact', selector: '[data-contact-social]', attribute: 'data-contact-social', identities: profile.socials.map((item) => item.label) },
 ] as const;
@@ -170,16 +181,26 @@ test('renders complete publication metadata and featured state in deterministic 
   }
 });
 
-test('binds every project and per-publication action to its canonical href and safety attributes', async ({ page }) => {
+test('binds every GitHub project and per-publication action to its canonical href and safety attributes', async ({ page }) => {
   await page.goto('/projects/');
-  const projectLinks = page.locator('a[data-project]');
-  await expect(projectLinks).toHaveCount(projects.length);
-  expect(await projectLinks.evaluateAll((links) => links.map((link) => ({
-    title: link.getAttribute('data-project'),
-    href: link.getAttribute('href'),
-    target: link.getAttribute('target'),
-    rel: link.getAttribute('rel'),
-  })))).toEqual(projects.map((project) => ({ ...project, target: '_blank', rel: 'noopener noreferrer' })));
+  const projectCards = page.locator('[data-github-project]');
+  await expect(projectCards).toHaveCount(projects.length);
+  expect(await projectCards.evaluateAll((cards) => cards.map((card) => ({
+    name: card.getAttribute('data-github-project'),
+    links: [...card.querySelectorAll('.github-project-action')].map((link) => ({
+      href: link.getAttribute('href'),
+      target: link.getAttribute('target'),
+      rel: link.getAttribute('rel'),
+    })),
+  })))).toEqual(projects.map((project) => ({
+    name: project.name,
+    links: [
+      { href: project.githubUrl, target: '_blank', rel: 'noopener noreferrer' },
+      ...('demoUrl' in project
+        ? [{ href: project.demoUrl, target: '_blank', rel: 'noopener noreferrer' }]
+        : []),
+    ],
+  })));
 
   await page.goto('/research/');
   const publicationCards = page.locator('[data-publication]');
@@ -202,22 +223,24 @@ test('binds every project and per-publication action to its canonical href and s
   })));
 });
 
-test('projects use an asymmetric experiment board on desktop and a clear single-column stack on mobile', async ({ page }) => {
+test('projects use featured full-width records in a two-column desktop board and one mobile column', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/projects/');
 
   const board = page.locator('.project-board');
-  const cards = board.locator('[data-project]');
+  const cards = board.locator('[data-github-project]');
   await expect(cards).toHaveCount(projects.length);
   const desktop = await board.evaluate((element) => {
     const style = getComputedStyle(element);
-    const records = [...element.querySelectorAll<HTMLElement>('[data-project]')];
+    const records = [...element.querySelectorAll<HTMLElement>('[data-github-project]')];
     return {
       columns: style.gridTemplateColumns.split(' ').length,
+      width: element.getBoundingClientRect().width,
       cards: records.map((record) => {
         const box = record.getBoundingClientRect();
         const matrix = new DOMMatrixReadOnly(getComputedStyle(record).transform);
         return {
+          featured: record.getAttribute('data-featured') === 'true',
           left: box.left,
           right: box.right,
           top: box.top,
@@ -228,21 +251,21 @@ test('projects use an asymmetric experiment board on desktop and a clear single-
       }),
     };
   });
-  expect(desktop.columns).toBe(12);
-  expect(desktop.cards[0].left).toBeLessThan(desktop.cards[1].left);
-  expect(desktop.cards[0].right).toBeGreaterThan(desktop.cards[1].left);
-  expect(desktop.cards[2].left).toBeLessThan(desktop.cards[3].left);
-  expect(desktop.cards[2].right).toBeGreaterThan(desktop.cards[3].left);
-  expect(desktop.cards[0].width).toBeGreaterThan(desktop.cards[1].width);
-  expect(desktop.cards[3].width).toBeGreaterThan(desktop.cards[2].width);
+  expect(desktop.columns).toBe(2);
+  expect(desktop.cards.map(({ featured }) => featured)).toEqual([true, true, true, false, false, false, false]);
+  for (const card of desktop.cards.slice(0, 3)) expect(card.width).toBeGreaterThan(desktop.width * .9);
+  expect(desktop.cards[3].width).toBeLessThan(desktop.cards[0].width * .6);
+  expect(desktop.cards[3].left).toBeLessThan(desktop.cards[4].left);
+  expect(desktop.cards[5].left).toBeLessThan(desktop.cards[6].left);
+  expect(Math.abs(desktop.cards[3].top - desktop.cards[4].top)).toBeLessThan(20);
+  expect(Math.abs(desktop.cards[5].top - desktop.cards[6].top)).toBeLessThan(20);
   expect(desktop.cards.every((card) => Math.abs(card.angle) >= .25)).toBe(true);
-  expect(desktop.cards.some((card, index) => index > 0 && card.top < desktop.cards[index - 1].bottom)).toBe(true);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
   const mobile = await board.evaluate((element) => {
     const style = getComputedStyle(element);
-    const records = [...element.querySelectorAll<HTMLElement>('[data-project]')];
+    const records = [...element.querySelectorAll<HTMLElement>('[data-github-project]')];
     return {
       columns: style.gridTemplateColumns.split(' ').length,
       cards: records.map((record) => {
@@ -262,7 +285,7 @@ test('projects use an asymmetric experiment board on desktop and a clear single-
   for (let index = 1; index < mobile.cards.length; index += 1) {
     expect(mobile.cards[index].top).toBeGreaterThan(mobile.cards[index - 1].bottom);
   }
-  expect(mobile.cards.every((card) => Math.abs(card.angle) > 0 && Math.abs(card.angle) <= .4)).toBe(true);
+  expect(mobile.cards.every((card) => Math.abs(card.angle) < .01)).toBe(true);
   expect(Math.min(...mobile.cards.map((card) => card.left))).toBeGreaterThanOrEqual(0);
   expect(Math.max(...mobile.cards.map((card) => card.right))).toBeLessThanOrEqual(390);
   for (const link of await cards.all()) await expect(link).toBeVisible();
