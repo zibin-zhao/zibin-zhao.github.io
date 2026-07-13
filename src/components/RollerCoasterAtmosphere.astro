@@ -1,0 +1,20 @@
+<canvas
+  class="roller-coaster-atmosphere"
+  data-coaster-atmosphere
+  data-motion-state="paused"
+  aria-hidden="true"
+></canvas>
+
+<script>import '../scripts/coaster.ts';</script>
+
+<style>
+  .roller-coaster-atmosphere {
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+  }
+</style>

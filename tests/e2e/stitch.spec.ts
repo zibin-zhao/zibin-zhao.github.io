@@ -87,6 +87,45 @@ const collectRuntimeErrors = (page: Page) => {
   return errors;
 };
 
+const installAnimationFrameProbe = async (page: Page) => {
+  await page.addInitScript(() => {
+    const pending = new Set<number>();
+    const nativeRequest = window.requestAnimationFrame.bind(window);
+    const nativeCancel = window.cancelAnimationFrame.bind(window);
+    let requests = 0;
+
+    window.requestAnimationFrame = (callback) => {
+      let id = 0;
+      id = nativeRequest((timestamp) => {
+        pending.delete(id);
+        callback(timestamp);
+      });
+      pending.add(id);
+      requests += 1;
+      return id;
+    };
+    window.cancelAnimationFrame = (id) => {
+      pending.delete(id);
+      nativeCancel(id);
+    };
+    Object.defineProperty(window, '__coasterRafProbe', {
+      configurable: true,
+      value: {
+        get active() { return pending.size; },
+        get requests() { return requests; },
+      },
+    });
+  });
+};
+
+const animationFrameProbe = (page: Page) => page.evaluate(() => {
+  const probe = (window as typeof window & {
+    __coasterRafProbe?: { active: number; requests: number };
+  }).__coasterRafProbe;
+  if (!probe) throw new Error('Animation-frame probe was not installed');
+  return { active: probe.active, requests: probe.requests };
+});
+
 const expectNoHorizontalOverflow = async (page: Page) => {
   const width = await page.evaluate(() => ({
     client: document.documentElement.clientWidth,
@@ -225,8 +264,15 @@ test('Prompt Pack copy, stage navigation, and failure feedback remain usable', a
 });
 
 test('reduced motion removes animation while preserving authored resting transforms', async ({ page }, testInfo) => {
+  await installAnimationFrameProbe(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'networkidle' });
+
+  const coaster = page.locator('[data-coaster-atmosphere]');
+  await expect(coaster).toHaveCount(1);
+  await expect(coaster).toHaveAttribute('data-motion-state', 'reduced');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
+  expect((await animationFrameProbe(page)).requests).toBe(0);
 
   const animated = page.locator([
     '.animate-parallax-slow', '.animate-parallax-fast', '.animate-float', '.blob',
@@ -242,6 +288,69 @@ test('reduced motion removes animation while preserving authored resting transfo
     await expect(page.locator('.hero-formula')).toBeVisible();
   }
   for (const card of await page.locator('.pub-card, .vibe-card').all()) await expect(card).toBeVisible();
+});
+
+test('coaster canvas stays singular above fallback and leaves pointer links actionable', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Normal coaster lifecycle is covered once at desktop width.');
+  await installAnimationFrameProbe(page);
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  const coaster = page.locator('[data-coaster-atmosphere]');
+  await expect(coaster).toHaveCount(1);
+  await expect(coaster).toHaveAttribute('aria-hidden', 'true');
+  await expect(coaster).toHaveAttribute('data-motion-state', 'running');
+  await expect(coaster).toHaveCSS('position', 'fixed');
+  await expect(coaster).toHaveCSS('z-index', '1');
+  await expect(coaster).toHaveCSS('pointer-events', 'none');
+  await expect(page.locator('.stitch-atmosphere')).toHaveCSS('z-index', '0');
+  await expect(page.locator('#main-content')).toHaveCSS('z-index', '10');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+  await expectNoHorizontalOverflow(page);
+
+  await page.locator('.footer-routes a[href="/about/"]').click();
+  await expect(page).toHaveURL(/\/about\/$/);
+  await expect(page.locator('[data-coaster-atmosphere]')).toHaveCount(1);
+  await expect(page.locator('[data-coaster-atmosphere]')).toHaveAttribute('data-motion-state', 'running');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+});
+
+test('coaster pauses and resumes one loop across visibility changes', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Visibility lifecycle is covered once at desktop width.');
+  await installAnimationFrameProbe(page);
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const coaster = page.locator('[data-coaster-atmosphere]');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(coaster).toHaveAttribute('data-motion-state', 'paused');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(coaster).toHaveAttribute('data-motion-state', 'running');
+  await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
+});
+
+test('coaster switches between desktop and mobile configurations without overflow', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Responsive coaster settings are covered once through a live resize.');
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const coaster = page.locator('[data-coaster-atmosphere]');
+
+  await expect(coaster).toHaveAttribute('data-car-count', '2');
+  await expect(coaster).toHaveAttribute('data-sleeper-count', '34');
+  await expect(coaster).toHaveAttribute('data-train-span', '0.12');
+  await expectNoHorizontalOverflow(page);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(coaster).toHaveAttribute('data-car-count', '1');
+  await expect(coaster).toHaveAttribute('data-sleeper-count', '18');
+  await expect(coaster).toHaveAttribute('data-train-span', '0.07');
+  await expectNoHorizontalOverflow(page);
 });
 
 test('sticker constellation stays static and overflow-free at every authored width', async ({ page }, testInfo) => {
