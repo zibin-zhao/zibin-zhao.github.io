@@ -290,6 +290,67 @@ test('sticker constellation stays static and overflow-free at every authored wid
   }
 });
 
+test('sticker captions keep a transform-safe gap through normal rest and hover endpoints', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Normal-motion sticker geometry is covered once at every authored width.');
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('DOM.enable');
+  await cdp.send('CSS.enable');
+
+  for (const width of [1_440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: width <= 390 ? 844 : 1_024 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+
+    const constellation = page.locator('[data-sticker-constellation]');
+    await page.locator('.sticker-figure--coding').evaluate((element) =>
+      element.scrollIntoView({ behavior: 'instant', block: 'center' }),
+    );
+    await expect(constellation).toHaveClass(/is-revealed/);
+    for (const reveal of await constellation.locator('.sticker-reveal').all()) {
+      await expect(reveal).toHaveCSS('transform', 'none');
+    }
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+    await constellation.locator('.sticker-drift').evaluateAll((elements) => {
+      for (const element of elements) (element as HTMLElement).style.animation = 'none';
+    });
+
+    await expect.poll(() => constellation.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).getPropertyValue('--sticker-scroll')),
+    )).toBeGreaterThan(0);
+
+    const assertGaps = async (endpoint: 'rest' | 'hover') => {
+      const offset = await constellation.evaluate((element) =>
+        Number.parseFloat(getComputedStyle(element).getPropertyValue('--sticker-scroll')),
+      );
+      const facts = await constellation.locator('figure').evaluateAll((figures) => figures.map((figure) => {
+        const image = figure.querySelector('img')?.getBoundingClientRect();
+        const caption = figure.querySelector('figcaption')?.getBoundingClientRect();
+        if (!image || !caption) throw new Error('Sticker image/caption geometry is missing');
+        return {
+          gap: caption.top - image.bottom,
+          sticker: [...figure.classList].find((name) => name.startsWith('sticker-figure--')) ?? 'unknown',
+        };
+      }));
+      for (const fact of facts) {
+        expect(fact.gap, `${width}px ${fact.sticker} ${endpoint} gap at ${offset}px parallax`)
+          .toBeGreaterThanOrEqual(4);
+      }
+    };
+
+    await assertGaps('rest');
+
+    const { root } = await cdp.send('DOM.getDocument');
+    const { nodeIds } = await cdp.send('DOM.querySelectorAll', {
+      nodeId: root.nodeId,
+      selector: '[data-sticker-constellation] figure',
+    });
+    for (const nodeId of nodeIds) {
+      await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['hover'] });
+    }
+    await page.waitForTimeout(220);
+    await assertGaps('hover');
+  }
+});
+
 test('sticker motion reveals once and clamps the shared parallax property', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Runtime sticker motion is covered once in the focused mobile project.');
   await page.goto('/', { waitUntil: 'networkidle' });
