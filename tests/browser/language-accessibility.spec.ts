@@ -62,9 +62,23 @@ test('sticker constellation keeps useful alternatives and switches every physica
   await expect(chinese).toHaveCount(7);
   for (const caption of await english.all()) await expect(caption).toBeVisible();
   for (const caption of await chinese.all()) await expect(caption).toBeHidden();
+  for (const name of [
+    'DNA + AI',
+    'Violin · piano · guitar · drums',
+    'Chinese calligraphy',
+    'Reading, underlining, returning',
+    'Psychology & the mind',
+    'Meditation practice',
+    'Late-night coding',
+  ]) {
+    await expect(constellation.getByRole('figure', { name, exact: true })).toHaveCount(1);
+  }
 
   await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
   for (const caption of await english.all()) await expect(caption).toBeHidden();
   for (const caption of await chinese.all()) await expect(caption).toBeVisible();
+  for (const name of ['DNA 与 AI', '小提琴 · 钢琴 · 吉他 · 架子鼓', '中国书法', '阅读、划线、重读', '心理学与心灵', '冥想练习', '深夜编程']) {
+    await expect(constellation.getByRole('figure', { name, exact: true })).toHaveCount(1);
+  }
   await expect(constellation.getByText('深夜编程')).toBeVisible();
 });

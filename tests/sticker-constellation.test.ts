@@ -70,6 +70,19 @@ describe('sticker constellation', () => {
     }
   });
 
+  it('keeps each semantic figcaption as the direct final child of its figure', () => {
+    const component = read('src/components/StickerConstellation.astro');
+    const figures = component.match(/<figure\b[\s\S]*?<\/figure>/g) ?? [];
+
+    expect(figures).toHaveLength(7);
+    for (const figure of figures) {
+      const captionStart = figure.indexOf('<figcaption>');
+      expect(captionStart).toBeGreaterThan(0);
+      expect(figure.lastIndexOf('</div>')).toBeLessThan(captionStart);
+      expect(figure).toMatch(/<figcaption>[\s\S]*<\/figcaption>\s*<\/figure>$/);
+    }
+  });
+
   it('queues a single transform-led parallax update and a one-time reveal', () => {
     const motion = read('src/scripts/sticker-motion.ts');
     expect(existsSync(new URL('src/scripts/sticker-motion.ts', root))).toBe(true);
