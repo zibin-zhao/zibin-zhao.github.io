@@ -223,8 +223,10 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
 
   .paper-links a {
     display: inline-flex;
+    min-width: 44px;
     min-height: 44px;
     align-items: center;
+    justify-content: center;
     border-bottom: 2px solid var(--ink);
     font: 500 var(--text-action)/1.4 var(--font-note);
     letter-spacing: var(--tracking-utility);

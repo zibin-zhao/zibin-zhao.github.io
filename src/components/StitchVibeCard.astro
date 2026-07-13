@@ -256,8 +256,10 @@ const imageAlt = `${item.title} project interface preview`;
     position: relative;
     z-index: 2;
     display: inline-flex;
+    min-width: 44px;
     min-height: 44px;
     align-items: center;
+    justify-content: center;
     border-bottom: 1px solid currentColor;
   }
 
@@ -280,10 +282,14 @@ const imageAlt = `${item.title} project interface preview`;
   @media (prefers-reduced-motion: reduce) {
     .vibe-card { transition: none; }
     .vibe-card:has(.vibe-action):hover {
+      border-color: var(--orange);
       box-shadow: var(--shadow-6);
       transform: var(--resting-transform);
     }
-    .vibe-card--dark:has(.vibe-action):hover { box-shadow: 6px 6px 0 var(--green); }
+    .vibe-card--dark:has(.vibe-action):hover {
+      border-color: var(--green-bright);
+      box-shadow: 6px 6px 0 var(--green);
+    }
   }
 
   @media (max-width: 700px) {
@@ -309,9 +315,6 @@ const imageAlt = `${item.title} project interface preview`;
       white-space: nowrap;
     }
 
-    .vibe-body { padding: 10px; }
-    .vibe-card--yaos .vibe-body,
-    .vibe-card--zen .vibe-body { padding: 10px; }
     .vibe-body { padding: 14px; }
     .vibe-card--yaos .vibe-body,
     .vibe-card--zen .vibe-body { padding: 14px; }

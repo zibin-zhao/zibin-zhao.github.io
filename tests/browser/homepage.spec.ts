@@ -342,6 +342,17 @@ test('keeps reduced-motion geometry static while retaining immediate interaction
     ty: publicationResting.ty,
   });
   expect(await paintState(icon)).not.toEqual(iconRestingPaint);
+
+  const vibeCard = page.locator('.vibe-card').first();
+  const vibeResting = await motionState(vibeCard);
+  const vibeRestingPaint = await paintState(vibeCard);
+  await vibeCard.hover();
+  expect(await motionState(vibeCard)).toMatchObject({
+    angle: vibeResting.angle,
+    tx: vibeResting.tx,
+    ty: vibeResting.ty,
+  });
+  expect(await paintState(vibeCard)).not.toEqual(vibeRestingPaint);
 });
 
 
@@ -359,6 +370,7 @@ test('mobile footer flows after content and exposes complete 44px controls', asy
     const box = await target.boundingBox();
     if (!box) throw new Error('Footer target missing');
     expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.width).toBeGreaterThanOrEqual(44);
   }
 
   await expect(page.locator('.footer-routes a[href="/contact/"]')).toBeVisible();
@@ -373,13 +385,17 @@ test('homepage cards expose primary destinations and the bilingual personal clos
   await expect(page.getByRole('heading', { name: 'Beyond the lab' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Start a conversation/ })).toHaveAttribute('href', /^mailto:/);
 
+  await page.locator('[data-vibe-role="singularity"]').click({ position: { x: 20, y: 20 } });
+  await expect(page).toHaveURL(/\/singularity\/$/);
+  await page.goBack({ waitUntil: 'networkidle' });
+
   await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
   await expect(page.getByRole('heading', { name: '实验室之外' })).toBeVisible();
   await expect(page.getByText('心理学 · 佛学')).toBeVisible();
 });
 
-test('tablet and mobile retain readable supporting and action type', async ({ page }) => {
-  for (const viewport of [{ width: 768, height: 1024 }, { width: 390, height: 844 }]) {
+test('tablet and mobile retain readable supporting type and complete action targets', async ({ page }) => {
+  for (const viewport of [{ width: 768, height: 1024 }, { width: 390, height: 844 }, { width: 320, height: 844 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/', { waitUntil: 'networkidle' });
 
@@ -390,21 +406,37 @@ test('tablet and mobile retain readable supporting and action type', async ({ pa
       expect(Math.min(...sizes), selector + ' at ' + viewport.width + 'px').toBeGreaterThanOrEqual(14);
     }
 
-    for (const selector of ['.paper-links a', '.vibe-action']) {
+    for (const selector of ['.paper-links a', '.vibe-action', '.footer-pill']) {
       const facts = await page.locator(selector).evaluateAll((elements) =>
         elements.map((element) => {
           const style = getComputedStyle(element);
-          const box = element.getBoundingClientRect();
+          const target = element as HTMLElement;
           return {
             fontSize: Number.parseFloat(style.fontSize),
-            targetSize: Math.max(box.height, Number.parseFloat(style.minHeight)),
+            height: target.offsetHeight,
+            width: target.offsetWidth,
           };
         }),
       );
       for (const fact of facts) {
         expect(fact.fontSize, selector + ' font at ' + viewport.width + 'px').toBeGreaterThanOrEqual(12);
-        expect(fact.targetSize, selector + ' target at ' + viewport.width + 'px').toBeGreaterThanOrEqual(44);
+        expect(fact.height, selector + ' height at ' + viewport.width + 'px').toBeGreaterThanOrEqual(44);
+        expect(fact.width, selector + ' width at ' + viewport.width + 'px').toBeGreaterThanOrEqual(44);
       }
     }
+
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);
   }
+});
+
+test('homepage reflows at a 200%-scale 320px CSS viewport', async ({ browser }) => {
+  const context = await browser.newContext({
+    deviceScaleFactor: 2,
+    viewport: { width: 320, height: 844 },
+  });
+  const page = await context.newPage();
+  await page.goto('/', { waitUntil: 'networkidle' });
+  expect(await page.evaluate(() => window.innerWidth)).toBe(320);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  await context.close();
 });
