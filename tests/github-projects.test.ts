@@ -57,6 +57,81 @@ const fetchStub = (
 }) as unknown as typeof globalThis.fetch;
 
 describe('getGithubProjects', () => {
+  it('uses the private build environment token when no explicit token is supplied', async () => {
+    const token = 'environment-build-token';
+    const requests: Array<{ authorization: string | null; url: string }> = [];
+    const authenticatedFetch = vi.fn(async (
+      input: string | URL | Request,
+      init?: RequestInit,
+    ) => {
+      const url = requestUrl(input);
+      requests.push({
+        authorization: new Headers(init?.headers).get('Authorization'),
+        url,
+      });
+      return jsonResponse(url.endsWith('/languages') ? {} : [repository('FutureLab')]);
+    }) as unknown as typeof globalThis.fetch;
+    vi.stubEnv('GITHUB_TOKEN', token);
+
+    try {
+      await getGithubProjects({ fetch: authenticatedFetch });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+
+    expect(requests).toHaveLength(2);
+    expect(requests.map(({ authorization }) => authorization)).toEqual([
+      `Bearer ${token}`,
+      `Bearer ${token}`,
+    ]);
+    expect(requests.every(({ url }) => !url.includes(token))).toBe(true);
+  });
+
+  it('keeps explicit authentication injectable ahead of the build environment', async () => {
+    const authorizations: Array<string | null> = [];
+    const authenticatedFetch = vi.fn(async (
+      input: string | URL | Request,
+      init?: RequestInit,
+    ) => {
+      const url = requestUrl(input);
+      authorizations.push(new Headers(init?.headers).get('Authorization'));
+      return jsonResponse(url.endsWith('/languages') ? {} : [repository('FutureLab')]);
+    }) as unknown as typeof globalThis.fetch;
+    vi.stubEnv('GITHUB_TOKEN', 'environment-build-token');
+
+    try {
+      await getGithubProjects({ fetch: authenticatedFetch, token: 'explicit-test-token' });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+
+    expect(authorizations).toEqual([
+      'Bearer explicit-test-token',
+      'Bearer explicit-test-token',
+    ]);
+  });
+
+  it('allows an explicit empty token for tokenless local requests', async () => {
+    const authorizations: Array<string | null> = [];
+    const tokenlessFetch = vi.fn(async (
+      input: string | URL | Request,
+      init?: RequestInit,
+    ) => {
+      const url = requestUrl(input);
+      authorizations.push(new Headers(init?.headers).get('Authorization'));
+      return jsonResponse(url.endsWith('/languages') ? {} : [repository('FutureLab')]);
+    }) as unknown as typeof globalThis.fetch;
+    vi.stubEnv('GITHUB_TOKEN', 'environment-build-token');
+
+    try {
+      await getGithubProjects({ fetch: tokenlessFetch, token: '' });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+
+    expect(authorizations).toEqual([null, null]);
+  });
+
   it('filters excluded repositories, keeps future owned repositories, and sorts deterministically', async () => {
     const projects = await getGithubProjects({
       fetch: fetchStub([

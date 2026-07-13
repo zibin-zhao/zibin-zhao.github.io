@@ -1,4 +1,5 @@
 import fallbackSnapshot from './github-projects.fallback.json';
+import process from 'node:process';
 
 export interface GithubProject {
   name: string;
@@ -206,7 +207,7 @@ export async function getGithubProjects(options: {
   token?: string;
 } = {}): Promise<GithubProject[]> {
   const fetcher = options.fetch ?? globalThis.fetch;
-  const headers = requestHeaders(options.token);
+  const headers = requestHeaders(options.token ?? process.env.GITHUB_TOKEN);
   let repositories: GithubRepository[];
 
   try {

@@ -633,7 +633,9 @@ test('a failed Vibe image reveals the designed fallback without hiding card cont
   await expect(card.locator('.vibe-image-fallback')).toContainText('CasMD preview unavailable');
   await expect(card.locator('.vibe-title')).toContainText('CasMD');
   await expect(card.locator('.vibe-description')).toBeVisible();
-  await expect(card.locator('.vibe-action')).toBeVisible();
+  const actions = card.locator('.vibe-action');
+  await expect(actions).toHaveCount(2);
+  for (const action of await actions.all()) await expect(action).toBeVisible();
 });
 
 test('canonical homepage keeps the readable tablet sticker composition and authored anchors', async ({ page }, testInfo) => {
@@ -849,6 +851,20 @@ test('1024px restores readable text and interaction sizing without overflow', as
   expect(sizing.paperLinkHeight).toBeGreaterThanOrEqual(24);
 });
 
+test('homepage and Projects clear the footer without overflow at every authored width', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'The complete authored-width matrix is retained once.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+
+  for (const width of [1_440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: width <= 390 ? 844 : 1_024 });
+    for (const route of ['/', '/projects/']) {
+      await page.goto(route, { waitUntil: 'networkidle' });
+      await expectNoHorizontalOverflow(page);
+      await expectEndContentClearsDock(page);
+    }
+  }
+});
+
 test('Contact and draw controls remain disjoint and actionable at every footer tier', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'canonical-768', 'Footer-tier geometry is retained once across representative widths.');
   for (const width of [390, 600, 768, 1_024, 1_440]) {
@@ -1002,13 +1018,15 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
       expect(guides[1].height).toBeCloseTo(documentHeight, 0);
       expect(guides[0].transformOrigin).toMatch(/ 0px$/);
       expect(guides[1].transformOrigin).toMatch(/ 0px$/);
-      const footer = await page.locator('.footer-decoration').boundingBox();
-      if (!footer) throw new Error('Artifact footer was not rendered');
-      expect(Math.abs(Math.round(footer.y + footer.height) - documentHeight)).toBeLessThanOrEqual(16);
+      await expect.poll(async () => {
+        const footer = await page.locator('.footer-decoration').boundingBox();
+        if (!footer) throw new Error('Artifact footer was not rendered');
+        return Math.abs(Math.round(footer.y + footer.height) - documentHeight);
+      }).toBeLessThanOrEqual(16);
       await page.screenshot({ animations: 'disabled', fullPage: false, path });
       const size = await pngSize(path);
       expect(size).toEqual({ height: documentHeight, width: viewport.width });
-      if (testInfo.project.name === 'canonical-768') {
+      if (testInfo.project.name === 'canonical-768' && name === 'home-768-full.png') {
         const finalClose = await page.locator('.collaboration-close').boundingBox();
         const dockBoxes = await Promise.all([
           page.locator('.footer-socials').boundingBox(),
@@ -1095,10 +1113,41 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
     expect(researchSize.height).toBeLessThanOrEqual(880);
     expect(vibeSize.width).toBeGreaterThanOrEqual(720);
     expect(vibeSize.height).toBeGreaterThanOrEqual(790);
+    await page.goto('/projects/', { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    await captureFull('projects-768-full.png');
   } else if (testInfo.project.name === 'desktop') {
     await captureFull('home-1440-full.png');
+    await captureSection('vibe-1440.png', page.locator('#vibe'), {
+      after: page.locator('.pub-card--3'),
+      bottom: page.locator('.collaboration-close'),
+      top: page.locator('#vibe > h2'),
+    });
+    await page.goto('/projects/', { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    await captureFull('projects-1440-full.png');
   } else if (testInfo.project.name === 'mobile') {
     await captureFull('home-390-full.png');
+    await captureSection('vibe-390.png', page.locator('#vibe'), {
+      after: page.locator('.pub-card--3'),
+      bottom: page.locator('.collaboration-close'),
+      top: page.locator('#vibe > h2'),
+    });
+    await page.goto('/projects/', { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    await captureFull('projects-390-full.png');
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    await captureFull('home-320-full.png');
+    await captureSection('vibe-320.png', page.locator('#vibe'), {
+      after: page.locator('.pub-card--3'),
+      bottom: page.locator('.collaboration-close'),
+      top: page.locator('#vibe > h2'),
+    });
+    await page.goto('/projects/', { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    await captureFull('projects-320-full.png');
     await page.setViewportSize(originalViewport);
     await page.goto('/research/', { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);

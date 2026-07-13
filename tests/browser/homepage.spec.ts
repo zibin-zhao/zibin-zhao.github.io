@@ -372,6 +372,27 @@ test('keeps required shell anchors visible without JavaScript at 390px', async (
     await page.evaluate(() => document.documentElement.clientWidth),
   );
 
+  await page.locator('.footer-routes a[href="/projects/"]').click();
+  await expect(page).toHaveURL(/\/projects\/$/);
+  const projectCards = page.locator('[data-github-project]');
+  await expect(projectCards).toHaveCount(7);
+  expect(await projectCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-github-project')))).toEqual([
+    'CasMD',
+    'DL-SELEX',
+    'Yaos',
+    'TEMPO',
+    'Cembra_AI',
+    'DL-SELEX-web-explain',
+    'ECG_analysing_app',
+  ]);
+  const projectActions = projectCards.locator('.github-project-action');
+  await expect(projectActions).toHaveCount(9);
+  for (const action of await projectActions.all()) {
+    await expect(action).toHaveAttribute('href', /^https:\/\//);
+    await expect(action).toHaveAttribute('target', '_blank');
+    await expect(action).toHaveAttribute('rel', 'noopener noreferrer');
+  }
+
   await context.close();
 });
 

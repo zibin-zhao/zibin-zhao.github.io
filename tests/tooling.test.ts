@@ -31,6 +31,16 @@ describe('production quality gates', () => {
     expect(qualityGates).toContain('`npm run test:visual:update` intentionally refreshes');
   });
 
+  it('passes GitHub authentication only to the server-side production build', () => {
+    const workflow = read('.github/workflows/deploy.yml');
+    const loader = read('src/data/github-projects.ts');
+
+    expect(workflow).toContain('GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}');
+    expect(loader).toContain('options.token ?? process.env.GITHUB_TOKEN');
+    expect(read('src/components/Projects.astro')).not.toContain('GITHUB_TOKEN');
+    expect(read('src/components/StitchVibe.astro')).not.toContain('GITHUB_TOKEN');
+  });
+
   it('requires the Node 22 runtime floor supported by ESLint 10', () => {
     const pkg = JSON.parse(read('package.json'));
     expect(pkg.engines.node).toBe('>=22.13.0');
