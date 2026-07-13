@@ -4,11 +4,17 @@ import T from './T.astro';
 import { profile } from '../data/profile';
 ---
 <header class="stitch-header">
-  <a class="site-stamp" href="/">ZIBINZHAO.COM · <T en="UNFINISHED INDEX" zh="未完成索引" /></a>
+  <a class="site-stamp" href="/">
+    <span class="stamp-wide">ZIBINZHAO.COM · <T en="UNFINISHED INDEX" zh="未完成索引" /></span>
+    <span class="stamp-compact">ZIBINZHAO.COM</span>
+  </a>
   <div class="header-actions">
     <LangToggle />
     <span class="talk-angle">
-      <a class="talk btn-primary" href={`mailto:${profile.email}`}><T en="LET'S TALK ↗" zh="联系我 ↗" /></a>
+      <a class="talk btn-primary" href={`mailto:${profile.email}`}>
+        <span class="talk-wide"><T en="LET'S TALK ↗" zh="联系我 ↗" /></span>
+        <span class="talk-compact"><T en="TALK ↗" zh="联系 ↗" /></span>
+      </a>
     </span>
   </div>
 </header>
@@ -34,7 +40,7 @@ import { profile } from '../data/profile';
 
   .site-stamp {
     display: inline-flex;
-    min-height: 40px;
+    min-height: 44px;
     align-items: center;
     padding: 8px;
     border: var(--stroke);
@@ -45,6 +51,9 @@ import { profile } from '../data/profile';
     text-transform: uppercase;
     transform: rotate(-1deg);
   }
+
+  .stamp-compact,
+  .talk-compact { display: none; }
 
   .header-actions {
     display: flex;
@@ -61,7 +70,7 @@ import { profile } from '../data/profile';
     --resting-shadow: var(--shadow-4);
     --resting-transform: none;
     display: inline-flex;
-    min-height: 40px;
+    min-height: 44px;
     align-items: center;
     padding: 8px 16px;
     border: var(--stroke);
@@ -73,15 +82,19 @@ import { profile } from '../data/profile';
 
   @media (max-width: 560px) {
     .stitch-header { gap: 8px; padding-block: 12px; }
-    .site-stamp { max-width: 52vw; font-size: 8px; }
+    .site-stamp { max-width: 52vw; font-size: .6875rem; }
     .header-actions { gap: 6px; }
-    .talk { padding-inline: 8px; font-size: 8px; }
+    .talk { padding-inline: 8px; font-size: .6875rem; }
   }
 
   @media (max-width: 390px) {
     .stitch-header { gap: 4px; padding-inline: 10px; }
-    .site-stamp { max-width: 40vw; padding: 5px; font-size: 7px; letter-spacing: .04em; }
+    .site-stamp { max-width: 42vw; padding: 6px; font-size: .625rem; letter-spacing: .04em; }
     .header-actions { gap: 4px; }
-    .talk { padding-inline: 6px; font-size: 7px; letter-spacing: 0; }
+    .talk { padding-inline: 7px; font-size: .625rem; letter-spacing: .02em; }
+    .stamp-wide,
+    .talk-wide { display: none; }
+    .stamp-compact,
+    .talk-compact { display: inline; }
   }
 </style>

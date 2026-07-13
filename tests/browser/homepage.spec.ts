@@ -251,8 +251,8 @@ test('keeps required shell anchors visible without JavaScript at 390px', async (
   await page.goto('/');
 
   await expect(page.getByRole('button', { name: 'Switch language / 切换语言' })).toBeHidden();
-  await expect(page.locator('.site-stamp .t-en')).toBeVisible();
-  await expect(page.locator('.site-stamp .t-zh')).toBeHidden();
+  await expect(page.locator('.site-stamp .stamp-compact')).toBeVisible();
+  await expect(page.locator('.site-stamp .stamp-wide')).toBeHidden();
   await expect(page.locator('a.talk[href^="mailto:"]')).toBeVisible();
   await expect(page.locator('.footer-socials a')).toHaveCount(3);
   for (const social of await page.locator('.footer-socials a').all()) await expect(social).toBeVisible();
@@ -342,4 +342,69 @@ test('keeps reduced-motion geometry static while retaining immediate interaction
     ty: publicationResting.ty,
   });
   expect(await paintState(icon)).not.toEqual(iconRestingPaint);
+});
+
+
+test('mobile footer flows after content and exposes complete 44px controls', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  await expect(page.locator('.stitch-footer')).toHaveCSS('position', 'relative');
+  const main = await page.locator('#main-content').boundingBox();
+  const footer = await page.locator('.stitch-footer').boundingBox();
+  if (!main || !footer) throw new Error('Mobile shell geometry missing');
+  expect(footer.y).toBeGreaterThanOrEqual(main.y + main.height - 1);
+
+  for (const target of await page.locator('.footer-pill, .draw-control').all()) {
+    const box = await target.boundingBox();
+    if (!box) throw new Error('Footer target missing');
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await expect(page.locator('.footer-routes a[href="/contact/"]')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+});
+
+test('homepage cards expose primary destinations and the bilingual personal close', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  await expect(page.locator('.paper-primary-link')).toHaveCount(3);
+  await expect(page.locator('.vibe-primary-link')).toHaveCount(4);
+  await expect(page.getByRole('heading', { name: 'Beyond the lab' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Start a conversation/ })).toHaveAttribute('href', /^mailto:/);
+
+  await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
+  await expect(page.getByRole('heading', { name: '实验室之外' })).toBeVisible();
+  await expect(page.getByText('心理学 · 佛学')).toBeVisible();
+});
+
+test('tablet and mobile retain readable supporting and action type', async ({ page }) => {
+  for (const viewport of [{ width: 768, height: 1024 }, { width: 390, height: 844 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/', { waitUntil: 'networkidle' });
+
+    for (const selector of ['.hero-card > p:not(.hero-thesis)', '.paper-authors', '.vibe-description']) {
+      const sizes = await page.locator(selector).evaluateAll((elements) =>
+        elements.map((element) => Number.parseFloat(getComputedStyle(element).fontSize)),
+      );
+      expect(Math.min(...sizes), selector + ' at ' + viewport.width + 'px').toBeGreaterThanOrEqual(14);
+    }
+
+    for (const selector of ['.paper-links a', '.vibe-action']) {
+      const facts = await page.locator(selector).evaluateAll((elements) =>
+        elements.map((element) => {
+          const style = getComputedStyle(element);
+          const box = element.getBoundingClientRect();
+          return {
+            fontSize: Number.parseFloat(style.fontSize),
+            targetSize: Math.max(box.height, Number.parseFloat(style.minHeight)),
+          };
+        }),
+      );
+      for (const fact of facts) {
+        expect(fact.fontSize, selector + ' font at ' + viewport.width + 'px').toBeGreaterThanOrEqual(12);
+        expect(fact.targetSize, selector + ' target at ' + viewport.width + 'px').toBeGreaterThanOrEqual(44);
+      }
+    }
+  }
 });

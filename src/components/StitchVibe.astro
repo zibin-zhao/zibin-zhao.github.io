@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { HOME_VIBE_TITLES, selectByTitles } from '../data/home';
+import { profile } from '../data/profile';
 import StitchVibeCard from './StitchVibeCard.astro';
 import T from './T.astro';
 
@@ -12,10 +13,10 @@ const singularityImage = '/stitch/singularity.png';
 ---
 
 <section class="stitch-vibe" id="vibe" aria-labelledby="vibe-title">
-  <h2 id="vibe-title">04 — Vibe Codings</h2>
-  <aside class="lol-note">
-    <strong>LOL</strong>
-    <T en="Things I've vibe-coded. (Exclude CasMD, it's for my PhD work...)" zh="我随性编写的小项目。（CasMD 除外，那是我的博士课题……）" />
+  <h2 id="vibe-title"><T en="Side Quests" zh="支线探索" /></h2>
+  <aside class="field-note">
+    <strong><T en="After hours" zh="研究之外" /></strong>
+    <T en="Small experiments where code meets curiosity. CasMD stays part of the PhD story." zh="让代码与好奇心相遇的小实验；CasMD 仍属于我的博士研究。" />
   </aside>
 
   <div class="vibe-mosaic">
@@ -32,6 +33,29 @@ const singularityImage = '/stitch/singularity.png';
       <StitchVibeCard item={yaos} role="yaos" />
       <StitchVibeCard item={zen} role="zen" />
     </div>
+  </div>
+
+  <div class="beyond-lab" role="region" aria-labelledby="beyond-lab-title">
+    <h3 id="beyond-lab-title"><T en="Beyond the lab" zh="实验室之外" /></h3>
+    <div class="interest-groups">
+      <article>
+        <span class="interest-icon" aria-hidden="true">♫</span>
+        <div><h4><T en="Music" zh="音乐" /></h4><p><T en="Violin · Piano · Guitar · Drums" zh="小提琴 · 钢琴 · 吉他 · 架子鼓" /></p></div>
+      </article>
+      <article>
+        <span class="interest-icon" aria-hidden="true">筆</span>
+        <div><h4><T en="Making and reading" zh="书写与阅读" /></h4><p><T en="Chinese calligraphy · Reading" zh="书法 · 阅读" /></p></div>
+      </article>
+      <article>
+        <span class="interest-icon" aria-hidden="true">◌</span>
+        <div><h4><T en="Inner life" zh="内在探索" /></h4><p><T en="Psychology · Buddhism" zh="心理学 · 佛学" /></p></div>
+      </article>
+    </div>
+  </div>
+
+  <div class="collaboration-close">
+    <p><T en="Curious about molecules, models, music—or the mind?" zh="想聊分子、模型、音乐，或心灵？" /></p>
+    <a class="btn-primary" href={`mailto:${profile.email}`}><T en="Start a conversation ↗" zh="开始聊聊 ↗" /></a>
   </div>
 </section>
 
@@ -60,7 +84,7 @@ const singularityImage = '/stitch/singularity.png';
     transform: rotate(-1deg);
   }
 
-  .lol-note {
+  .field-note {
     position: relative;
     z-index: 10;
     display: block;
@@ -70,16 +94,18 @@ const singularityImage = '/stitch/singularity.png';
     border: var(--stroke);
     background: var(--surface);
     box-shadow: var(--shadow-2);
-    font: 500 10px/1.5 var(--font-note);
+    font: 500 var(--text-meta)/1.5 var(--font-note);
     transform: rotate(1deg);
   }
 
-  .lol-note strong {
+  .field-note strong {
     display: block;
     margin-bottom: 7px;
     padding-bottom: 4px;
     border-bottom: 1px solid var(--ink);
-    font-size: 11px;
+    font-size: var(--text-meta);
+    letter-spacing: var(--tracking-utility);
+    text-transform: uppercase;
   }
 
   .vibe-mosaic {
@@ -113,6 +139,91 @@ const singularityImage = '/stitch/singularity.png';
   .vibe-card--yaos { --resting-transform: rotate(-1deg); }
   .vibe-card--zen { --resting-transform: rotate(2deg); }
 
+  .beyond-lab {
+    margin: 88px 4% 0;
+    border: var(--stroke);
+    background: var(--ink);
+    box-shadow: var(--shadow-6);
+    color: var(--surface);
+    transform: rotate(-.6deg);
+  }
+
+  .beyond-lab > h3 {
+    padding: 18px 20px;
+    font: 400 clamp(30px, 5vw, 48px)/1 var(--font-display);
+    letter-spacing: .01em;
+    text-transform: uppercase;
+  }
+
+  .interest-groups {
+    display: flex;
+    border-top: 2px dashed var(--surface);
+  }
+
+  .interest-groups article {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px;
+  }
+
+  .interest-groups article + article { border-left: 1px solid color-mix(in srgb, var(--surface) 55%, transparent); }
+
+  .interest-icon {
+    flex: none;
+    color: var(--orange);
+    font: 400 30px/1 var(--font-display);
+  }
+
+  .interest-groups h4 {
+    font: 400 18px/1.2 var(--font-display);
+    letter-spacing: .02em;
+    text-transform: uppercase;
+  }
+
+  .interest-groups p {
+    margin-top: 7px;
+    color: var(--surface);
+    font-size: var(--text-supporting);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  .collaboration-close {
+    display: flex;
+    max-width: 820px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin: 48px auto 0;
+    padding: 20px 22px;
+    border: var(--stroke);
+    background: var(--orange);
+    box-shadow: var(--shadow-4);
+    transform: rotate(.8deg);
+  }
+
+  .collaboration-close p {
+    max-width: 32ch;
+    font: 400 clamp(22px, 3vw, 32px)/1.15 var(--font-display);
+    text-wrap: balance;
+  }
+
+  .collaboration-close a {
+    --resting-shadow: var(--shadow-4);
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 10px 14px;
+    border: var(--stroke);
+    background: var(--surface);
+    font: 500 var(--text-action)/1.4 var(--font-note);
+    letter-spacing: var(--tracking-utility);
+    text-transform: uppercase;
+  }
+
   @media (max-width: 700px) {
     .stitch-vibe {
       width: min(100% - 36px, 440px);
@@ -128,11 +239,11 @@ const singularityImage = '/stitch/singularity.png';
       font-size: clamp(27px, 9.4vw, 38px);
     }
 
-    .lol-note {
+    .field-note {
       width: 86%;
       margin-bottom: 26px;
       padding: 9px 11px;
-      font-size: 9px;
+      font-size: var(--text-meta);
     }
 
     .vibe-mosaic {
@@ -156,6 +267,23 @@ const singularityImage = '/stitch/singularity.png';
 
     .vibe-lower > .vibe-card { max-width: none; }
     .vibe-lower > .vibe-card + .vibe-card { margin-top: -10px; }
+
+    .beyond-lab { margin: 64px 0 0; transform: rotate(-.4deg); }
+    .beyond-lab > h3 { padding: 16px; font-size: 32px; }
+    .interest-groups { flex-direction: column; }
+    .interest-groups article { padding: 16px; }
+    .interest-groups article + article {
+      border-top: 1px solid color-mix(in srgb, var(--surface) 55%, transparent);
+      border-left: 0;
+    }
+    .interest-groups p { font-size: var(--text-supporting); }
+    .collaboration-close {
+      align-items: flex-start;
+      flex-direction: column;
+      margin-top: 28px;
+      padding: 18px;
+    }
+    .collaboration-close a { width: 100%; justify-content: center; }
   }
 
   @media (min-width: 701px) and (max-width: 960px) {
@@ -164,18 +292,22 @@ const singularityImage = '/stitch/singularity.png';
       padding: 8px 10px;
       font-size: 31px;
     }
-    .lol-note {
+    .field-note {
       width: min(43%, 294px);
       margin-bottom: 25px;
-      padding: 8px 10px;
-      font-size: 8px;
+      padding: 10px 12px;
+      font-size: var(--text-meta);
     }
-    .lol-note strong { margin-bottom: 4px; padding-bottom: 2px; font-size: 9px; }
+    .field-note strong { margin-bottom: 5px; padding-bottom: 3px; font-size: var(--text-meta); }
     .vibe-mosaic { column-gap: 30px; row-gap: 26px; }
-    .vibe-mosaic > [data-vibe-slot='singularity'] { margin-top: -44px; margin-left: 17%; }
+    .vibe-mosaic > [data-vibe-slot='singularity'] { margin-top: -24px; margin-left: 17%; }
     .vibe-mosaic > [data-vibe-slot='singularity'] > .vibe-card { width: 84%; }
-    [data-vibe-slot='medit'] { margin-top: -78px; }
+    [data-vibe-slot='medit'] { margin-top: -40px; }
     .vibe-lower { gap: 12px; margin-top: 0; }
     .vibe-lower > .vibe-card { flex: 0 1 272px; max-width: 272px; }
+    .beyond-lab { margin-top: 64px; }
+    .interest-groups article { padding: 14px; }
+    .interest-groups p { font-size: var(--text-supporting); }
+    .collaboration-close { margin-top: 36px; }
   }
 </style>

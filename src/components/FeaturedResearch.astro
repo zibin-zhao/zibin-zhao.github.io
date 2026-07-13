@@ -9,34 +9,44 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
 
 <section class="featured-research" id="research" aria-labelledby="research-title">
   <header class="research-heading">
-    <h2 id="research-title">02 — <T en="Research & Publications" zh="研究与论文" /></h2>
+    <h2 id="research-title"><T en="Research & Publications" zh="研究与论文" /></h2>
     <span class="research-annotation"><T en="Selected work" zh="代表性成果" /></span>
   </header>
 
   <div class="research-stack">
-    {featured.map((paper, index) => (
-      <div class:list={['fade-slot', `fade-slot--${index + 1}`, `animate-fade-up-${index + 1}`]}>
-        <article class:list={['pub-card', `pub-card--${index + 1}`]} data-featured-paper={index + 1}>
-          {index === 0 && <span class="paper-index" aria-hidden="true">1</span>}
-          <div class="paper-meta">
-            <span>{paper.year} / {paper.venue}</span>
-            <span class="magnify-icon" aria-hidden="true">⌕</span>
-          </div>
-          <h3>
-            {paper.title}
-            {paper.featured && <span class="paper-star" aria-label="Featured">★</span>}
-          </h3>
-          {paper.authors && <p class="paper-authors">{paper.authors}</p>}
-          {paper.links && (
-            <div class="paper-links">
-              {Object.entries(paper.links).filter(([, href]) => href).map(([label, href]) => (
-                <a href={href} target="_blank" rel="noopener noreferrer">{label.toUpperCase()} →</a>
-              ))}
+    {featured.map((paper, index) => {
+      const links = Object.entries(paper.links ?? {}).filter(([, href]) => Boolean(href)) as [string, string][];
+      const primaryHref = links[0]?.[1];
+      return (
+        <div class:list={['fade-slot', `fade-slot--${index + 1}`, `animate-fade-up-${index + 1}`]}>
+          <article class:list={['pub-card', primaryHref && 'pub-card--linked', `pub-card--${index + 1}`]} data-featured-paper={index + 1}>
+            {index === 0 && <span class="paper-index" aria-hidden="true">1</span>}
+            <div class="paper-meta">
+              <span>{paper.year} / {paper.venue}</span>
+              <span class="magnify-icon" aria-hidden="true">⌕</span>
             </div>
-          )}
-        </article>
-      </div>
-    ))}
+            <h3>
+              {primaryHref ? (
+                <a class="paper-primary-link" href={primaryHref} target="_blank" rel="noopener noreferrer">
+                  {paper.title}
+                  {paper.featured && <span class="paper-star" aria-label="Featured">★</span>}
+                </a>
+              ) : (
+                <>{paper.title}{paper.featured && <span class="paper-star" aria-label="Featured">★</span>}</>
+              )}
+            </h3>
+            {paper.authors && <p class="paper-authors">{paper.authors}</p>}
+            {links.length > 0 && (
+              <div class="paper-links">
+                {links.map(([label, href]) => (
+                  <a href={href} target="_blank" rel="noopener noreferrer">{label.toUpperCase()} →</a>
+                ))}
+              </div>
+            )}
+          </article>
+        </div>
+      );
+    })}
   </div>
 </section>
 
@@ -71,8 +81,9 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
 
   .research-annotation {
     flex: none;
-    color: var(--outline);
-    font: 500 11px/1.4 var(--font-note);
+    color: var(--muted);
+    font: 500 var(--text-meta)/1.4 var(--font-note);
+    letter-spacing: var(--tracking-utility);
     text-transform: uppercase;
     transform: rotate(-12deg);
   }
@@ -146,7 +157,7 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
     padding: 3px 8px;
     background: var(--ink);
     color: var(--surface);
-    font: 500 11px/1.4 var(--font-note);
+    font: 500 var(--text-meta)/1.4 var(--font-note);
     overflow-wrap: anywhere;
   }
 
@@ -158,8 +169,8 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
 
   .pub-card--3 .paper-meta > span:first-child {
     padding: 2px 5px;
-    background: var(--outline);
-    font-size: 10px;
+    background: var(--ink);
+    font-size: var(--text-meta);
   }
 
   .magnify-icon {
@@ -173,6 +184,14 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
     font-size: clamp(22px, 3.1vw, 32px);
     line-height: 1.18;
     overflow-wrap: anywhere;
+  }
+
+  .paper-primary-link { color: inherit; }
+
+  .paper-primary-link::after {
+    position: absolute;
+    inset: 0;
+    content: '';
   }
 
   .pub-card--3 h3 {
@@ -191,9 +210,11 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
     overflow-wrap: anywhere;
   }
 
-  .pub-card--3 .paper-authors { font-size: 12px; }
+  .pub-card--3 .paper-authors { font-size: var(--text-supporting); }
 
   .paper-links {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
@@ -201,14 +222,19 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
   }
 
   .paper-links a {
-    min-height: 28px;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
     border-bottom: 2px solid var(--ink);
-    font: 500 11px/1.4 var(--font-note);
+    font: 500 var(--text-action)/1.4 var(--font-note);
+    letter-spacing: var(--tracking-utility);
     text-transform: uppercase;
   }
 
   .pub-card--3 .paper-links { margin-top: 8px; }
-  .pub-card--3 .paper-links a { border-bottom-width: 1px; font-size: 10px; }
+  .pub-card--3 .paper-links a { border-bottom-width: 1px; font-size: var(--text-action); }
+
+  .pub-card--linked:focus-within { box-shadow: var(--shadow-8); }
 
   @media (max-width: 700px) {
     .featured-research { margin-top: 16px; }
@@ -219,34 +245,34 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
       margin-left: -8px;
     }
     .research-heading h2 { padding: 13px 15px; font-size: clamp(28px, 9vw, 40px); }
-    .research-annotation { max-width: 76px; font-size: 9px; }
+    .research-annotation { max-width: 92px; font-size: var(--text-meta); }
     .research-stack { gap: 32px; padding-inline: 5px; }
     .fade-slot--1 { width: 94%; }
-    .fade-slot--2 { width: 88%; margin-top: -54px; }
+    .fade-slot--2 { width: 90%; margin-top: -32px; }
     .fade-slot--3 { width: 82%; margin-top: 4px; margin-left: 12%; }
     .pub-card { padding: 18px; }
     .pub-card--3 { padding: 14px; }
     .paper-meta { gap: 8px; }
-    .paper-meta > span:first-child { font-size: 9px; }
+    .paper-meta > span:first-child { font-size: var(--text-meta); }
     .pub-card h3 { font-size: clamp(18px, 5.4vw, 24px); }
-    .pub-card--3 h3 { font-size: 15px; }
-    .paper-authors { font-size: 12px; }
+    .pub-card--3 h3 { font-size: 18px; }
+    .paper-authors { font-size: var(--text-supporting); }
   }
 
   @media (min-width: 701px) and (max-width: 960px) {
-    .featured-research { min-height: 573px; margin-bottom: 0; }
+    .featured-research { margin-bottom: 72px; }
     .research-heading { margin-bottom: 40px; }
     .research-heading h2 {
       padding: 10px 14px;
       font-size: 30px;
       line-height: 34px;
     }
-    .research-annotation { font-size: 8px; }
-    .research-stack { width: 90%; }
-    .fade-slot--2 { margin-top: -42px; }
-    .fade-slot--3 { margin-top: -10px; }
-    .pub-card { padding: 12px; }
-    .pub-card--3 { padding: 8px 10px; }
+    .research-annotation { font-size: var(--text-meta); }
+    .research-stack { width: 94%; }
+    .fade-slot--2 { margin-top: -44px; }
+    .fade-slot--3 { margin-top: 8px; }
+    .pub-card { padding: 16px; }
+    .pub-card--3 { padding: 14px; }
     .paper-index {
       top: -12px;
       left: -12px;
@@ -255,7 +281,7 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
       font-size: 17px;
     }
     .paper-meta { gap: 8px; padding-bottom: 5px; }
-    .paper-meta > span:first-child { padding: 2px 5px; font-size: 7px; }
+    .paper-meta > span:first-child { padding: 3px 6px; font-size: var(--text-meta); }
     .pub-card--3 .paper-meta {
       height: 0;
       padding: 0;
@@ -266,26 +292,26 @@ const featured = selectByTitles(publications.map((entry) => entry.data), HOME_RE
       z-index: 2;
       top: -10px;
       left: 12px;
-      font-size: 7px;
+      font-size: var(--text-meta);
     }
     .pub-card--3 .magnify-icon { position: absolute; top: 7px; right: 9px; }
     .magnify-icon { font-size: 16px; }
     .pub-card h3 {
-      margin-top: 8px;
-      font-size: 15px;
-      line-height: 1.16;
+      margin-top: 10px;
+      font-size: 20px;
+      line-height: 1.22;
     }
     .pub-card--3 h3 {
-      margin-top: 3px;
+      margin-top: 8px;
       padding-right: 14px;
-      font-size: 9px;
-      line-height: 1.2;
+      font-size: 18px;
+      line-height: 1.25;
     }
-    .paper-authors { margin-top: 6px; font-size: 9px; line-height: 1.35; }
-    .pub-card--3 .paper-authors { margin-top: 2px; font-size: 7.5px; line-height: 1.2; }
-    .paper-links { gap: 10px; margin-top: 4px; }
-    .paper-links a { display: inline-flex; min-height: 24px; align-items: center; font-size: 7px; }
-    .pub-card--3 .paper-links { margin-top: 0; }
-    .pub-card--3 .paper-links a { font-size: 7px; }
+    .paper-authors { margin-top: 8px; font-size: var(--text-supporting); line-height: 1.45; }
+    .pub-card--3 .paper-authors { margin-top: 6px; font-size: var(--text-supporting); line-height: 1.45; }
+    .paper-links { gap: 10px; margin-top: 6px; }
+    .paper-links a { font-size: var(--text-action); }
+    .pub-card--3 .paper-links { margin-top: 4px; }
+    .pub-card--3 .paper-links a { font-size: var(--text-action); }
   }
 </style>

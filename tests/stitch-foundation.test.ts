@@ -54,8 +54,8 @@ describe('Stitch shell', () => {
     for (const role of ['casmd', 'singularity', 'medit', 'yaos', 'zen']) {
       expect(vibe).toContain(`vibe-card--${role}`);
     }
-    expect(vibe).toContain('04 —');
-    expect(vibe).toContain('LOL');
+    expect(vibe).toContain('Side Quests');
+    expect(vibe).toContain('Beyond the lab');
     expect(vibe).toContain('id="vibe"');
     expect(card).toContain("role: 'casmd' | 'singularity' | 'medit' | 'yaos' | 'zen'");
     expect(home).toContain('<StitchVibe />');

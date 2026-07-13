@@ -19,7 +19,7 @@ const socials = profile.socials.slice(0, 3);
 const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools for care ↔ ';
 ---
 <footer class="stitch-footer" aria-label="Site index">
-  <div class="footer-socials" role="group" aria-label="Social links rail" tabindex="0">
+  <div class="footer-socials" role="group" aria-label="Social links rail">
     {socials.map((social, index) => (
       <a class:list={['footer-pill', `social-${index + 1}`]} href={social.href} target="_blank" rel="noopener">
         <span aria-hidden="true">↗</span>{social.label}
@@ -27,7 +27,7 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
     ))}
   </div>
 
-  <nav class="footer-routes" aria-label="Portfolio sections" tabindex="0">
+  <nav class="footer-routes" aria-label="Portfolio sections">
     {routes.map((route, index) => (
       <span class:list={['route-angle', `route-angle-${index + 1}`]}>
         <a
@@ -45,6 +45,7 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
 
   <a class="draw-control" href="/prompts/" aria-label="Open Prompt Archive" aria-current={active === 'prompts' ? 'page' : undefined}>
     <span class="draw-disc" aria-hidden="true">✎</span>
+    <span class="draw-label"><T en="Prompts" zh="提示词" /></span>
   </a>
 </footer>
 
@@ -76,7 +77,7 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
 
   .footer-routes {
     position: absolute;
-    right: calc(var(--page-pad) + 12px);
+    right: calc(var(--page-pad) + 16px);
     bottom: calc(32px + env(safe-area-inset-bottom));
     display: flex;
     width: min(250px, calc(100vw - 40px));
@@ -91,14 +92,15 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
     --resting-transform: none;
     display: inline-flex;
     min-width: 40px;
-    min-height: 40px;
+    min-height: 44px;
     align-items: center;
     gap: 5px;
     padding: 4px 10px;
     border: var(--stroke);
     background: var(--resting-background);
     box-shadow: var(--shadow-2);
-    font: 500 10px/1 var(--font-note);
+    font: 500 var(--text-action)/1.2 var(--font-note);
+    letter-spacing: var(--tracking-utility);
     white-space: nowrap;
     text-transform: uppercase;
   }
@@ -150,8 +152,8 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
     right: 0;
     bottom: calc(45px + env(safe-area-inset-bottom));
     display: inline-flex;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     color: #ef4444;
@@ -159,55 +161,80 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
 
   .draw-disc {
     display: inline-flex;
-    width: 100%;
-    height: 100%;
+    width: 44px;
+    height: 44px;
     align-items: center;
     justify-content: center;
     border: 2px solid #ef4444;
     border-radius: 50%;
     background: var(--surface);
     box-shadow: 2px 2px 0 #ef4444;
-    font: 700 23px/1 var(--font-note);
+    font: 500 23px/1 var(--font-note);
   }
 
+  .draw-label { display: none; }
+
   @media (max-width: 700px) {
+    .stitch-footer {
+      position: relative;
+      inset: auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      overflow: clip;
+      padding: 16px 12px 0;
+      pointer-events: auto;
+    }
+
     .footer-socials,
     .footer-routes {
-      right: 8px;
-      left: 8px;
+      position: static;
       display: flex;
-      width: auto;
+      width: 100%;
       align-items: center;
-      flex-flow: row nowrap;
+      flex-flow: row wrap;
       justify-content: flex-start;
       gap: 6px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 3px 4px 5px;
-      overscroll-behavior-inline: contain;
-      scroll-padding-inline: 4px;
-      scrollbar-width: none;
+      overflow: visible;
+      padding: 0;
       transform: none;
     }
 
-    .footer-socials::-webkit-scrollbar,
-    .footer-routes::-webkit-scrollbar { display: none; }
-
-    .footer-socials { bottom: calc(102px + env(safe-area-inset-bottom)); }
-
-    .footer-routes {
-      right: 56px;
-      bottom: calc(50px + env(safe-area-inset-bottom));
-    }
+    .footer-socials { grid-column: 1 / -1; }
+    .footer-routes { grid-column: 1; }
 
     .footer-pill {
       flex: 0 0 auto;
       padding-inline: 8px;
-      font-size: 9px;
+      font-size: var(--text-action);
     }
 
     .route-angle { flex: 0 0 auto; }
-    .draw-control { right: 8px; }
+    .draw-control {
+      position: static;
+      grid-column: 2;
+      grid-row: 2;
+      display: inline-flex;
+      width: auto;
+      min-width: 44px;
+      height: 44px;
+      align-items: center;
+      gap: 8px;
+      transform: none;
+    }
+    .draw-label {
+      display: inline;
+      font: 500 var(--text-action)/1.2 var(--font-note);
+      letter-spacing: var(--tracking-utility);
+      text-transform: uppercase;
+    }
+    .footer-decoration {
+      grid-column: 1 / -1;
+      width: calc(100% + 24px);
+      margin-inline: -12px;
+      transform: rotate(1deg) scale(1.02);
+    }
+    .marquee { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
   }
 
   @media (min-width: 701px) and (max-width: 960px) {
@@ -219,26 +246,27 @@ const tape = 'molecules ↔ models ↔ small habits ↔ field notes ↔ tools fo
       flex-flow: row nowrap;
       justify-content: flex-start;
       gap: 4px;
-      overflow-x: auto;
-      overflow-y: hidden;
+      overflow: visible;
       padding: 3px 4px 5px;
-      overscroll-behavior-inline: contain;
-      scroll-padding-inline: 4px;
-      scrollbar-width: none;
       transform: none;
     }
 
-    .footer-socials::-webkit-scrollbar,
-    .footer-routes::-webkit-scrollbar { display: none; }
+    .footer-socials {
+      bottom: calc(32px + env(safe-area-inset-bottom));
+      left: 24px;
+      max-width: calc(100vw - 100px);
+    }
 
-    .footer-socials { left: 24px; max-width: 34vw; }
-
-    .footer-routes { right: 52px; max-width: 48vw; }
+    .footer-routes {
+      right: 24px;
+      bottom: calc(96px + env(safe-area-inset-bottom));
+      max-width: calc(100vw - 48px);
+    }
 
     .footer-pill {
       flex: 0 0 auto;
-      padding: 3px 6px;
-      font-size: 7px;
+      padding: 5px 8px;
+      font-size: var(--text-action);
     }
 
     .route-angle { flex: 0 0 auto; }

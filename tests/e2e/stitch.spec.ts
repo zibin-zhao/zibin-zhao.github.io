@@ -17,6 +17,7 @@ const applyArtifactProjection = async (page: Page, width: number, height: number
       width: 100% !important;
       height: var(--artifact-height) !important;
     }
+    html.artifact-projection .stitch-main { min-height: 0 !important; }
     html.artifact-projection .artifact-guide {
       position: absolute !important;
       top: 0 !important;
@@ -216,7 +217,7 @@ test('Prompt Pack copy, stage navigation, and failure feedback remain usable', a
   await expect(page.locator('.copy-feedback').first()).toHaveText('Copy failed. Select the prompt and copy manually.');
 });
 
-test('reduced motion removes animation while preserving authored resting transforms', async ({ page }) => {
+test('reduced motion removes animation while preserving authored resting transforms', async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'networkidle' });
 
@@ -227,8 +228,12 @@ test('reduced motion removes animation while preserving authored resting transfo
   ].join(','));
   expect(await animated.evaluateAll((elements) => elements.map((element) => getComputedStyle(element).animationName)))
     .toEqual(Array(await animated.count()).fill('none'));
-  await expect(page.locator('.hero-formula')).toHaveCSS('transform', /matrix/);
-  await expect(page.locator('.hero-formula')).toBeVisible();
+  if (testInfo.project.name === 'mobile') {
+    await expect(page.locator('.hero-formula')).toBeHidden();
+  } else {
+    await expect(page.locator('.hero-formula')).toHaveCSS('transform', /matrix/);
+    await expect(page.locator('.hero-formula')).toBeVisible();
+  }
   for (const card of await page.locator('.pub-card, .vibe-card').all()) await expect(card).toBeVisible();
 });
 
@@ -244,7 +249,7 @@ test('a failed Vibe image reveals the designed fallback without hiding card cont
   await expect(card.locator('.vibe-action')).toBeVisible();
 });
 
-test('canonical homepage matches the source-normalized vertical density and anchors', async ({ page }, testInfo) => {
+test('canonical homepage keeps the readable tablet composition and authored anchors', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'canonical-768', 'Canonical geometry belongs to the 768px source-comparison project.');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'networkidle' });
@@ -264,6 +269,8 @@ test('canonical homepage matches the source-normalized vertical density and anch
     };
     return {
       documentHeight: document.documentElement.scrollHeight,
+      beyondLab: box('.beyond-lab'),
+      collaborationClose: box('.collaboration-close'),
       contact: box('.footer-routes a[href="/contact/"]'),
       draw: box('.draw-control'),
       footerRoutes: box('.footer-routes'),
@@ -279,37 +286,37 @@ test('canonical homepage matches the source-normalized vertical density and anch
       vibe: box('#vibe'),
       vibeCards: ['casmd', 'singularity', 'medit', 'yaos', 'zen'].map((role) => box(`[data-vibe-role="${role}"]`)),
       vibeHeading: box('#vibe > h2'),
-      vibeNote: box('.lol-note'),
+      vibeNote: box('.field-note'),
     };
   });
 
-  expect(geometry.documentHeight).toBeGreaterThanOrEqual(2_060);
-  expect(geometry.documentHeight).toBeLessThanOrEqual(2_110);
-  expect(geometry.hero.bottom).toBeGreaterThanOrEqual(610);
-  expect(geometry.hero.bottom).toBeLessThanOrEqual(680);
-  expect(geometry.research.top).toBeGreaterThanOrEqual(640);
-  expect(geometry.research.top).toBeLessThanOrEqual(700);
-  expect(geometry.research.height).toBeGreaterThanOrEqual(420);
-  expect(geometry.research.height).toBeLessThanOrEqual(580);
-  expect(geometry.vibe.top).toBeGreaterThanOrEqual(1_130);
-  expect(geometry.vibe.top).toBeLessThanOrEqual(1_280);
-  expect(geometry.vibe.height).toBeGreaterThanOrEqual(700);
-  expect(geometry.vibe.height).toBeLessThanOrEqual(900);
-  expect(geometry.heroCard.width).toBeGreaterThanOrEqual(275);
-  expect(geometry.heroCard.width).toBeLessThanOrEqual(310);
-  expect(geometry.heroCard.left).toBeGreaterThanOrEqual(225);
-  expect(geometry.heroCard.left).toBeLessThanOrEqual(255);
-  expect(geometry.heroCard.top).toBeGreaterThanOrEqual(300);
-  expect(geometry.heroCard.top).toBeLessThanOrEqual(330);
-  expect(geometry.researchBanner.width).toBeGreaterThanOrEqual(360);
-  expect(geometry.researchBanner.width).toBeLessThanOrEqual(410);
+  expect(geometry.documentHeight).toBeGreaterThanOrEqual(3_440);
+  expect(geometry.documentHeight).toBeLessThanOrEqual(3_500);
+  expect(geometry.hero.bottom).toBeGreaterThanOrEqual(740);
+  expect(geometry.hero.bottom).toBeLessThanOrEqual(800);
+  expect(geometry.research.top).toBeGreaterThanOrEqual(790);
+  expect(geometry.research.top).toBeLessThanOrEqual(840);
+  expect(geometry.research.height).toBeGreaterThanOrEqual(760);
+  expect(geometry.research.height).toBeLessThanOrEqual(820);
+  expect(geometry.vibe.top).toBeGreaterThanOrEqual(1_640);
+  expect(geometry.vibe.top).toBeLessThanOrEqual(1_710);
+  expect(geometry.vibe.height).toBeGreaterThanOrEqual(1_580);
+  expect(geometry.vibe.height).toBeLessThanOrEqual(1_640);
+  expect(geometry.heroCard.width).toBeGreaterThanOrEqual(370);
+  expect(geometry.heroCard.width).toBeLessThanOrEqual(410);
+  expect(geometry.heroCard.left).toBeGreaterThanOrEqual(180);
+  expect(geometry.heroCard.left).toBeLessThanOrEqual(205);
+  expect(geometry.heroCard.top).toBeGreaterThanOrEqual(315);
+  expect(geometry.heroCard.top).toBeLessThanOrEqual(345);
+  expect(geometry.researchBanner.width).toBeGreaterThanOrEqual(320);
+  expect(geometry.researchBanner.width).toBeLessThanOrEqual(350);
   expect(geometry.researchBanner.left).toBeGreaterThanOrEqual(10);
   expect(geometry.researchBanner.left).toBeLessThanOrEqual(30);
-  expect(geometry.researchBanner.top).toBeGreaterThanOrEqual(650);
-  expect(geometry.researchBanner.top).toBeLessThanOrEqual(680);
-  const researchWidthRanges = [[500, 545], [410, 450], [350, 390]] as const;
-  const researchLeftRanges = [[160, 185], [65, 95], [190, 215]] as const;
-  const researchTopRanges = [[750, 790], [880, 925], [1_065, 1_110]] as const;
+  expect(geometry.researchBanner.top).toBeGreaterThanOrEqual(795);
+  expect(geometry.researchBanner.top).toBeLessThanOrEqual(825);
+  const researchWidthRanges = [[530, 550], [440, 460], [380, 400]] as const;
+  const researchLeftRanges = [[150, 175], [55, 75], [180, 200]] as const;
+  const researchTopRanges = [[895, 930], [1_095, 1_125], [1_370, 1_400]] as const;
   for (let index = 0; index < geometry.researchCards.length; index += 1) {
     expect(geometry.researchCards[index].width).toBeGreaterThanOrEqual(researchWidthRanges[index][0]);
     expect(geometry.researchCards[index].width).toBeLessThanOrEqual(researchWidthRanges[index][1]);
@@ -318,57 +325,59 @@ test('canonical homepage matches the source-normalized vertical density and anch
     expect(geometry.researchCards[index].top).toBeGreaterThanOrEqual(researchTopRanges[index][0]);
     expect(geometry.researchCards[index].top).toBeLessThanOrEqual(researchTopRanges[index][1]);
   }
-  expect(geometry.researchCards[2].height).toBeGreaterThanOrEqual(75);
-  expect(geometry.researchCards[2].height).toBeLessThanOrEqual(105);
-  expect(geometry.vibeHeading.width).toBeGreaterThanOrEqual(220);
-  expect(geometry.vibeHeading.width).toBeLessThanOrEqual(260);
-  expect(geometry.vibeHeading.left).toBeGreaterThanOrEqual(485);
-  expect(geometry.vibeHeading.left).toBeLessThanOrEqual(510);
-  expect(geometry.vibeHeading.top).toBeGreaterThanOrEqual(1_220);
-  expect(geometry.vibeHeading.top).toBeLessThanOrEqual(1_250);
-  expect(geometry.vibeNote.width).toBeGreaterThanOrEqual(275);
-  expect(geometry.vibeNote.width).toBeLessThanOrEqual(310);
-  expect(geometry.vibeNote.top).toBeGreaterThanOrEqual(1_220);
-  expect(geometry.vibeNote.top).toBeLessThanOrEqual(1_250);
+  expect(geometry.researchCards[2].height).toBeGreaterThanOrEqual(210);
+  expect(geometry.researchCards[2].height).toBeLessThanOrEqual(235);
+  expect(geometry.vibeHeading.width).toBeGreaterThanOrEqual(150);
+  expect(geometry.vibeHeading.width).toBeLessThanOrEqual(180);
+  expect(geometry.vibeHeading.left).toBeGreaterThanOrEqual(560);
+  expect(geometry.vibeHeading.left).toBeLessThanOrEqual(590);
+  expect(geometry.vibeHeading.top).toBeGreaterThanOrEqual(1_640);
+  expect(geometry.vibeHeading.top).toBeLessThanOrEqual(1_690);
+  expect(geometry.vibeNote.width).toBeGreaterThanOrEqual(285);
+  expect(geometry.vibeNote.width).toBeLessThanOrEqual(305);
+  expect(geometry.vibeNote.top).toBeGreaterThanOrEqual(1_660);
+  expect(geometry.vibeNote.top).toBeLessThanOrEqual(1_710);
   const [casmd, singularity, medit, yaos, zen] = geometry.vibeCards;
   expect(casmd.left).toBeGreaterThanOrEqual(25);
   expect(casmd.left).toBeLessThanOrEqual(50);
   expect(casmd.width).toBeGreaterThanOrEqual(430);
   expect(casmd.width).toBeLessThanOrEqual(470);
-  expect(casmd.top).toBeGreaterThanOrEqual(1_300);
-  expect(casmd.top).toBeLessThanOrEqual(1_340);
-  expect(singularity.width).toBeGreaterThanOrEqual(260);
+  expect(casmd.top).toBeGreaterThanOrEqual(1_790);
+  expect(casmd.top).toBeLessThanOrEqual(1_840);
+  expect(singularity.width).toBeGreaterThanOrEqual(280);
   expect(singularity.width).toBeLessThanOrEqual(300);
   expect(singularity.left).toBeGreaterThanOrEqual(80);
-  expect(singularity.left).toBeLessThanOrEqual(115);
-  expect(singularity.top).toBeGreaterThanOrEqual(1_540);
-  expect(singularity.top).toBeLessThanOrEqual(1_590);
-  expect(medit.width).toBeGreaterThanOrEqual(260);
-  expect(medit.width).toBeLessThanOrEqual(300);
-  expect(medit.left).toBeGreaterThanOrEqual(380);
-  expect(medit.left).toBeLessThanOrEqual(410);
-  expect(medit.top).toBeGreaterThanOrEqual(1_515);
-  expect(medit.top).toBeLessThanOrEqual(1_565);
+  expect(singularity.left).toBeLessThanOrEqual(105);
+  expect(singularity.top).toBeGreaterThanOrEqual(2_140);
+  expect(singularity.top).toBeLessThanOrEqual(2_190);
+  expect(medit.width).toBeGreaterThanOrEqual(275);
+  expect(medit.width).toBeLessThanOrEqual(290);
+  expect(medit.left).toBeGreaterThanOrEqual(385);
+  expect(medit.left).toBeLessThanOrEqual(405);
+  expect(medit.top).toBeGreaterThanOrEqual(2_120);
+  expect(medit.top).toBeLessThanOrEqual(2_170);
   for (const card of [yaos, zen]) {
-    expect(card.width).toBeGreaterThanOrEqual(250);
-    expect(card.width).toBeLessThanOrEqual(295);
+    expect(card.width).toBeGreaterThanOrEqual(270);
+    expect(card.width).toBeLessThanOrEqual(290);
   }
   expect(yaos.left).toBeGreaterThanOrEqual(85);
   expect(yaos.left).toBeLessThanOrEqual(125);
   expect(zen.left).toBeGreaterThanOrEqual(375);
   expect(zen.left).toBeLessThanOrEqual(415);
   for (const card of [yaos, zen]) {
-    expect(card.top).toBeGreaterThanOrEqual(1_820);
-    expect(card.top).toBeLessThanOrEqual(1_880);
+    expect(card.top).toBeGreaterThanOrEqual(2_570);
+    expect(card.top).toBeLessThanOrEqual(2_610);
   }
+  expect(geometry.beyondLab.top).toBeGreaterThan(Math.max(yaos.bottom, zen.bottom) + 40);
+  expect(geometry.collaborationClose.top).toBeGreaterThan(geometry.beyondLab.bottom + 20);
   expect(geometry.guideLeftX).toBeCloseTo(768 * .15, 0);
   expect(geometry.guideRightX).toBeCloseTo(768 * .76, 0);
   expect(geometry.footerSocials.left).toBeGreaterThanOrEqual(20);
   expect(geometry.footerSocials.left).toBeLessThanOrEqual(30);
   expect(geometry.footerSocials.height).toBeGreaterThanOrEqual(40);
   expect(geometry.footerSocials.height).toBeLessThanOrEqual(52);
-  expect(geometry.footerRoutes.right).toBeGreaterThanOrEqual(710);
-  expect(geometry.footerRoutes.right).toBeLessThanOrEqual(720);
+  expect(geometry.footerRoutes.right).toBeGreaterThanOrEqual(740);
+  expect(geometry.footerRoutes.right).toBeLessThanOrEqual(750);
   expect(geometry.footerRoutes.height).toBeGreaterThanOrEqual(40);
   expect(geometry.footerRoutes.height).toBeLessThanOrEqual(52);
   const tabletRailStyles = await page.locator('.footer-socials, .footer-routes').evaluateAll((rails) => rails.map((rail) => {
@@ -376,8 +385,8 @@ test('canonical homepage matches the source-normalized vertical density and anch
     return { flexWrap: style.flexWrap, overflowX: style.overflowX };
   }));
   expect(tabletRailStyles).toEqual([
-    { flexWrap: 'nowrap', overflowX: 'auto' },
-    { flexWrap: 'nowrap', overflowX: 'auto' },
+    { flexWrap: 'nowrap', overflowX: 'visible' },
+    { flexWrap: 'nowrap', overflowX: 'visible' },
   ]);
   await expect(page.locator('.footer-socials a')).toHaveCount(3);
   await expect(page.locator('.footer-routes a')).toHaveCount(6);
@@ -385,7 +394,12 @@ test('canonical homepage matches the source-normalized vertical density and anch
   const horizontalOverlap = Math.max(0, Math.min(geometry.contact.right, geometry.draw.right) - Math.max(geometry.contact.left, geometry.draw.left));
   const verticalOverlap = Math.max(0, Math.min(geometry.contact.bottom, geometry.draw.bottom) - Math.max(geometry.contact.top, geometry.draw.top));
   expect(horizontalOverlap * verticalOverlap).toBe(0);
-  expect(geometry.draw.left - geometry.contact.right).toBeGreaterThanOrEqual(4);
+  if (verticalOverlap > 0) {
+    const horizontalGap = geometry.contact.right <= geometry.draw.left
+      ? geometry.draw.left - geometry.contact.right
+      : geometry.contact.left - geometry.draw.right;
+    expect(horizontalGap).toBeGreaterThanOrEqual(4);
+  }
 
   await page.locator('.footer-routes a[href="/contact/"]').click();
   await expect(page).toHaveURL(/\/contact\/$/);
@@ -484,27 +498,13 @@ test('Contact and draw controls remain disjoint and actionable at every footer t
     }
     if (width <= 600) {
       for (const [name, rail] of Object.entries({ routes: footerContract.routes, socials: footerContract.socials })) {
-        expect(rail.flexWrap, `${width}px ${name} wrapping`).toBe('nowrap');
-        expect(rail.overflowX, `${width}px ${name} horizontal overflow`).toBe('auto');
-        expect(rail.scrollWidth, `${width}px ${name} scroll range`).toBeGreaterThanOrEqual(rail.clientWidth);
+        expect(rail.flexWrap, `${width}px ${name} wrapping`).toBe('wrap');
+        expect(rail.overflowX, `${width}px ${name} horizontal overflow`).toBe('visible');
+        expect(rail.scrollWidth, `${width}px ${name} content width`).toBeLessThanOrEqual(rail.clientWidth);
       }
       const lastRoute = page.locator('.footer-routes a').last();
       await lastRoute.focus();
       await expect(lastRoute).toBeFocused();
-      const routeRail = page.locator('.footer-routes');
-      await routeRail.focus();
-      await expect(routeRail).toBeFocused();
-      if (footerContract.routes.scrollWidth > footerContract.routes.clientWidth + 4) {
-        await page.keyboard.press('ArrowRight');
-        await expect.poll(() => routeRail.evaluate((rail) => rail.scrollLeft)).toBeGreaterThan(0);
-      }
-      const socialRail = page.locator('.footer-socials');
-      await socialRail.focus();
-      await expect(socialRail).toBeFocused();
-      if (footerContract.socials.scrollWidth > footerContract.socials.clientWidth + 4) {
-        await page.keyboard.press('ArrowRight');
-        await expect.poll(() => socialRail.evaluate((rail) => rail.scrollLeft)).toBeGreaterThan(0);
-      }
     }
 
     const contact = await page.locator('.footer-routes a[href="/contact/"]').boundingBox();
@@ -544,7 +544,7 @@ test('mobile without JavaScript keeps English content and every ordinary destina
   await page.goto('/');
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.locator('.t-en').first()).toBeVisible();
+  await expect(page.locator('.site-stamp .stamp-compact')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Switch language / 切换语言' })).toBeHidden();
   await expect(page.locator('.footer-routes a')).toHaveCount(6);
   await expect(page.locator('.footer-socials a')).toHaveCount(3);
@@ -687,8 +687,8 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
 
   if (testInfo.project.name === 'canonical-768') {
     const canonicalHeight = await captureFull('home-768-full.png');
-    expect(canonicalHeight).toBeGreaterThanOrEqual(2_060);
-    expect(canonicalHeight).toBeLessThanOrEqual(2_110);
+    expect(canonicalHeight).toBeGreaterThanOrEqual(3_440);
+    expect(canonicalHeight).toBeLessThanOrEqual(3_500);
     await captureSection('research-768.png', page.locator('#research'), {
       bottom: page.locator('.pub-card--3'),
       capBefore: page.locator('#vibe > h2'),
@@ -702,8 +702,8 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
     const researchSize = await pngSize(`${artifactDir}/research-768.png`);
     const vibeSize = await pngSize(`${artifactDir}/vibe-768.png`);
     expect(researchSize.width).toBeGreaterThanOrEqual(720);
-    expect(researchSize.height).toBeGreaterThanOrEqual(540);
-    expect(researchSize.height).toBeLessThanOrEqual(600);
+    expect(researchSize.height).toBeGreaterThanOrEqual(800);
+    expect(researchSize.height).toBeLessThanOrEqual(880);
     expect(vibeSize.width).toBeGreaterThanOrEqual(720);
     expect(vibeSize.height).toBeGreaterThanOrEqual(790);
   } else if (testInfo.project.name === 'desktop') {

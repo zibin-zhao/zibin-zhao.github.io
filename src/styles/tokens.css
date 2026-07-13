@@ -6,7 +6,7 @@
   --ink: #003322;
   --on-surface: #1d1c0c;
   --muted: #414944;
-  --outline: #717973;
+  --outline: #59625b;
   --outline-variant: #c0c8c2;
   --green: #a2d39c;
   --green-bright: #bdf0b6;
@@ -21,10 +21,15 @@
   --shadow-4: 4px 4px 0 var(--ink);
   --shadow-6: 6px 6px 0 var(--ink);
   --shadow-8: 8px 8px 0 var(--ink);
-  --footer-reserve: 170px;
+  --footer-reserve: 190px;
   --font-display: 'Anton', 'Arial Narrow', sans-serif;
   --font-body: 'Space Grotesk', 'PingFang SC', sans-serif;
   --font-note: 'JetBrains Mono', ui-monospace, monospace;
+  --text-body: 1rem;
+  --text-supporting: .875rem;
+  --text-meta: .75rem;
+  --text-action: .75rem;
+  --tracking-utility: .04em;
 
   /* Compatibility aliases retained until the archive renderers move to Index Sheets. */
   --paper: var(--surface);
