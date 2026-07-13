@@ -165,6 +165,13 @@ test('keyboard focus, canonical destinations, images, and active footer states r
   await page.keyboard.press('Enter');
   await expect(page.locator('main#main-content')).toBeFocused();
 
+  for (const image of await page.locator('img[loading="lazy"]').all()) {
+    await image.evaluate((element) => element.scrollIntoView({ behavior: 'instant', block: 'center' }));
+    await expect.poll(() => image.evaluate((element) => {
+      const target = element as HTMLImageElement;
+      return target.complete && target.naturalWidth > 0;
+    })).toBe(true);
+  }
   const imageFacts = await page.locator('img').evaluateAll((images) => images.map((image) => ({
     alt: image.getAttribute('alt'),
     height: (image as HTMLImageElement).naturalHeight,
@@ -237,6 +244,70 @@ test('reduced motion removes animation while preserving authored resting transfo
   for (const card of await page.locator('.pub-card, .vibe-card').all()) await expect(card).toBeVisible();
 });
 
+test('sticker constellation stays static and overflow-free at every authored width', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'The four authored widths are covered once in the focused mobile project.');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+
+  for (const width of [1_440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: width <= 390 ? 844 : 1_024 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await expectNoHorizontalOverflow(page);
+
+    const constellation = page.locator('[data-sticker-constellation]');
+    const figures = constellation.locator('figure');
+    await expect(figures).toHaveCount(7);
+    await expect(constellation.locator('figcaption')).toHaveCount(7);
+
+    const sectionBox = await constellation.boundingBox();
+    if (!sectionBox) throw new Error(`Sticker constellation did not render at ${width}px`);
+    expect(sectionBox.x, `${width}px section left edge`).toBeGreaterThanOrEqual(0);
+    expect(sectionBox.x + sectionBox.width, `${width}px section right edge`).toBeLessThanOrEqual(width);
+
+    for (const figure of await figures.all()) {
+      const [figureBox, imageBox, captionBox] = await Promise.all([
+        figure.boundingBox(),
+        figure.locator('img').boundingBox(),
+        figure.locator('figcaption').boundingBox(),
+      ]);
+      if (!figureBox || !imageBox || !captionBox) throw new Error(`Sticker geometry was unavailable at ${width}px`);
+      expect(figureBox.x, `${width}px figure left edge`).toBeGreaterThanOrEqual(sectionBox.x);
+      expect(figureBox.x + figureBox.width, `${width}px figure right edge`)
+        .toBeLessThanOrEqual(sectionBox.x + sectionBox.width);
+      expect(captionBox.y, `${width}px caption/image separation`)
+        .toBeGreaterThanOrEqual(imageBox.y + imageBox.height);
+      await expect(figure).toHaveCSS('position', 'static');
+    }
+
+    const wrappers = constellation.locator('.sticker-reveal, .sticker-parallax, .sticker-drift');
+    for (const wrapper of await wrappers.all()) {
+      await expect(wrapper).toHaveCSS('animation-name', 'none');
+      await expect(wrapper).toHaveCSS('transform', 'none');
+      await expect(wrapper).toHaveCSS('opacity', '1');
+    }
+    expect(await constellation.evaluate((element) =>
+      getComputedStyle(element).getPropertyValue('--sticker-scroll').trim(),
+    )).toBe('0px');
+  }
+});
+
+test('sticker motion reveals once and clamps the shared parallax property', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Runtime sticker motion is covered once in the focused mobile project.');
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  const constellation = page.locator('[data-sticker-constellation]');
+  await constellation.scrollIntoViewIfNeeded();
+  await expect(constellation).toHaveClass(/is-revealed/);
+  const readOffset = () => constellation.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).getPropertyValue('--sticker-scroll')),
+  );
+  expect(Math.abs(await readOffset())).toBeLessThanOrEqual(12);
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.waitForTimeout(40);
+  expect(Math.abs(await readOffset())).toBeLessThanOrEqual(12);
+  await expect(constellation).toHaveClass(/is-revealed/);
+});
+
 test('a failed Vibe image reveals the designed fallback without hiding card content', async ({ page }) => {
   await page.route('**/stitch/casmd.png', (route) => route.abort('failed'));
   await page.goto('/#vibe', { waitUntil: 'networkidle' });
@@ -249,7 +320,7 @@ test('a failed Vibe image reveals the designed fallback without hiding card cont
   await expect(card.locator('.vibe-action')).toBeVisible();
 });
 
-test('canonical homepage keeps the readable tablet composition and authored anchors', async ({ page }, testInfo) => {
+test('canonical homepage keeps the readable tablet sticker composition and authored anchors', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'canonical-768', 'Canonical geometry belongs to the 768px source-comparison project.');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'networkidle' });
@@ -269,7 +340,6 @@ test('canonical homepage keeps the readable tablet composition and authored anch
     };
     return {
       documentHeight: document.documentElement.scrollHeight,
-      beyondLab: box('.beyond-lab'),
       collaborationClose: box('.collaboration-close'),
       contact: box('.footer-routes a[href="/contact/"]'),
       draw: box('.draw-control'),
@@ -278,6 +348,7 @@ test('canonical homepage keeps the readable tablet composition and authored anch
       guideLeftX: (document.querySelector('.guide-left') as HTMLElement).offsetLeft,
       guideRightX: (document.querySelector('.guide-right') as HTMLElement).offsetLeft
         + (document.querySelector('.guide-right') as HTMLElement).offsetWidth,
+      githubShelf: box('.github-project-shelf'),
       hero: box('.stitch-hero'),
       heroCard: box('.hero-card'),
       research: box('#research'),
@@ -287,11 +358,12 @@ test('canonical homepage keeps the readable tablet composition and authored anch
       vibeCards: ['casmd', 'singularity', 'medit', 'yaos', 'zen'].map((role) => box(`[data-vibe-role="${role}"]`)),
       vibeHeading: box('#vibe > h2'),
       vibeNote: box('.field-note'),
+      stickerConstellation: box('[data-sticker-constellation]'),
     };
   });
 
-  expect(geometry.documentHeight).toBeGreaterThanOrEqual(3_440);
-  expect(geometry.documentHeight).toBeLessThanOrEqual(3_500);
+  expect(geometry.documentHeight).toBeGreaterThanOrEqual(5_600);
+  expect(geometry.documentHeight).toBeLessThanOrEqual(5_680);
   expect(geometry.hero.bottom).toBeGreaterThanOrEqual(740);
   expect(geometry.hero.bottom).toBeLessThanOrEqual(800);
   expect(geometry.research.top).toBeGreaterThanOrEqual(790);
@@ -300,8 +372,8 @@ test('canonical homepage keeps the readable tablet composition and authored anch
   expect(geometry.research.height).toBeLessThanOrEqual(820);
   expect(geometry.vibe.top).toBeGreaterThanOrEqual(1_640);
   expect(geometry.vibe.top).toBeLessThanOrEqual(1_710);
-  expect(geometry.vibe.height).toBeGreaterThanOrEqual(1_580);
-  expect(geometry.vibe.height).toBeLessThanOrEqual(1_640);
+  expect(geometry.vibe.height).toBeGreaterThanOrEqual(3_730);
+  expect(geometry.vibe.height).toBeLessThanOrEqual(3_800);
   expect(geometry.heroCard.width).toBeGreaterThanOrEqual(370);
   expect(geometry.heroCard.width).toBeLessThanOrEqual(410);
   expect(geometry.heroCard.left).toBeGreaterThanOrEqual(180);
@@ -368,8 +440,9 @@ test('canonical homepage keeps the readable tablet composition and authored anch
     expect(card.top).toBeGreaterThanOrEqual(2_570);
     expect(card.top).toBeLessThanOrEqual(2_610);
   }
-  expect(geometry.beyondLab.top).toBeGreaterThan(Math.max(yaos.bottom, zen.bottom) + 40);
-  expect(geometry.collaborationClose.top).toBeGreaterThan(geometry.beyondLab.bottom + 20);
+  expect(geometry.githubShelf.top).toBeGreaterThan(Math.max(yaos.bottom, zen.bottom) + 40);
+  expect(geometry.stickerConstellation.top).toBeGreaterThan(geometry.githubShelf.bottom + 40);
+  expect(geometry.collaborationClose.top).toBeGreaterThan(geometry.stickerConstellation.bottom + 20);
   expect(geometry.guideLeftX).toBeCloseTo(768 * .15, 0);
   expect(geometry.guideRightX).toBeCloseTo(768 * .76, 0);
   expect(geometry.footerSocials.left).toBeGreaterThanOrEqual(20);
@@ -620,14 +693,14 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
       const size = await pngSize(path);
       expect(size).toEqual({ height: documentHeight, width: viewport.width });
       if (testInfo.project.name === 'canonical-768') {
-        const zen = await page.locator('[data-vibe-role="zen"]').boundingBox();
+        const finalClose = await page.locator('.collaboration-close').boundingBox();
         const dockBoxes = await Promise.all([
           page.locator('.footer-socials').boundingBox(),
           page.locator('.footer-routes').boundingBox(),
         ]);
-        if (!zen || dockBoxes.some((box) => !box)) throw new Error('Canonical artifact clearance geometry was unavailable');
+        if (!finalClose || dockBoxes.some((box) => !box)) throw new Error('Canonical artifact clearance geometry was unavailable');
         const dockTop = Math.min(...dockBoxes.map((box) => box!.y));
-        expect(zen.y + zen.height).toBeLessThanOrEqual(dockTop - 8);
+        expect(finalClose.y + finalClose.height).toBeLessThanOrEqual(dockTop - 8);
       }
       return documentHeight;
     } finally {
@@ -687,8 +760,8 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
 
   if (testInfo.project.name === 'canonical-768') {
     const canonicalHeight = await captureFull('home-768-full.png');
-    expect(canonicalHeight).toBeGreaterThanOrEqual(3_440);
-    expect(canonicalHeight).toBeLessThanOrEqual(3_500);
+    expect(canonicalHeight).toBeGreaterThanOrEqual(5_600);
+    expect(canonicalHeight).toBeLessThanOrEqual(5_680);
     await captureSection('research-768.png', page.locator('#research'), {
       bottom: page.locator('.pub-card--3'),
       capBefore: page.locator('#vibe > h2'),
@@ -696,7 +769,7 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
     });
     await captureSection('vibe-768.png', page.locator('#vibe'), {
       after: page.locator('.pub-card--3'),
-      bottom: page.locator('.vibe-lower'),
+      bottom: page.locator('.collaboration-close'),
       top: page.locator('#vibe > h2'),
     });
     const researchSize = await pngSize(`${artifactDir}/research-768.png`);

@@ -482,12 +482,13 @@ test('mobile footer flows after content and exposes complete 44px controls', asy
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
 
-test('homepage cards expose primary destinations and the bilingual personal close', async ({ page }) => {
+test('homepage cards expose primary destinations and the bilingual sticker close', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
 
   await expect(page.locator('.paper-primary-link')).toHaveCount(3);
   await expect(page.locator('.vibe-primary-link')).toHaveCount(4);
-  await expect(page.getByRole('heading', { name: 'Beyond the lab' })).toBeVisible();
+  await expect(page.locator('[data-sticker-constellation] figure')).toHaveCount(7);
+  await expect(page.locator('[data-sticker-constellation] figcaption .t-en')).toHaveCount(7);
   await expect(page.getByRole('link', { name: /Start a conversation/ })).toHaveAttribute('href', /^mailto:/);
 
   await page.locator('[data-vibe-role="singularity"]').click({ position: { x: 20, y: 20 } });
@@ -495,8 +496,8 @@ test('homepage cards expose primary destinations and the bilingual personal clos
   await page.goBack({ waitUntil: 'networkidle' });
 
   await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
-  await expect(page.getByRole('heading', { name: '实验室之外' })).toBeVisible();
-  await expect(page.getByText('心理学 · 佛学')).toBeVisible();
+  await expect(page.getByText('心理学与心灵')).toBeVisible();
+  await expect(page.getByText('冥想练习')).toBeVisible();
 });
 
 test('tablet and mobile retain readable supporting type and complete action targets', async ({ page }) => {

@@ -40,3 +40,31 @@ test('keeps the language hit target accessible without colliding at 390px', asyn
   expect(toggleBox.x + toggleBox.width).toBeLessThanOrEqual(talkBox.x);
   expect(talkBox.x + talkBox.width).toBeLessThanOrEqual(390);
 });
+
+test('sticker constellation keeps useful alternatives and switches every physical caption', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  const constellation = page.locator('[data-sticker-constellation]');
+  await expect(constellation).toHaveAttribute('aria-label', /Personal interests and creative practices/);
+  await expect(constellation.locator('figure')).toHaveCount(7);
+  await expect(constellation.locator('img')).toHaveCount(7);
+  await expect(page.getByRole('heading', { name: /Beyond the lab/i })).toHaveCount(0);
+
+  const alternatives = await constellation.locator('img').evaluateAll((images) =>
+    images.map((image) => image.getAttribute('alt') ?? ''),
+  );
+  expect(new Set(alternatives).size).toBe(7);
+  for (const alternative of alternatives) expect(alternative.length).toBeGreaterThan(12);
+
+  const english = constellation.locator('figcaption .t-en');
+  const chinese = constellation.locator('figcaption .t-zh');
+  await expect(english).toHaveCount(7);
+  await expect(chinese).toHaveCount(7);
+  for (const caption of await english.all()) await expect(caption).toBeVisible();
+  for (const caption of await chinese.all()) await expect(caption).toBeHidden();
+
+  await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
+  for (const caption of await english.all()) await expect(caption).toBeHidden();
+  for (const caption of await chinese.all()) await expect(caption).toBeVisible();
+  await expect(constellation.getByText('深夜编程')).toBeVisible();
+});
