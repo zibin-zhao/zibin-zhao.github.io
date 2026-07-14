@@ -4,12 +4,12 @@ export const profile = {
   lastName: 'ZHAO',
   role: { en: 'Bioengineering × AI', zh: '生物工程 × 人工智能' },
   tagline: {
-    en: 'PhD candidate at the Hong Kong University of Science and Technology — deep learning for molecular diagnostics, CRISPR & aptamer design.',
-    zh: '香港科技大学博士候选人 —— 以深度学习推进分子诊断、CRISPR 与适体设计。',
+    en: 'Curious builder doing a PhD at HKUST — exploring AI and biology through molecular diagnostics, CRISPR, and aptamer design.',
+    zh: '在香港科技大学读博的好奇心建造者 —— 用 AI 与生物学探索分子诊断、CRISPR 和适体设计。',
   },
   valueProp: {
-    en: 'I build tools that make care measurable, beautiful, and accessible — from molecular diagnostics to everyday wellbeing.',
-    zh: '我打造让「关怀」可被衡量、美观且触手可及的工具 —— 从分子诊断到日常身心健康。',
+    en: 'I make useful things — and the occasional gloriously unnecessary one — wherever research, design, and code collide.',
+    zh: '我喜欢在研究、设计与代码相遇的地方做点东西 —— 有些很有用，有些则精彩得毫无必要。',
   },
   status: { en: 'Open to Collaboration', zh: '开放合作' },
   email: 'zibin.zhao@connect.ust.hk',

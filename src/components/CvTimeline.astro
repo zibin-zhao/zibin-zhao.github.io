@@ -3,24 +3,20 @@ import Section from './Section.astro';
 import { cv } from '../data/cv';
 import T from './T.astro';
 
-const items = [...cv.education, ...cv.experience, ...cv.leadership];
+const currentStudy = cv.education[0];
 ---
 
 <Section id="cv" num="05" label="CV / Resume" labelZh="简历" variant="strip">
   <div class="cv-layout">
     <ol class="cv-index">
-      {items.map((item, index) => (
-        <li class="cv-entry" data-cv-entry={item.title.en}>
-          <span class="cv-num" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-          <div class="cv-copy">
-            <h3>
-              <T en={`${item.title.en} — ${item.org.en}`} zh={`${item.title.zh} — ${item.org.zh}`} />
-            </h3>
-            <p class="t-en">{[item.period.en, ...item.notes.en].filter(Boolean).join(' · ')}</p>
-            <p class="t-zh">{[item.period.zh, ...item.notes.zh].filter(Boolean).join(' · ')}</p>
-          </div>
-        </li>
-      ))}
+      <li class="cv-entry" data-cv-entry="PhD @ HKUST">
+        <span class="cv-num" aria-hidden="true">01</span>
+        <div class="cv-copy">
+          <h3><T en="PhD @ HKUST" zh="博士研究 @ 香港科技大学" /></h3>
+          <p class="t-en">{[currentStudy.period.en, ...currentStudy.notes.en].filter(Boolean).join(' · ')}</p>
+          <p class="t-zh">{[currentStudy.period.zh, ...currentStudy.notes.zh].filter(Boolean).join(' · ')}</p>
+        </div>
+      </li>
     </ol>
 
     <aside class="cv-tools" aria-label="CV skills">

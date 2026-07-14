@@ -90,20 +90,22 @@ describe('complete archive source contracts', () => {
     const projects = read('src/components/Projects.astro');
     expect(fallbackProjects.map(({ name }) => name)).toEqual([
       'CasMD',
+      'TEMPO',
       'DL-SELEX',
       'Yaos',
-      'TEMPO',
       'Cembra_AI',
       'DL-SELEX-web-explain',
       'ECG_analysing_app',
     ]);
-    expect(projects).toContain('githubProjects.map((project)');
+    expect(projects).toContain('partitionGithubProjects(githubProjects)');
+    expect(projects).toContain('research.map((project)');
+    expect(projects).toContain('more.map((project)');
     expect(projects).toContain('getGithubProjects');
     expect(projects).not.toContain("getCollection('projects')");
     expect(projects).not.toContain('.slice(');
   });
 
-  it('renders every CV entry, note and skill with the real PDF download', () => {
+  it('retains the complete CV data while showing only the active PhD study and core skills', () => {
     const entries = [...cv.education, ...cv.experience, ...cv.leadership];
     expect(entries.map((entry) => entry.title.en)).toEqual([
       'Ph.D., Bioengineering',
@@ -113,16 +115,18 @@ describe('complete archive source contracts', () => {
       'President & Event Director',
     ]);
     expect(entries.flatMap((entry) => entry.notes.en)).toHaveLength(6);
-    expect(cv.skills).toEqual(['Python', 'C', 'MATLAB', 'LabVIEW', 'SolidWorks']);
+    expect(cv.skills).toEqual(['AI', 'Python', 'C', 'MATLAB', 'LabVIEW', 'SolidWorks']);
     expect(cv.pdf).toBe('/cv.pdf');
     expect(existsSync(new URL('public/cv.pdf', root))).toBe(true);
     const timeline = read('src/components/CvTimeline.astro');
-    expect(timeline).toContain('const items = [...cv.education, ...cv.experience, ...cv.leadership]');
-    expect(timeline).toContain('items.map((item, index)');
-    expect(timeline).toContain('item.notes.en');
+    expect(timeline).toContain('const currentStudy = cv.education[0]');
+    expect(timeline).toContain('en="PhD @ HKUST"');
+    expect(timeline).toContain('zh="博士研究 @ 香港科技大学"');
+    expect(timeline).toContain('currentStudy.notes.en');
     expect(timeline).toContain('cv.skills.map((skill)');
     expect(timeline).toContain('href={cv.pdf} download');
-    expect(timeline).not.toContain('.slice(');
+    expect(timeline).not.toMatch(/cv\.(experience|leadership)/);
+    expect(timeline).not.toMatch(/candidate|co-founder|leadership/i);
   });
 
   it('renders the canonical email, every social and every contact index link', () => {

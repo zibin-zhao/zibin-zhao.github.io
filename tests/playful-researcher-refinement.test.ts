@@ -24,6 +24,31 @@ const contrast = (foreground: string, background: string) => {
 };
 
 describe('playful researcher refinement', () => {
+  it('uses the approved curious-builder story without candidate language', () => {
+    const about = read('src/components/About.astro');
+    const profile = read('src/data/profile.ts');
+    const base = read('src/layouts/Base.astro');
+    const approvedEnglishStory = 'I keep making things because apparently leaving an idea alone is not one of my skills. Some are useful, some are gloriously unnecessary, and most begin with “what if?” I like trains, games, design, AI, biology, and the strange places where they crash into each other. Somewhere along the way, curiosity accidentally turned into doing a PhD at HKUST. I still learn the same way: build it, break it, make notes, try again.';
+
+    expect(about).toContain('CURIOSITY FILE / ACTIVE');
+    expect(about).toContain(approvedEnglishStory);
+    for (const marker of ['火车', '游戏', '设计', 'AI', '生物', '香港科技大学读博']) {
+      expect(about).toContain(marker);
+    }
+
+    expect(profile).toContain('doing a PhD at HKUST');
+    expect(profile).toMatch(/curious|curiosity/i);
+    expect(profile).toMatch(/AI[\s\S]*biology|biology[\s\S]*AI/i);
+    expect(profile).toMatch(/molecular diagnostics/i);
+    expect(base).toContain("jobTitle: 'PhD Researcher in Bioengineering'");
+    expect(base).toMatch(/AI[\s\S]*biology|biology[\s\S]*AI/i);
+    expect(base).toMatch(/molecular diagnostics/i);
+
+    for (const source of [about, profile, base]) {
+      expect(source).not.toMatch(/PhD candidate/i);
+    }
+  });
+
   it('adds the bilingual personal close without unexplained homepage numbering', () => {
     const research = read('src/components/FeaturedResearch.astro');
     const vibe = read('src/components/StitchVibe.astro');

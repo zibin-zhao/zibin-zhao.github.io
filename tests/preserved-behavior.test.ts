@@ -38,12 +38,13 @@ describe('preserved portfolio behavior', () => {
     for (const [path, contract] of contracts) expect(read(path)).toMatch(contract);
   });
 
-  it('keeps the complete CV sequence and real PDF download', () => {
+  it('keeps complete CV data and the real PDF behind the focused timeline', () => {
     const component = read('src/components/CvTimeline.astro');
     const expectedCount = cv.education.length + cv.experience.length + cv.leadership.length;
-    expect(expectedCount).toBeGreaterThan(0);
-    expect(component).toContain('const items = [...cv.education, ...cv.experience, ...cv.leadership]');
-    expect(component).toContain('items.map((item, index)');
+    expect(expectedCount).toBe(5);
+    expect(component).toContain('const currentStudy = cv.education[0]');
+    expect(component.match(/<li class="cv-entry"/g)).toHaveLength(1);
+    expect(component).not.toMatch(/cv\.(experience|leadership)/);
     expect(component).toContain('href={cv.pdf} download');
     expect(cv.pdf).toBe('/cv.pdf');
     expect(existsSync(new URL('public/cv.pdf', root))).toBe(true);

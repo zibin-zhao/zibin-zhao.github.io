@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { profile } from '../data/profile';
-const { title = 'Zibin Zhao', description = 'PhD candidate in Bioengineering at the Hong Kong University of Science and Technology — deep learning for molecular diagnostics, CRISPR & aptamer design.' } = Astro.props;
+const { title = 'Zibin Zhao', description = 'Curious builder doing a PhD at HKUST — exploring AI and biology through molecular diagnostics, CRISPR, and aptamer design.' } = Astro.props;
 const ogImage = Astro.site ? new URL('og.png', Astro.site).href : '/og.png';
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
 const personSchema = {
@@ -9,7 +9,7 @@ const personSchema = {
   '@type': 'Person',
   name: 'Zibin Zhao',
   url: Astro.site?.href,
-  jobTitle: 'PhD Candidate in Bioengineering',
+  jobTitle: 'PhD Researcher in Bioengineering',
   affiliation: {
     '@type': 'CollegeOrUniversity',
     name: 'The Hong Kong University of Science and Technology',

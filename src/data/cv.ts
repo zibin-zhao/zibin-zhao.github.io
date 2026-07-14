@@ -53,6 +53,6 @@ export const cv: {
       notes: { en: ['5,000+ members'], zh: ['5,000+ 名成员'] },
     },
   ],
-  skills: ['Python', 'C', 'MATLAB', 'LabVIEW', 'SolidWorks'],
+  skills: ['AI', 'Python', 'C', 'MATLAB', 'LabVIEW', 'SolidWorks'],
   download: { en: '⬇ Download CV (PDF)', zh: '⬇ 下载简历（PDF）' },
 };

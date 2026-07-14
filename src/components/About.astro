@@ -5,10 +5,10 @@ import T from './T.astro';
 ---
 <Section id="about" num="01" label="About" labelZh="关于" variant="dossier">
   <article class="dossier">
-    <p class="dossier-code">RESEARCHER FILE / ACTIVE</p>
+    <p class="dossier-code">CURIOSITY FILE / ACTIVE</p>
     <h3><T en="A short story" zh="我的故事" /></h3>
-    <p class="t-en">PhD candidate in Bioengineering at the Hong Kong University of Science and Technology (Hsing Lab), HKPFS + Redbird awardee. BSc Biomedical Engineering, University of Melbourne (First Class Honours). I build deep-learning methods at the interface of molecular biology and AI — one-pot CRISPR diagnostics, structure-aware aptamer selection, and molecular-dynamics tooling.</p>
-    <p class="t-zh">香港科技大学生物工程博士候选人（Hsing 实验室），香港博士研究生奖学金（HKPFS）+ Redbird 奖得主；本科毕业于墨尔本大学生物医学工程（一等荣誉）。我在分子生物学与人工智能的交叉处构建深度学习方法 —— 一锅式 CRISPR 诊断、结构感知的适体筛选，以及分子动力学工具。</p>
+    <p class="t-en">I keep making things because apparently leaving an idea alone is not one of my skills. Some are useful, some are gloriously unnecessary, and most begin with “what if?” I like trains, games, design, AI, biology, and the strange places where they crash into each other. Somewhere along the way, curiosity accidentally turned into doing a PhD at HKUST. I still learn the same way: build it, break it, make notes, try again.</p>
+    <p class="t-zh">我总忍不住把脑子里的点子做出来 —— 看来「先放着不管」并不是我的强项。有些真的有用，有些精彩得毫无必要，而大多数都始于一句「要不试试？」我喜欢火车、游戏、设计、AI、生物，也喜欢看它们在意想不到的地方撞个满怀。不知不觉，好奇心一路把我带到了香港科技大学读博。我的学习方式倒一直没变：先做出来，拆坏它，记两笔，再来一次。</p>
     <div class="chips">{profile.focus.map((focus) => <span class="chip" data-focus={focus.en}><T en={focus.en} zh={focus.zh} /></span>)}</div>
   </article>
 </Section>
