@@ -7,82 +7,92 @@ const root = new URL('..', import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
 
 describe('GitHub project surfaces', () => {
-  it('loads both project surfaces through the shared normalized loader', () => {
+  it('loads the homepage research collection and complete Projects route once per surface', () => {
+    expect(existsSync(new URL('src/components/StitchResearchProjects.astro', root))).toBe(true);
+    const research = read('src/components/StitchResearchProjects.astro');
     const vibe = read('src/components/StitchVibe.astro');
     const projects = read('src/components/Projects.astro');
 
-    for (const surface of [vibe, projects]) {
-      expect(surface).toContain("import { getGithubProjects } from '../data/github-projects'");
+    for (const surface of [research, projects]) {
+      expect(surface).toContain('getGithubProjects');
+      expect(surface).toContain('partitionGithubProjects');
       expect(surface).toContain('await getGithubProjects()');
+      expect(surface.match(/await getGithubProjects\(\)/g)).toHaveLength(1);
     }
-    expect(vibe).toContain('<GithubProjectShelf projects={githubProjects} />');
-    expect(projects).toContain('githubProjects.map((project)');
+    expect(vibe).not.toContain('getGithubProjects');
+    expect(vibe).not.toContain('GithubProjectShelf');
   });
 
-  it('deduplicates the homepage shelf from the authored CasMD and Yaos cards', () => {
-    expect(existsSync(new URL('src/components/GithubProjectShelf.astro', root))).toBe(true);
-    if (!existsSync(new URL('src/components/GithubProjectShelf.astro', root))) return;
-
-    const shelf = read('src/components/GithubProjectShelf.astro');
+  it('renders CasMD first, then TEMPO, then the remaining homepage research projects', () => {
+    if (!existsSync(new URL('src/components/StitchResearchProjects.astro', root))) {
+      expect(existsSync(new URL('src/components/StitchResearchProjects.astro', root))).toBe(true);
+      return;
+    }
+    const research = read('src/components/StitchResearchProjects.astro');
     expect(fallbackProjects.map(({ name }) => name)).toEqual([
       'CasMD',
+      'TEMPO',
       'DL-SELEX',
       'Yaos',
-      'TEMPO',
       'Cembra_AI',
       'DL-SELEX-web-explain',
       'ECG_analysing_app',
     ]);
-    expect(fallbackProjects.filter(({ name }) => !['CasMD', 'Yaos'].includes(name)).map(({ name }) => name)).toEqual([
-      'DL-SELEX',
-      'TEMPO',
-      'Cembra_AI',
-      'DL-SELEX-web-explain',
-      'ECG_analysing_app',
-    ]);
-    expect(shelf).toContain("const AUTHORED_PROJECTS = new Set(['CasMD', 'Yaos'])");
-    expect(shelf).toContain('!AUTHORED_PROJECTS.has(project.name)');
-    expect(shelf).toContain('shelfProjects.map((project)');
-    expect(shelf).toContain('<GithubProjectCard project={project} />');
-    expect(shelf).toMatch(/\.github-project-shelf-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);/);
-    expect(shelf).toMatch(/@media \(max-width: 700px\)[\s\S]*?\.github-project-shelf-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\);/);
+    expect(research).toContain("const casmd = research.find(({ name }) => name === 'CasMD')");
+    expect(research).toContain("const tempo = research.find(({ name }) => name === 'TEMPO')");
+    expect(research).toContain("!['CasMD', 'TEMPO'].includes(project.name)");
+    expect(research.indexOf('project={casmd}')).toBeLessThan(research.indexOf('project={tempo}'));
+    expect(research.indexOf('project={tempo}')).toBeLessThan(research.indexOf('remaining.map((project)'));
+    expect(research).toContain("src: '/stitch/casmd-cartoon.png'");
   });
 
-  it('renders every normalized project on the Projects route without the manual collection', () => {
+  it('renders non-overlapping Research, Vibe, and More groups on the Projects route', () => {
     const projects = read('src/components/Projects.astro');
 
     expect(fallbackProjects).toHaveLength(7);
-    expect(projects).toContain('<GithubProjectCard project={project} />');
+    expect(projects).toContain('const { research, more } = partitionGithubProjects(githubProjects)');
+    expect(projects).toContain('HOME_VIBE_TITLES');
+    expect(projects).toContain("getCollection('vibe')");
+    expect(projects).toContain('research.map((project) => <ResearchProjectCard project={project} />)');
+    expect(projects).toContain('vibeProjects.map((item, index) =>');
+    expect(projects).toContain('more.map((project) => <GithubProjectCard project={project} />)');
+    expect(projects).not.toContain('githubProjects.map(');
     expect(projects).not.toMatch(/getCollection\(['"]projects['"]\)/);
     expect(projects).not.toContain("from './ProjectCard.astro'");
-    expect(projects).not.toMatch(/githubProjects\.(?:filter|slice)\(/);
+    for (const heading of [
+      '<T en="Research" zh="研究项目" />',
+      '<T en="Vibe" zh="随性实验" />',
+      '<T en="More" zh="更多项目" />',
+    ]) expect(projects).toContain(heading);
   });
 
-  it('uses semantic bilingual GitHub cards with safe, touch-sized actions', () => {
-    expect(existsSync(new URL('src/components/GithubProjectCard.astro', root))).toBe(true);
-    if (!existsSync(new URL('src/components/GithubProjectCard.astro', root))) return;
+  it('uses semantic bilingual research cards with bounded stacks and optional art', () => {
+    expect(existsSync(new URL('src/components/ResearchProjectCard.astro', root))).toBe(true);
+    const card = read('src/components/ResearchProjectCard.astro');
 
-    const card = read('src/components/GithubProjectCard.astro');
     expect(card).toContain('<article');
-    expect(card).toContain('data-github-project={project.name}');
-    expect(card).toContain("data-featured={project.featured ? 'true' : undefined}");
-    expect(card).toContain('<T en={project.description} zh={project.descriptionZh} />');
-    expect(card).toContain('project.stack.map((technology)');
+    expect(card).toContain('data-research-project={project.name}');
+    expect(card).toContain('data-featured={project.featured}');
+    expect(card).toContain('image &&');
+    expect(card).toContain('src={image.src}');
+    expect(card).toContain('alt={image.alt}');
+    expect(card).toContain('width="1024"');
+    expect(card).toContain('height="576"');
+    expect(card).toContain('<p class="t-en">{project.description}</p>');
+    expect(card).toContain('<p class="t-zh">{project.descriptionZh}</p>');
+    expect(card).toContain('project.stack.slice(0, 3).map((technology)');
     expect(card).toContain('<li>{technology}</li>');
     expect(card).toContain('href={project.githubUrl}');
     expect(card).toContain('project.demoUrl &&');
     expect(card).toContain('href={project.demoUrl}');
     expect(card).toContain('target="_blank"');
     expect(card).toContain('rel="noopener noreferrer"');
-    expect(card).toContain('★');
-    expect(card).toMatch(/\.github-project-action\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/);
-    expect(card).toMatch(/\.github-project-action:focus-visible\s*\{[^}]*outline:/);
+    expect(card).toMatch(/\.research-project-action\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/);
   });
 
-  it('gives the authored CasMD and Yaos cards separate GitHub and live-demo actions', () => {
+  it('keeps separate GitHub and live-demo actions for authored Vibe projects', () => {
     const card = read('src/components/StitchVibeCard.astro');
     const config = read('src/content.config.ts');
-    const casmd = read('src/content/vibe/casmd.md');
     const yaos = read('src/content/vibe/yaos.md');
 
     expect(config).toContain('githubUrl: z.string().optional()');
@@ -92,8 +102,6 @@ describe('GitHub project surfaces', () => {
     expect(card).toMatch(/\.vibe-secondary-actions\s*\{[^}]*position:\s*relative;[^}]*z-index:\s*2;/);
     expect(card).toMatch(/\.vibe-action\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/);
 
-    expect(casmd).toContain('githubUrl: "https://github.com/zibin-zhao/CasMD"');
-    expect(casmd).toContain('href: "https://huggingface.co/spaces/zzhaobz/HsingMD"');
     expect(yaos).toContain('githubUrl: "https://github.com/zibin-zhao/Yaos"');
     expect(yaos).toContain('href: "https://zibin-zhao.github.io/Yaos/"');
   });

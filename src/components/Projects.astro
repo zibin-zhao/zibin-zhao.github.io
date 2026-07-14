@@ -1,14 +1,49 @@
 ---
-import { getGithubProjects } from '../data/github-projects';
+import { getCollection } from 'astro:content';
+import { getGithubProjects, partitionGithubProjects } from '../data/github-projects';
+import { HOME_VIBE_TITLES, selectByTitles } from '../data/home';
 import GithubProjectCard from './GithubProjectCard.astro';
+import ResearchProjectCard from './ResearchProjectCard.astro';
 import Section from './Section.astro';
+import StitchVibeCard from './StitchVibeCard.astro';
 import T from './T.astro';
 
 const githubProjects = await getGithubProjects();
+const { research, more } = partitionGithubProjects(githubProjects);
+const vibeEntries = await getCollection('vibe');
+const vibeProjects = selectByTitles(vibeEntries.map((entry) => entry.data), HOME_VIBE_TITLES);
+const vibeRoles = ['singularity', 'medit', 'yaos', 'zen'] as const;
 ---
 <Section id="projects" num="03" label="Projects & Demos" labelZh="项目与演示" variant="scrap">
   <h3 class="big"><T en="Things I've built" zh="我做过的东西" /></h3>
-  <div class="project-board">{githubProjects.map((project) => <GithubProjectCard project={project} />)}</div>
+
+  <section class="project-group" aria-labelledby="research-projects-heading">
+    <h3 id="research-projects-heading" class="project-group-title"><T en="Research" zh="研究项目" /></h3>
+    <div class="project-board project-board--research">
+      {research.map((project) => <ResearchProjectCard project={project} />)}
+    </div>
+  </section>
+
+  <section class="project-group" aria-labelledby="vibe-projects-heading">
+    <h3 id="vibe-projects-heading" class="project-group-title"><T en="Vibe" zh="随性实验" /></h3>
+    <div class="project-board project-board--vibe">
+      {vibeProjects.map((item, index) => (
+        <StitchVibeCard
+          item={item}
+          role={vibeRoles[index] ?? 'zen'}
+          image={item.title === 'Singularity' ? '/stitch/singularity.png' : undefined}
+          dark={item.title === 'Singularity'}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="project-group" aria-labelledby="more-projects-heading">
+    <h3 id="more-projects-heading" class="project-group-title"><T en="More" zh="更多项目" /></h3>
+    <div class="project-board project-board--more">
+      {more.map((project) => <GithubProjectCard project={project} />)}
+    </div>
+  </section>
 </Section>
 <style>
   .big {
@@ -19,16 +54,30 @@ const githubProjects = await getGithubProjects();
     text-transform: uppercase;
   }
 
+  .project-group { margin-top: clamp(42px, 7vw, 72px); }
+
+  .project-group-title {
+    display: inline-block;
+    padding: 8px 12px;
+    border: var(--stroke);
+    background: var(--orange);
+    box-shadow: var(--shadow-2);
+    font: 400 clamp(27px, 4vw, 40px)/1 var(--font-display);
+    text-transform: uppercase;
+    transform: rotate(-.6deg);
+  }
+
   .project-board {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(24px, 4vw, 40px);
     align-items: start;
-    margin-top: clamp(30px, 5vw, 52px);
+    margin-top: 26px;
   }
 
   .project-board :global([data-featured='true']) { grid-column: span 2; }
   .project-board :global([data-github-project]:nth-child(even)) { --github-card-transform: rotate(.45deg); }
+  .project-board--vibe { align-items: stretch; }
 
   @media (max-width: 780px) {
     .project-board {
@@ -36,7 +85,8 @@ const githubProjects = await getGithubProjects();
       gap: 30px;
     }
 
-    .project-board :global([data-github-project]) {
+    .project-board :global([data-github-project]),
+    .project-board :global([data-research-project]) {
       grid-column: 1;
     }
   }

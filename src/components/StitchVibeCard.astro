@@ -14,7 +14,7 @@ interface VibeItem {
 
 interface Props {
   item: VibeItem;
-  role: 'casmd' | 'singularity' | 'medit' | 'yaos' | 'zen';
+  role: 'singularity' | 'medit' | 'yaos' | 'zen';
   image?: string;
   dark?: boolean;
 }
@@ -34,7 +34,7 @@ const imageAlt = `${item.title} project interface preview`;
         src={image}
         alt={imageAlt}
         width="512"
-        height={role === 'casmd' ? '286' : '384'}
+        height="384"
         loading="lazy"
         decoding="async"
         onerror="this.setAttribute('hidden','');this.nextElementSibling?.removeAttribute('hidden')"
@@ -326,10 +326,8 @@ const imageAlt = `${item.title} project interface preview`;
   }
 
   @media (min-width: 701px) and (max-width: 960px) {
-    .vibe-card--casmd .vibe-image { height: 180px; aspect-ratio: auto; }
     .vibe-card--singularity .vibe-image { height: 128px; aspect-ratio: auto; }
 
-    .vibe-card--casmd .vibe-title,
     .vibe-card--singularity .vibe-title {
       position: absolute;
       width: 1px;

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { cv } from '../src/data/cv';
 import { promptPack } from '../src/data/prompts';
@@ -62,25 +62,30 @@ describe('preserved portfolio behavior', () => {
     expect(block).toContain('aria-label="Copy prompt to clipboard"');
   });
 
-  it('keeps authoritative CasMD data cross-listed in deterministic Vibe order', () => {
+  it('keeps CasMD in research while removing it completely from Vibe sources', () => {
     const vibe = read('src/components/StitchVibe.astro');
     const projects = read('src/components/Projects.astro');
     const home = read('src/data/home.ts');
     const project = read('src/content/projects/hsingmd.md');
-    const casmd = read('src/content/vibe/casmd.md');
+    const vibeSources = readdirSync(new URL('src/content/vibe/', root))
+      .filter((name) => name.endsWith('.md'))
+      .map((name) => read(`src/content/vibe/${name}`));
     for (const fact of [
       'title: "CasMD"',
       'blurb: "Protein–nucleic acid molecular dynamics, made simple. Interactive demo."',
       'href: "https://huggingface.co/spaces/zzhaobz/HsingMD"',
     ]) {
       expect(project).toContain(fact);
-      expect(casmd).toContain(fact);
     }
+    expect(existsSync(new URL('src/content/vibe/casmd.md', root))).toBe(false);
+    expect(vibeSources.join('\n')).not.toMatch(/casmd/i);
     expect(vibe).toContain("getCollection('vibe')");
     expect(vibe).toContain('selectByTitles');
     expect(vibe).toContain('HOME_VIBE_TITLES');
+    expect(vibe).not.toMatch(/casmd/i);
     expect(projects).toContain('getGithubProjects');
     expect(projects).not.toContain("getCollection('projects')");
-    expect(home).toContain("'CasMD',\n  'Singularity',\n  'Medit',\n  'Yaos',\n  'Zen',");
+    expect(home).toContain("'Singularity',\n  'Medit',\n  'Yaos',\n  'Zen',");
+    expect(home.slice(home.indexOf('HOME_VIBE_TITLES'))).not.toContain("'CasMD'");
   });
 });
