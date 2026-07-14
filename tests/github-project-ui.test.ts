@@ -29,6 +29,7 @@ describe('GitHub project surfaces', () => {
       return;
     }
     const research = read('src/components/StitchResearchProjects.astro');
+    const vibe = read('src/components/StitchVibe.astro');
     expect(fallbackProjects.map(({ name }) => name)).toEqual([
       'CasMD',
       'TEMPO',
@@ -44,6 +45,9 @@ describe('GitHub project surfaces', () => {
     expect(research.indexOf('project={casmd}')).toBeLessThan(research.indexOf('project={tempo}'));
     expect(research.indexOf('project={tempo}')).toBeLessThan(research.indexOf('remaining.map((project)'));
     expect(research).toContain("src: '/stitch/casmd-cartoon.png'");
+    expect(research).not.toContain("src: '/stitch/casmd.png'");
+    expect(vibe).toContain("const singularityImage = '/stitch/singularity-cartoon.png'");
+    expect(vibe).not.toContain("const singularityImage = '/stitch/singularity.png'");
   });
 
   it('renders non-overlapping Research, Vibe, and More groups on the Projects route', () => {

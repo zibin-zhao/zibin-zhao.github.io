@@ -60,7 +60,9 @@ describe('production quality gates', () => {
   it.each([
     ['cart.png', 'Rollercoaster Cart Icon'],
     ['casmd.png', 'CasMD'],
+    ['casmd-cartoon.png', 'CasMD'],
     ['singularity.png', 'Singularity'],
+    ['singularity-cartoon.png', 'Singularity'],
   ])('tracks a non-empty PNG payload for %s', (file, label) => {
     const bytes = readBytes(`public/stitch/${file}`);
     expect(bytes.byteLength).toBeGreaterThan(pngSignature.byteLength);
