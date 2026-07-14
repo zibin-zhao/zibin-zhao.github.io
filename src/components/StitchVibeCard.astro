@@ -21,7 +21,9 @@ interface Props {
 
 const { item, role, image, dark = false } = Astro.props;
 const isExternal = item.href ? /^https?:\/\//.test(item.href) : false;
-const imageAlt = `${item.title} project interface preview`;
+const imageAlt = role === 'singularity'
+  ? 'Hand-drawn particle and black-hole illustration for Singularity'
+  : `${item.title} project preview`;
 ---
 
 <article

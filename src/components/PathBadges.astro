@@ -12,20 +12,24 @@ const badges = [
 
 <div class="path-badges" data-path-badges aria-hidden="true">
   {badges.map((badge) => (
-    <img
+    <span
       class="path-badge"
       data-path-badge
       data-guide={badge.guide}
       data-center={badge.center}
       data-visible="false"
-      src={badge.src}
-      width="768"
-      height="768"
-      loading="lazy"
-      decoding="async"
-      alt=""
       style={`--badge-size: ${badge.size}; --badge-top: ${badge.top}; --badge-tilt: ${badge.tilt};`}
-    />
+    >
+      <img
+        class="path-badge-image"
+        src={badge.src}
+        width="768"
+        height="768"
+        loading="lazy"
+        decoding="async"
+        alt=""
+      />
+    </span>
   ))}
 </div>
 
@@ -54,15 +58,47 @@ const badges = [
     position: absolute;
     top: var(--badge-top);
     width: var(--badge-size);
-    height: auto;
+    aspect-ratio: 1;
     opacity: 0;
-    filter: drop-shadow(3px 4px 0 color-mix(in srgb, var(--ink) 28%, transparent));
+    pointer-events: none;
     transform: translate(var(--badge-anchor-x), -50%) rotate(var(--badge-tilt)) scale(.8);
     transition: opacity 220ms ease, transform 280ms ease;
   }
 
-  [data-guide='left'] { left: 15%; --badge-anchor-x: -50%; }
-  [data-guide='right'] { right: 24%; --badge-anchor-x: 50%; }
+  .path-badge::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 50%;
+    width: 34px;
+    height: 22px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: 2px 2px 0 color-mix(in srgb, var(--ink) 24%, transparent);
+    transform: translateY(-50%) rotate(-2deg);
+  }
+
+  .path-badge-image {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(3px 4px 0 color-mix(in srgb, var(--ink) 28%, transparent));
+    object-fit: contain;
+  }
+
+  [data-guide='left'] {
+    left: 15%;
+    --badge-anchor-x: max(calc(-100% + 12px), calc(-15vw + 8px));
+  }
+  [data-guide='right'] {
+    right: 24%;
+    --badge-anchor-x: min(calc(100% - 12px), calc(24vw - 8px));
+  }
+  [data-guide='left']::before { right: -16px; }
+  [data-guide='right']::before { left: -16px; }
 
   .path-badge[data-visible='true'] {
     opacity: .88;

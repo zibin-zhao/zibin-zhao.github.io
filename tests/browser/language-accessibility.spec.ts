@@ -77,3 +77,44 @@ test('keeps one bilingual interest list available without exposing decorative ba
   await expect(interestList).toHaveCount(1);
   await expect(badgeLayer.locator('[data-path-badge]')).toHaveCount(7);
 });
+
+test('renders each decorative badge as a paper-tab attachment on its dashed guide', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/', { waitUntil: 'networkidle' });
+
+  const badges = page.locator('[data-path-badges] [data-path-badge]');
+  await expect(badges).toHaveCount(7);
+  const contracts = await badges.evaluateAll((elements) => elements.map((element) => {
+    const badge = element as HTMLElement;
+    const box = badge.getBoundingClientRect();
+    const guide = badge.dataset.guide;
+    const guideX = guide === 'left' ? innerWidth * .15 : innerWidth * .76;
+    const style = getComputedStyle(badge);
+    const tab = getComputedStyle(badge, '::before');
+    return {
+      background: tab.backgroundColor,
+      content: tab.content,
+      guideAttached: box.left <= guideX && box.right >= guideX,
+      imageCount: badge.querySelectorAll('img.path-badge-image').length,
+      pointerEvents: style.pointerEvents,
+      tabHeight: Number.parseFloat(tab.height),
+      tabPosition: tab.position,
+      tabWidth: Number.parseFloat(tab.width),
+      transitionProperty: style.transitionProperty,
+    };
+  }));
+
+  for (const contract of contracts) {
+    expect(contract).toEqual({
+      background: 'rgb(255, 250, 224)',
+      content: '""',
+      guideAttached: true,
+      imageCount: 1,
+      pointerEvents: 'none',
+      tabHeight: 22,
+      tabPosition: 'absolute',
+      tabWidth: 34,
+      transitionProperty: 'opacity, transform',
+    });
+  }
+});

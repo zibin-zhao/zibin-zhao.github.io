@@ -281,7 +281,8 @@ test('projects render three non-overlapping category groups in two desktop colum
 
   const groups = page.locator('.project-group');
   await expect(groups).toHaveCount(3);
-  await expect(groups.locator('.project-group-title .t-en')).toHaveText(['Research', 'Vibe', 'More']);
+  await expect(groups.locator('.project-group-title .t-en')).toHaveText(['Research', 'Vibe', 'More from GitHub']);
+  await expect(groups.locator('.project-group-title .t-zh')).toHaveText(['研究项目', '随性实验', '更多 GitHub 项目']);
   const researchCards = page.locator('.project-board--research [data-research-project]');
   const vibeCards = page.locator('.project-board--vibe [data-vibe-role]');
   const moreCards = page.locator('.project-board--more [data-github-project]');
@@ -317,6 +318,52 @@ test('projects render three non-overlapping category groups in two desktop colum
     expect(box.x + box.width).toBeLessThanOrEqual(390);
   }
   await assertNoOverflowOrDockOverlap(page);
+});
+
+test('Projects reuses the authored CasMD cover metadata and loads its intrinsic image', async ({ page }) => {
+  await page.goto('/projects/');
+
+  const cover = page.locator('[data-research-project="CasMD"] .research-project-cover');
+  await expect(cover).toHaveAttribute('src', '/stitch/casmd-cartoon.png');
+  await expect(cover).toHaveAttribute(
+    'alt',
+    'Hand-drawn CasMD molecular dynamics illustration of a protein–nucleic acid complex',
+  );
+  await expect(cover).toHaveAttribute('width', '1024');
+  await expect(cover).toHaveAttribute('height', '576');
+  await cover.scrollIntoViewIfNeeded();
+  await expect.poll(() => cover.evaluate((image) => ({
+    complete: (image as HTMLImageElement).complete,
+    height: (image as HTMLImageElement).naturalHeight,
+    width: (image as HTMLImageElement).naturalWidth,
+  }))).toEqual({ complete: true, height: 576, width: 1024 });
+});
+
+test('a failed Projects CasMD cover keeps its authored 16:9 geometry and card content', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/projects/');
+
+  const successfulFrame = page.locator('[data-research-project="CasMD"] .research-project-cover-frame');
+  const successfulBox = await successfulFrame.boundingBox();
+  if (!successfulBox) throw new Error('Successful CasMD cover frame did not render');
+
+  const failedPage = await page.context().newPage();
+  await failedPage.setViewportSize({ width: 1280, height: 900 });
+  await failedPage.emulateMedia({ reducedMotion: 'reduce' });
+  await failedPage.route('**/stitch/casmd-cartoon.png', (route) => route.abort('failed'));
+  await failedPage.goto('/projects/', { waitUntil: 'networkidle' });
+
+  const card = failedPage.locator('[data-research-project="CasMD"]');
+  const frame = card.locator('.research-project-cover-frame');
+  const box = await frame.boundingBox();
+  if (!box) throw new Error('Failed CasMD cover frame did not render');
+  expect(box.width).toBeCloseTo(successfulBox.width, 1);
+  expect(box.height).toBeCloseTo(successfulBox.height, 1);
+  await expect(card.locator('h3')).toHaveText('CasMD');
+  await expect(card.locator('.research-project-descriptions')).toBeVisible();
+  await expect(card.locator('.research-project-actions')).toBeVisible();
+  await failedPage.close();
 });
 
 test('contact is a high-contrast ink poster with accessible accent interactions at desktop and mobile', async ({ page }) => {

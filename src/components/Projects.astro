@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { getGithubProjects, partitionGithubProjects } from '../data/github-projects';
 import { HOME_VIBE_TITLES, selectByTitles } from '../data/home';
+import { CASMD_COVER } from '../data/project-media';
 import GithubProjectCard from './GithubProjectCard.astro';
 import ResearchProjectCard from './ResearchProjectCard.astro';
 import Section from './Section.astro';
@@ -20,7 +21,12 @@ const vibeRoles = ['singularity', 'medit', 'yaos', 'zen'] as const;
   <section class="project-group" aria-labelledby="research-projects-heading">
     <h3 id="research-projects-heading" class="project-group-title"><T en="Research" zh="研究项目" /></h3>
     <div class="project-board project-board--research">
-      {research.map((project) => <ResearchProjectCard project={project} />)}
+      {research.map((project) => (
+        <ResearchProjectCard
+          project={project}
+          image={project.name === 'CasMD' ? CASMD_COVER : undefined}
+        />
+      ))}
     </div>
   </section>
 
@@ -39,7 +45,7 @@ const vibeRoles = ['singularity', 'medit', 'yaos', 'zen'] as const;
   </section>
 
   <section class="project-group" aria-labelledby="more-projects-heading">
-    <h3 id="more-projects-heading" class="project-group-title"><T en="More" zh="更多项目" /></h3>
+    <h3 id="more-projects-heading" class="project-group-title"><T en="More from GitHub" zh="更多 GitHub 项目" /></h3>
     <div class="project-board project-board--more">
       {more.map((project) => <GithubProjectCard project={project} />)}
     </div>

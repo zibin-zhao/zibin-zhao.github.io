@@ -30,6 +30,7 @@ describe('GitHub project surfaces', () => {
     }
     const research = read('src/components/StitchResearchProjects.astro');
     const vibe = read('src/components/StitchVibe.astro');
+    const media = read('src/data/project-media.ts');
     expect(fallbackProjects.map(({ name }) => name)).toEqual([
       'CasMD',
       'TEMPO',
@@ -44,7 +45,12 @@ describe('GitHub project surfaces', () => {
     expect(research).toContain("!['CasMD', 'TEMPO'].includes(project.name)");
     expect(research.indexOf('project={casmd}')).toBeLessThan(research.indexOf('project={tempo}'));
     expect(research.indexOf('project={tempo}')).toBeLessThan(research.indexOf('remaining.map((project)'));
-    expect(research).toContain("src: '/stitch/casmd-cartoon.png'");
+    expect(media).toContain("src: '/stitch/casmd-cartoon.png'");
+    expect(media).toContain("alt: 'Hand-drawn CasMD molecular dynamics illustration of a protein–nucleic acid complex'");
+    expect(media).toContain('width: 1024');
+    expect(media).toContain('height: 576');
+    expect(research).toContain("import { CASMD_COVER } from '../data/project-media'");
+    expect(research).toContain('project={casmd} image={CASMD_COVER}');
     expect(research).not.toContain("src: '/stitch/casmd.png'");
     expect(vibe).toContain("const singularityImage = '/stitch/singularity-cartoon.png'");
     expect(vibe).not.toContain("const singularityImage = '/stitch/singularity.png'");
@@ -57,7 +63,10 @@ describe('GitHub project surfaces', () => {
     expect(projects).toContain('const { research, more } = partitionGithubProjects(githubProjects)');
     expect(projects).toContain('HOME_VIBE_TITLES');
     expect(projects).toContain("getCollection('vibe')");
-    expect(projects).toContain('research.map((project) => <ResearchProjectCard project={project} />)');
+    expect(projects).toContain("import { CASMD_COVER } from '../data/project-media'");
+    expect(projects).toContain(
+      "image={project.name === 'CasMD' ? CASMD_COVER : undefined}",
+    );
     expect(projects).toContain('vibeProjects.map((item, index) =>');
     expect(projects).toContain(
       "image={item.title === 'Singularity' ? '/stitch/singularity-cartoon.png' : undefined}",
@@ -70,7 +79,7 @@ describe('GitHub project surfaces', () => {
     for (const heading of [
       '<T en="Research" zh="研究项目" />',
       '<T en="Vibe" zh="随性实验" />',
-      '<T en="More" zh="更多项目" />',
+      '<T en="More from GitHub" zh="更多 GitHub 项目" />',
     ]) expect(projects).toContain(heading);
   });
 
@@ -84,8 +93,9 @@ describe('GitHub project surfaces', () => {
     expect(card).toContain('image &&');
     expect(card).toContain('src={image.src}');
     expect(card).toContain('alt={image.alt}');
-    expect(card).toContain('width="1024"');
-    expect(card).toContain('height="576"');
+    expect(card).toContain('width={image.width}');
+    expect(card).toContain('height={image.height}');
+    expect(card).toContain('research-project-cover-frame');
     expect(card).toContain('<p class="t-en">{project.description}</p>');
     expect(card).toContain('<p class="t-zh">{project.descriptionZh}</p>');
     expect(card).toContain('project.stack.slice(0, 3).map((technology)');
@@ -96,6 +106,14 @@ describe('GitHub project surfaces', () => {
     expect(card).toContain('target="_blank"');
     expect(card).toContain('rel="noopener noreferrer"');
     expect(card).toMatch(/\.research-project-action\s*\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px;/);
+  });
+
+  it('authors an illustration-specific alt for the Singularity cartoon', () => {
+    const card = read('src/components/StitchVibeCard.astro');
+
+    expect(card).toContain("role === 'singularity'");
+    expect(card).toContain('Hand-drawn particle and black-hole illustration for Singularity');
+    expect(card).not.toContain('project interface preview');
   });
 
   it('keeps separate GitHub and live-demo actions for authored Vibe projects', () => {

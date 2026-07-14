@@ -163,7 +163,7 @@ test('renders canonical Vibe content, assets, and action semantics', async ({ pa
   await expect(cards.locator('.vibe-description .t-zh')).toHaveCount(4);
   const cover = cards.nth(0).locator('img');
   await expect(cover).toHaveAttribute('src', '/stitch/singularity-cartoon.png');
-  await expect(cover).toHaveAttribute('alt', 'Singularity project interface preview');
+  await expect(cover).toHaveAttribute('alt', 'Hand-drawn particle and black-hole illustration for Singularity');
   await cover.scrollIntoViewIfNeeded();
   await expect.poll(() => cover.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(1024);
   await expect(cards.locator('.vibe-image')).toHaveCount(1);

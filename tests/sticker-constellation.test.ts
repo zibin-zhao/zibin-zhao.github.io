@@ -33,7 +33,8 @@ describe('homepage path badges', () => {
 
     const visualLayer = component.match(/<div\b[^>]*data-path-badges[^>]*>[\s\S]*?<\/div>/)?.[0] ?? '';
     expect(visualLayer).toContain('aria-hidden="true"');
-    expect(visualLayer).toMatch(/<img\b[^>]*data-path-badge/);
+    expect(visualLayer).toMatch(/<span\b[^>]*data-path-badge/);
+    expect(visualLayer).toMatch(/<img\b[^>]*class="path-badge-image"/);
     expect(visualLayer).toContain('alt=""');
     expect(visualLayer).toContain('width="768"');
     expect(visualLayer).toContain('height="768"');
@@ -59,6 +60,17 @@ describe('homepage path badges', () => {
     expect(component).toMatch(/\.path-badges\s*\{[^}]*position:\s*fixed;[^}]*z-index:\s*[1-9];[^}]*pointer-events:\s*none;/);
     const responsiveRules = component.slice(component.indexOf('@media (max-width: 700px)'));
     expect(responsiveRules).not.toMatch(/\[data-guide='(?:left|right)'\]/);
+  });
+
+  it('clips every motion wrapper to its guide with a cream paper tab behind the image', () => {
+    const component = read('src/components/PathBadges.astro');
+
+    expect(component).toMatch(/\.path-badge::before\s*\{[^}]*content:\s*'';[^}]*position:\s*absolute;[^}]*background:\s*var\(--surface\);/);
+    expect(component).toMatch(/\[data-guide='left'\]::before\s*\{[^}]*right:\s*-/);
+    expect(component).toMatch(/\[data-guide='right'\]::before\s*\{[^}]*left:\s*-/);
+    expect(component).toMatch(/\.path-badge-image\s*\{[^}]*position:\s*relative;[^}]*z-index:\s*1;/);
+    expect(component).toMatch(/\.path-badge\s*\{[^}]*transition:\s*opacity\s+220ms\s+ease,\s*transform\s+280ms\s+ease;/);
+    expect(component).not.toMatch(/transition:\s*[^;]*(?:top|left|right|width|height|filter)/);
   });
 
   it('keeps one bilingual interest list available without visible badge copy', () => {
@@ -101,6 +113,7 @@ describe('homepage path badges', () => {
     expect(script).toMatch(/document\.documentElement\.scrollHeight\s*-\s*window\.innerHeight/);
     expect(script).toMatch(/window\.innerWidth\s*<=\s*700\s*\?\s*1\s*:\s*2/);
     expect(script).toContain("badge.dataset.visible = visible.has(badge) ? 'true' : 'false'");
+    expect(script).toContain("querySelectorAll<HTMLElement>('[data-path-badge]')");
     expect(script).toMatch(/Math\.abs\(\w+\.center\s*-\s*progress\)/);
 
     const reducedRules = component.slice(component.indexOf('@media (prefers-reduced-motion: reduce)'));

@@ -1,13 +1,11 @@
 ---
 import type { GithubProject } from '../data/github-projects';
+import type { ProjectCover } from '../data/project-media';
 import T from './T.astro';
 
 interface Props {
   project: GithubProject;
-  image?: {
-    src: string;
-    alt: string;
-  };
+  image?: ProjectCover;
 }
 
 const { project, image } = Astro.props;
@@ -19,15 +17,20 @@ const { project, image } = Astro.props;
   data-featured={project.featured}
 >
   {image && (
-    <img
-      class="research-project-cover"
-      src={image.src}
-      alt={image.alt}
-      width="1024"
-      height="576"
-      loading="lazy"
-      decoding="async"
-    />
+    <div
+      class="research-project-cover-frame"
+      style={`--cover-ratio: ${image.width} / ${image.height};`}
+    >
+      <img
+        class="research-project-cover"
+        src={image.src}
+        alt={image.alt}
+        width={image.width}
+        height={image.height}
+        loading="lazy"
+        decoding="async"
+      />
+    </div>
   )}
 
   <div class="research-project-body">
@@ -78,12 +81,18 @@ const { project, image } = Astro.props;
 
   .research-project-card[data-featured='true'] { box-shadow: 7px 7px 0 var(--orange); }
 
+  .research-project-cover-frame {
+    width: 100%;
+    aspect-ratio: var(--cover-ratio);
+    overflow: hidden;
+    border-bottom: var(--stroke);
+    background: var(--surface-low);
+  }
+
   .research-project-cover {
     display: block;
     width: 100%;
-    aspect-ratio: 16 / 9;
-    border-bottom: var(--stroke);
-    background: var(--surface-low);
+    height: 100%;
     object-fit: cover;
   }
 

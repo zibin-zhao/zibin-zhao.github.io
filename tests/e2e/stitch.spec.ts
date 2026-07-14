@@ -674,8 +674,8 @@ test('canonical homepage keeps readable tablet project regions and authored anch
     };
   });
 
-  expect(geometry.documentHeight).toBeGreaterThanOrEqual(4_400);
-  expect(geometry.documentHeight).toBeLessThanOrEqual(4_500);
+  expect(geometry.documentHeight).toBeGreaterThanOrEqual(4_180);
+  expect(geometry.documentHeight).toBeLessThanOrEqual(4_240);
   expect(geometry.hero.bottom).toBeGreaterThanOrEqual(740);
   expect(geometry.hero.bottom).toBeLessThanOrEqual(800);
   expect(geometry.research.top).toBeGreaterThanOrEqual(790);
@@ -1076,8 +1076,8 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
 
   if (testInfo.project.name === 'canonical-768') {
     const canonicalHeight = await captureFull('home-768-full.png');
-    expect(canonicalHeight).toBeGreaterThanOrEqual(4_400);
-    expect(canonicalHeight).toBeLessThanOrEqual(4_500);
+    expect(canonicalHeight).toBeGreaterThanOrEqual(4_180);
+    expect(canonicalHeight).toBeLessThanOrEqual(4_240);
     await captureSection('research-768.png', page.locator('#research'), {
       bottom: page.locator('.pub-card--3'),
       capBefore: page.locator('#research-projects'),

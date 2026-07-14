@@ -1,5 +1,6 @@
 ---
 import { getGithubProjects, partitionGithubProjects } from '../data/github-projects';
+import { CASMD_COVER } from '../data/project-media';
 import ResearchProjectCard from './ResearchProjectCard.astro';
 import T from './T.astro';
 
@@ -8,10 +9,6 @@ const { research } = partitionGithubProjects(githubProjects);
 const casmd = research.find(({ name }) => name === 'CasMD');
 const tempo = research.find(({ name }) => name === 'TEMPO');
 const remaining = research.filter((project) => !['CasMD', 'TEMPO'].includes(project.name));
-const casmdImage = {
-  src: '/stitch/casmd-cartoon.png',
-  alt: 'CasMD molecular dynamics research project illustration',
-};
 ---
 
 <section class="stitch-research-projects" id="research-projects" aria-labelledby="research-projects-title">
@@ -21,7 +18,7 @@ const casmdImage = {
   </header>
 
   <div class="research-projects-grid">
-    {casmd && <ResearchProjectCard project={casmd} image={casmdImage} />}
+    {casmd && <ResearchProjectCard project={casmd} image={CASMD_COVER} />}
     {tempo && <ResearchProjectCard project={tempo} />}
     {remaining.map((project) => <ResearchProjectCard project={project} />)}
   </div>
