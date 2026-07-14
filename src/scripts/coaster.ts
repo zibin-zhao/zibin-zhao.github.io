@@ -1,9 +1,9 @@
 import {
   coasterConfigForWidth,
+  coasterMotionProgress,
   pointAtProgress,
   sampleVerticalSCurve,
   trainPointsAtProgress,
-  wrapProgress,
   type CoasterConfiguration,
   type CoasterPathSample,
 } from '../lib/coaster-path';
@@ -144,7 +144,7 @@ const createController = (canvas: HTMLCanvasElement): Cleanup | undefined => {
     trainPointsAtProgress(pathSamples, progress, configuration).forEach(drawCar);
   };
 
-  const currentProgress = () => wrapProgress(elapsedMotionTime / LOOP_DURATION_MS);
+  const currentProgress = () => coasterMotionProgress(elapsedMotionTime / LOOP_DURATION_MS);
 
   const cancelFrame = () => {
     if (frameId !== null) {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   coasterConfigForWidth,
+  coasterMotionProgress,
   pointAtProgress,
   sampleVerticalSCurve,
   trainPointsAtProgress,
@@ -60,5 +61,48 @@ describe('roller-coaster path geometry', () => {
     expect(desktop.trackOpacity).toBeCloseTo(.12);
     expect(mobile.trainSpan).toBeCloseTo(.07);
     expect(desktop.trainSpan).toBeCloseTo(.12);
+  });
+});
+
+describe('roller-coaster motion timing', () => {
+  const sampleCount = 2_000;
+  const sampleStep = 1 / sampleCount;
+  const progressSamples = Array.from(
+    { length: sampleCount },
+    (_, index) => coasterMotionProgress(index * sampleStep),
+  );
+  const sampledSpeeds = progressSamples.map((progress, index) => {
+    const nextProgress = index === sampleCount - 1
+      ? 1 + coasterMotionProgress(1)
+      : progressSamples[index + 1];
+    return (nextProgress - progress) / sampleStep;
+  });
+
+  it('stays wrapped and moves strictly forward within each cycle', () => {
+    for (const progress of progressSamples) {
+      expect(progress).toBeGreaterThanOrEqual(0);
+      expect(progress).toBeLessThan(1);
+    }
+    for (let index = 1; index < progressSamples.length; index += 1) {
+      expect(progressSamples[index]).toBeGreaterThan(progressSamples[index - 1]);
+    }
+  });
+
+  it('joins position and speed continuously at the loop boundary', () => {
+    const speedAfterBoundary = sampledSpeeds[0];
+    const speedBeforeBoundary = sampledSpeeds.at(-1);
+
+    expect(coasterMotionProgress(1)).toBeCloseTo(coasterMotionProgress(0), 12);
+    expect(speedBeforeBoundary).toBeDefined();
+    expect(speedBeforeBoundary).toBeCloseTo(speedAfterBoundary, 2);
+  });
+
+  it('varies visibly while retaining positive forward speed', () => {
+    const minimumSpeed = Math.min(...sampledSpeeds);
+    const maximumSpeed = Math.max(...sampledSpeeds);
+
+    expect(minimumSpeed).toBeGreaterThan(.45);
+    expect(maximumSpeed).toBeGreaterThan(1.6);
+    expect(maximumSpeed - minimumSpeed).toBeGreaterThan(.8);
   });
 });

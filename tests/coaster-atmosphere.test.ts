@@ -68,6 +68,15 @@ describe('roller-coaster atmosphere contract', () => {
     expect(controller).not.toContain('frame(0)');
   });
 
+  it('maps elapsed loop time through the physical motion timing curve', () => {
+    const controller = read(controllerPath);
+
+    expect(controller).toContain('coasterMotionProgress,');
+    expect(controller).toContain(
+      'const currentProgress = () => coasterMotionProgress(elapsedMotionTime / LOOP_DURATION_MS);',
+    );
+  });
+
   it('parks under reduced motion without requesting an animation frame', () => {
     const controller = read(controllerPath);
     const reducedBranch = controller.slice(

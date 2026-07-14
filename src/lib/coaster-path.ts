@@ -36,6 +36,19 @@ export const wrapProgress = (progress: number): number => (
   ((progress % 1) + 1) % 1
 );
 
+const TAU = Math.PI * 2;
+const PRIMARY_SWING = .45;
+const SECONDARY_SWING = .3;
+const SECONDARY_PHASE = 4.2;
+
+export const coasterMotionProgress = (linearProgress: number): number => {
+  const time = wrapProgress(linearProgress);
+  const primary = -(PRIMARY_SWING / TAU) * (Math.cos(TAU * time) - 1);
+  const secondary = -(SECONDARY_SWING / (TAU * 2))
+    * (Math.cos((TAU * 2 * time) + SECONDARY_PHASE) - Math.cos(SECONDARY_PHASE));
+  return time + primary + secondary;
+};
+
 export const sampleVerticalSCurve = (
   width: number,
   height: number,
