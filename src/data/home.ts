@@ -5,7 +5,6 @@ export const HOME_RESEARCH_TITLES = [
 ] as const;
 
 export const HOME_VIBE_TITLES = [
-  'CasMD',
   'Singularity',
   'Medit',
   'Yaos',

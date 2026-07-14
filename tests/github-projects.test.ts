@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import fallbackProjects from '../src/data/github-projects.fallback.json';
-import { getGithubProjects } from '../src/data/github-projects';
+import { getGithubProjects, partitionGithubProjects } from '../src/data/github-projects';
 
 interface RepositoryFixture {
   name: string;
@@ -57,6 +57,54 @@ const fetchStub = (
 }) as unknown as typeof globalThis.fetch;
 
 describe('getGithubProjects', () => {
+  it('assigns the curated editorial categories to fallback projects', () => {
+    expect(Object.fromEntries(fallbackProjects.map(({ name, category }) => [name, category])))
+      .toEqual({
+        CasMD: 'research',
+        TEMPO: 'research',
+        'DL-SELEX': 'research',
+        Cembra_AI: 'research',
+        'DL-SELEX-web-explain': 'research',
+        ECG_analysing_app: 'research',
+        Yaos: 'vibe',
+      });
+  });
+
+  it('normalizes curated categories, defaults future repositories to more, and partitions projects', async () => {
+    const projects = await getGithubProjects({
+      fetch: fetchStub([
+        repository('ECG_analysing_app'),
+        repository('FutureLab', { updated_at: '2027-01-01T00:00:00Z' }),
+        repository('DL-SELEX-web-explain'),
+        repository('Cembra_AI'),
+        repository('Yaos'),
+        repository('DL-SELEX'),
+        repository('TEMPO'),
+        repository('CasMD'),
+      ]),
+    });
+
+    expect(Object.fromEntries(projects.map(({ name, category }) => [name, category])))
+      .toEqual({
+        CasMD: 'research',
+        TEMPO: 'research',
+        'DL-SELEX': 'research',
+        FutureLab: 'more',
+        ECG_analysing_app: 'research',
+        'DL-SELEX-web-explain': 'research',
+        Cembra_AI: 'research',
+        Yaos: 'vibe',
+      });
+
+    const partitioned = partitionGithubProjects(projects);
+    expect(partitioned.research.slice(0, 3).map(({ name }) => name)).toEqual([
+      'CasMD',
+      'TEMPO',
+      'DL-SELEX',
+    ]);
+    expect(partitioned.more.map(({ name }) => name)).toEqual(['FutureLab']);
+  });
+
   it('memoizes one promise and one GitHub transaction for default build-time calls', async () => {
     const requests: string[] = [];
     const defaultFetch = vi.fn(async (input: string | URL | Request) => {
@@ -220,10 +268,10 @@ describe('getGithubProjects', () => {
 
     expect(projects.map(({ name }) => name)).toEqual([
       'CasMD',
+      'TEMPO',
       'DL-SELEX',
       'Yaos',
       'FutureLab',
-      'TEMPO',
     ]);
   });
 

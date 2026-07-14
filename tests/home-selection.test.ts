@@ -31,6 +31,7 @@ describe('selectByTitles', () => {
   });
 
   it('fixes canonical Vibe order', () => {
-    expect(HOME_VIBE_TITLES).toEqual(['CasMD', 'Singularity', 'Medit', 'Yaos', 'Zen']);
+    expect(HOME_VIBE_TITLES).toEqual(['Singularity', 'Medit', 'Yaos', 'Zen']);
+    expect(HOME_VIBE_TITLES).not.toContain('CasMD');
   });
 });

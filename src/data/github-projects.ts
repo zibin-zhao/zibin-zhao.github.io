@@ -1,6 +1,8 @@
 import fallbackSnapshot from './github-projects.fallback.json';
 import process from 'node:process';
 
+export type ProjectCategory = 'research' | 'vibe' | 'more';
+
 export interface GithubProject {
   name: string;
   description: string;
@@ -10,6 +12,7 @@ export interface GithubProject {
   stack: string[];
   updatedAt: string;
   featured: boolean;
+  category: ProjectCategory;
 }
 
 interface GithubRepository {
@@ -31,8 +34,8 @@ const REQUEST_TIMEOUT_MS = 8_000;
 const REPOSITORIES_PER_PAGE = 100;
 const MAX_REPOSITORY_PAGES = 100;
 const EXCLUDED_REPOSITORIES = new Set(['zibin-zhao.github.io', 'handle_mutation']);
-const FEATURED_ORDER = ['CasMD', 'DL-SELEX', 'Yaos'] as const;
-const fallbackProjects: GithubProject[] = fallbackSnapshot;
+const FEATURED_ORDER = ['CasMD', 'TEMPO', 'DL-SELEX'] as const;
+const fallbackProjects = fallbackSnapshot as GithubProject[];
 const curatedProjects = new Map(fallbackProjects.map((project) => [project.name, project]));
 let defaultProjectsPromise: Promise<GithubProject[]> | undefined;
 
@@ -208,6 +211,7 @@ const normalizeRepository = (
     stack: normalizedStack(repository, languages),
     updatedAt: repository.updatedAt,
     featured: curated?.featured ?? false,
+    category: curated?.category ?? 'more',
   };
   const demoUrl = repository.demoUrl ?? curated?.demoUrl;
   if (demoUrl) project.demoUrl = demoUrl;
@@ -219,16 +223,19 @@ const sortProjects = (projects: GithubProject[]): GithubProject[] => {
     FEATURED_ORDER.map((name, index) => [name, index]),
   );
   return projects.sort((left, right) => {
+    const featuredOrder = (featuredRank.get(left.name) ?? Number.MAX_SAFE_INTEGER)
+      - (featuredRank.get(right.name) ?? Number.MAX_SAFE_INTEGER);
+    if (featuredOrder !== 0) return featuredOrder;
     if (left.featured !== right.featured) return left.featured ? -1 : 1;
-    if (left.featured && right.featured) {
-      const order = (featuredRank.get(left.name) ?? Number.MAX_SAFE_INTEGER)
-        - (featuredRank.get(right.name) ?? Number.MAX_SAFE_INTEGER);
-      if (order !== 0) return order;
-    }
     return Date.parse(right.updatedAt) - Date.parse(left.updatedAt)
       || left.name.localeCompare(right.name);
   });
 };
+
+export const partitionGithubProjects = (projects: readonly GithubProject[]) => ({
+  research: projects.filter(({ category }) => category === 'research'),
+  more: projects.filter(({ category }) => category === 'more'),
+});
 
 interface GithubProjectsOptions {
   fetch?: typeof globalThis.fetch;

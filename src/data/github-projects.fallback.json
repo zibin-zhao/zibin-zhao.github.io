@@ -7,7 +7,8 @@
     "demoUrl": "https://huggingface.co/spaces/zzhaobz/HsingMD",
     "stack": ["Python", "HTML", "Shell"],
     "updatedAt": "2026-07-06T07:14:00Z",
-    "featured": true
+    "featured": true,
+    "category": "research"
   },
   {
     "name": "DL-SELEX",
@@ -16,7 +17,8 @@
     "githubUrl": "https://github.com/zibin-zhao/DL-SELEX",
     "stack": ["Python", "Jupyter Notebook", "Dockerfile"],
     "updatedAt": "2025-11-05T04:19:16Z",
-    "featured": true
+    "featured": true,
+    "category": "research"
   },
   {
     "name": "Yaos",
@@ -26,7 +28,8 @@
     "demoUrl": "https://zibin-zhao.github.io/Yaos/",
     "stack": ["JavaScript", "CSS", "HTML"],
     "updatedAt": "2026-05-16T09:31:00Z",
-    "featured": true
+    "featured": true,
+    "category": "vibe"
   },
   {
     "name": "TEMPO",
@@ -35,7 +38,8 @@
     "githubUrl": "https://github.com/zibin-zhao/TEMPO",
     "stack": ["JavaScript", "Vue", "Python"],
     "updatedAt": "2026-06-16T05:37:35Z",
-    "featured": false
+    "featured": false,
+    "category": "research"
   },
   {
     "name": "Cembra_AI",
@@ -44,7 +48,8 @@
     "githubUrl": "https://github.com/zibin-zhao/Cembra_AI",
     "stack": ["Python", "Shell", "Dockerfile"],
     "updatedAt": "2026-03-13T12:47:53Z",
-    "featured": false
+    "featured": false,
+    "category": "research"
   },
   {
     "name": "DL-SELEX-web-explain",
@@ -53,7 +58,8 @@
     "githubUrl": "https://github.com/zibin-zhao/DL-SELEX-web-explain",
     "stack": ["TypeScript", "HTML"],
     "updatedAt": "2025-12-22T00:29:01Z",
-    "featured": false
+    "featured": false,
+    "category": "research"
   },
   {
     "name": "ECG_analysing_app",
@@ -62,6 +68,7 @@
     "githubUrl": "https://github.com/zibin-zhao/ECG_analysing_app",
     "stack": ["Python"],
     "updatedAt": "2025-06-05T11:07:09Z",
-    "featured": false
+    "featured": false,
+    "category": "research"
   }
 ]
