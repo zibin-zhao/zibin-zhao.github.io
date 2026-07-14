@@ -28,6 +28,7 @@ describe('playful researcher refinement', () => {
     const about = read('src/components/About.astro');
     const profile = read('src/data/profile.ts');
     const base = read('src/layouts/Base.astro');
+    const ogTemplate = read('tools/og-template.html');
     const approvedEnglishStory = 'I keep making things because apparently leaving an idea alone is not one of my skills. Some are useful, some are gloriously unnecessary, and most begin with “what if?” I like trains, games, design, AI, biology, and the strange places where they crash into each other. Somewhere along the way, curiosity accidentally turned into doing a PhD at HKUST. I still learn the same way: build it, break it, make notes, try again.';
 
     expect(about).toContain('CURIOSITY FILE / ACTIVE');
@@ -43,8 +44,9 @@ describe('playful researcher refinement', () => {
     expect(base).toContain("jobTitle: 'PhD Researcher in Bioengineering'");
     expect(base).toMatch(/AI[\s\S]*biology|biology[\s\S]*AI/i);
     expect(base).toMatch(/molecular diagnostics/i);
+    expect(ogTemplate).toContain('PhD researcher @ HKUST');
 
-    for (const source of [about, profile, base]) {
+    for (const source of [about, profile, base, ogTemplate]) {
       expect(source).not.toMatch(/PhD candidate/i);
     }
   });
