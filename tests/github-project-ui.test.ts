@@ -59,6 +59,10 @@ describe('GitHub project surfaces', () => {
     expect(projects).toContain("getCollection('vibe')");
     expect(projects).toContain('research.map((project) => <ResearchProjectCard project={project} />)');
     expect(projects).toContain('vibeProjects.map((item, index) =>');
+    expect(projects).toContain(
+      "image={item.title === 'Singularity' ? '/stitch/singularity-cartoon.png' : undefined}",
+    );
+    expect(projects).not.toContain("'/stitch/singularity.png'");
     expect(projects).toContain('more.map((project) => <GithubProjectCard project={project} />)');
     expect(projects).not.toContain('githubProjects.map(');
     expect(projects).not.toMatch(/getCollection\(['"]projects['"]\)/);

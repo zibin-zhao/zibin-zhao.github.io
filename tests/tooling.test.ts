@@ -6,6 +6,40 @@ const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
 const readBytes = (path: string) => readFileSync(new URL(path, root));
 const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
+const readPngMetadata = (path: string) => {
+  const bytes = readBytes(path);
+  if (bytes.byteLength < 33 || !bytes.subarray(0, pngSignature.byteLength).equals(pngSignature)) {
+    throw new Error(`${path} is not a valid PNG`);
+  }
+  if (bytes.readUInt32BE(8) !== 13 || bytes.toString('ascii', 12, 16) !== 'IHDR') {
+    throw new Error(`${path} does not start with a valid IHDR chunk`);
+  }
+
+  let offset = pngSignature.byteLength;
+  let hasTransparencyChunk = false;
+  let reachedEnd = false;
+  while (offset + 12 <= bytes.byteLength) {
+    const dataLength = bytes.readUInt32BE(offset);
+    const chunkEnd = offset + 12 + dataLength;
+    if (chunkEnd > bytes.byteLength) throw new Error(`${path} contains a truncated PNG chunk`);
+    const chunkType = bytes.toString('ascii', offset + 4, offset + 8);
+    hasTransparencyChunk ||= chunkType === 'tRNS';
+    if (chunkType === 'IEND') {
+      reachedEnd = true;
+      break;
+    }
+    offset = chunkEnd;
+  }
+  if (!reachedEnd) throw new Error(`${path} does not contain an IEND chunk`);
+
+  const colorType = bytes[25];
+  return {
+    width: bytes.readUInt32BE(16),
+    height: bytes.readUInt32BE(20),
+    opaque: colorType !== 4 && colorType !== 6 && !hasTransparencyChunk,
+  };
+};
+
 describe('production quality gates', () => {
   it('defines all verification scripts', () => {
     const pkg = JSON.parse(read('package.json'));
@@ -68,5 +102,13 @@ describe('production quality gates', () => {
     expect(bytes.byteLength).toBeGreaterThan(pngSignature.byteLength);
     expect(bytes.subarray(0, pngSignature.byteLength)).toEqual(pngSignature);
     expect(read('public/stitch/ASSETS.md')).toContain(label);
+  });
+
+  it.each([
+    ['casmd-cartoon.png', 1024, 576],
+    ['singularity-cartoon.png', 1024, 768],
+  ])('keeps %s at its exact opaque cover contract', (file, width, height) => {
+    expect(readPngMetadata(`public/stitch/${file}`)).toEqual({ width, height, opaque: true });
+    expect(read('public/stitch/ASSETS.md')).toContain(`| \`/stitch/${file}\` |`);
   });
 });

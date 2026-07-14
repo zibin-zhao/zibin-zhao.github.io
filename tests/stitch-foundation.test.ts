@@ -102,8 +102,8 @@ describe('Stitch shell', () => {
   it('uses local image-led Vibe assets with explicit intrinsic dimensions and fallbacks', () => {
     const vibe = read('src/components/StitchVibe.astro');
     const card = read('src/components/StitchVibeCard.astro');
-    expect(existsSync(new URL('public/stitch/singularity.png', root))).toBe(true);
-    expect(vibe).toContain("const singularityImage = '/stitch/singularity.png'");
+    expect(existsSync(new URL('public/stitch/singularity-cartoon.png', root))).toBe(true);
+    expect(vibe).toContain("const singularityImage = '/stitch/singularity-cartoon.png'");
     expect(card).toContain('width="512"');
     expect(card).toContain('height="384"');
     expect(card).toContain('onerror=');
