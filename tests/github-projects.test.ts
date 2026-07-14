@@ -333,12 +333,24 @@ describe('getGithubProjects', () => {
     expect(projects).toEqual(fallbackProjects);
     expect(projects.map(({ name }) => name)).toEqual([
       'CasMD',
+      'TEMPO',
       'DL-SELEX',
       'Yaos',
-      'TEMPO',
       'Cembra_AI',
       'DL-SELEX-web-explain',
       'ECG_analysing_app',
+    ]);
+  });
+
+  it('keeps fallback research projects in editorial order', async () => {
+    const failingFetch = vi.fn(async () => jsonResponse({ message: 'rate limited' }, 403)) as unknown as typeof globalThis.fetch;
+
+    const projects = await getGithubProjects({ fetch: failingFetch });
+
+    expect(partitionGithubProjects(projects).research.slice(0, 3).map(({ name }) => name)).toEqual([
+      'CasMD',
+      'TEMPO',
+      'DL-SELEX',
     ]);
   });
 

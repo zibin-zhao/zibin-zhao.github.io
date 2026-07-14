@@ -11,6 +11,16 @@
     "category": "research"
   },
   {
+    "name": "TEMPO",
+    "description": "Supplementary toolkit for one-pot CRISPR molecular diagnostics.",
+    "descriptionZh": "一锅式 CRISPR 分子诊断的配套工具包。",
+    "githubUrl": "https://github.com/zibin-zhao/TEMPO",
+    "stack": ["JavaScript", "Vue", "Python"],
+    "updatedAt": "2026-06-16T05:37:35Z",
+    "featured": false,
+    "category": "research"
+  },
+  {
     "name": "DL-SELEX",
     "description": "Structure-enhanced deep learning for aptamer selection.",
     "descriptionZh": "结构增强的深度学习，用于适体筛选。",
@@ -30,16 +40,6 @@
     "updatedAt": "2026-05-16T09:31:00Z",
     "featured": true,
     "category": "vibe"
-  },
-  {
-    "name": "TEMPO",
-    "description": "Supplementary toolkit for one-pot CRISPR molecular diagnostics.",
-    "descriptionZh": "一锅式 CRISPR 分子诊断的配套工具包。",
-    "githubUrl": "https://github.com/zibin-zhao/TEMPO",
-    "stack": ["JavaScript", "Vue", "Python"],
-    "updatedAt": "2026-06-16T05:37:35Z",
-    "featured": false,
-    "category": "research"
   },
   {
     "name": "Cembra_AI",
