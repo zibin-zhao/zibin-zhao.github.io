@@ -41,44 +41,39 @@ test('keeps the language hit target accessible without colliding at 390px', asyn
   expect(talkBox.x + talkBox.width).toBeLessThanOrEqual(390);
 });
 
-test('sticker constellation keeps useful alternatives and switches every physical caption', async ({ page }) => {
+test('keeps one bilingual interest list available without exposing decorative badge copy', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
 
-  const constellation = page.locator('[data-sticker-constellation]');
-  await expect(constellation).toHaveAttribute('aria-label', /Personal interests and creative practices/);
-  await expect(constellation.locator('figure')).toHaveCount(7);
-  await expect(constellation.locator('img')).toHaveCount(7);
+  const badgeLayer = page.locator('[data-path-badges]');
+  const interestList = page.locator('ul.sr-only[aria-label="Personal interests / 个人兴趣"]');
+  await expect(badgeLayer).toHaveAttribute('aria-hidden', 'true');
+  await expect(badgeLayer.locator('[data-path-badge]')).toHaveCount(7);
+  await expect(badgeLayer.locator('img[alt=""]')).toHaveCount(7);
+  await expect(badgeLayer.locator('figcaption, [class*="caption"], [class*="label"]')).toHaveCount(0);
+  await expect(interestList).toHaveCount(1);
+  expect(await interestList.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const box = element.getBoundingClientRect();
+    return {
+      height: box.height,
+      overflow: style.overflow,
+      position: style.position,
+      width: box.width,
+    };
+  })).toEqual({ height: 1, overflow: 'hidden', position: 'absolute', width: 1 });
+  await expect(interestList.locator('li')).toHaveText([
+    'DNA and AI / DNA 与 AI',
+    'Music / 音乐',
+    'Chinese calligraphy / 中国书法',
+    'Reading / 阅读',
+    'Psychology / 心理学',
+    'Meditation and Buddhism / 冥想与佛学',
+    'Coding experiments / 编程实验',
+  ]);
   await expect(page.getByRole('heading', { name: /Beyond the lab/i })).toHaveCount(0);
 
-  const alternatives = await constellation.locator('img').evaluateAll((images) =>
-    images.map((image) => image.getAttribute('alt') ?? ''),
-  );
-  expect(new Set(alternatives).size).toBe(7);
-  for (const alternative of alternatives) expect(alternative.length).toBeGreaterThan(12);
-
-  const english = constellation.locator('figcaption .t-en');
-  const chinese = constellation.locator('figcaption .t-zh');
-  await expect(english).toHaveCount(7);
-  await expect(chinese).toHaveCount(7);
-  for (const caption of await english.all()) await expect(caption).toBeVisible();
-  for (const caption of await chinese.all()) await expect(caption).toBeHidden();
-  for (const name of [
-    'DNA + AI',
-    'Violin · piano · guitar · drums',
-    'Chinese calligraphy',
-    'Reading, underlining, returning',
-    'Psychology & the mind',
-    'Meditation practice',
-    'Late-night coding',
-  ]) {
-    await expect(constellation.getByRole('figure', { name, exact: true })).toHaveCount(1);
-  }
-
   await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
-  for (const caption of await english.all()) await expect(caption).toBeHidden();
-  for (const caption of await chinese.all()) await expect(caption).toBeVisible();
-  for (const name of ['DNA 与 AI', '小提琴 · 钢琴 · 吉他 · 架子鼓', '中国书法', '阅读、划线、重读', '心理学与心灵', '冥想练习', '深夜编程']) {
-    await expect(constellation.getByRole('figure', { name, exact: true })).toHaveCount(1);
-  }
-  await expect(constellation.getByText('深夜编程')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+  await expect(interestList).toHaveCount(1);
+  await expect(badgeLayer.locator('[data-path-badge]')).toHaveCount(7);
 });

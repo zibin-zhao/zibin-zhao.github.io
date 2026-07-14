@@ -83,6 +83,7 @@ describe('homepage path badges', () => {
   it('uses one scheduled frame to select at most two desktop or one mobile badge', () => {
     const scriptPath = 'src/scripts/path-badges.ts';
     const script = read(scriptPath);
+    const component = read('src/components/PathBadges.astro');
 
     expect(existsSync(new URL(scriptPath, root))).toBe(true);
     expect(script.match(/requestAnimationFrame/g) ?? []).toHaveLength(1);
@@ -93,6 +94,7 @@ describe('homepage path badges', () => {
     expect(script).toContain("addEventListener('astro:page-load'");
     expect(script).toContain("addEventListener('pagehide'");
     expect(script).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
+    expect(script).toContain("layer.dataset.motionState = reducedMotion.matches ? 'reduced' : 'running'");
     expect(script).toContain("removeEventListener('change'");
     expect(script).toContain('cancelAnimationFrame');
 
@@ -100,5 +102,24 @@ describe('homepage path badges', () => {
     expect(script).toMatch(/window\.innerWidth\s*<=\s*700\s*\?\s*1\s*:\s*2/);
     expect(script).toContain("badge.dataset.visible = visible.has(badge) ? 'true' : 'false'");
     expect(script).toMatch(/Math\.abs\(\w+\.center\s*-\s*progress\)/);
+
+    const reducedRules = component.slice(component.indexOf('@media (prefers-reduced-motion: reduce)'));
+    expect(reducedRules).toMatch(/\.path-badge\s*\{[^}]*transition:\s*none\s*!important;/);
+  });
+
+  it('removes every dead legacy constellation motion selector', () => {
+    const motionCss = read('src/styles/stitch-motion.css');
+
+    for (const selector of [
+      'sticker-idle-drift',
+      'sticker-reveal',
+      'sticker-constellation',
+      'sticker-parallax',
+      'sticker-drift',
+      'sticker-figure',
+      'sticker-image',
+    ]) {
+      expect(motionCss).not.toContain(selector);
+    }
   });
 });

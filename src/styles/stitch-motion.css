@@ -36,11 +36,6 @@
   80% { transform: skew(2deg); }
 }
 
-@keyframes sticker-idle-drift {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--sticker-angle)); }
-  50% { transform: translate3d(0, -6px, 0) rotate(var(--sticker-angle)); }
-}
-
 .animate-parallax-slow { animation: parallax-slow 20s linear infinite alternate; }
 .animate-parallax-fast { animation: parallax-fast 15s linear infinite alternate; }
 .animate-float { animation: float 6s ease-in-out infinite; }
@@ -56,37 +51,6 @@
 
 .marquee span { animation: marquee 20s linear infinite; }
 .glitch-hover:hover { animation: glitch-skew .3s cubic-bezier(.25, .46, .45, .94) both infinite; }
-
-.js .sticker-reveal {
-  opacity: 0;
-  transform: translate3d(0, 18px, 0) scale(.96);
-  transition: opacity .55s ease, transform .55s cubic-bezier(.2, .8, .2, 1);
-}
-
-.js .sticker-figure:nth-child(2n) .sticker-reveal { transition-delay: 70ms; }
-.js .sticker-figure:nth-child(3n) .sticker-reveal { transition-delay: 140ms; }
-
-.js .sticker-constellation.is-revealed .sticker-reveal {
-  opacity: 1;
-  transform: none;
-}
-
-.sticker-parallax {
-  transform: translate3d(0, calc(var(--sticker-scroll, 0px) * var(--sticker-depth)), 0);
-  will-change: transform;
-}
-
-.sticker-drift {
-  transform: rotate(var(--sticker-angle));
-  animation: sticker-idle-drift var(--sticker-duration) ease-in-out var(--sticker-delay) infinite;
-  transform-origin: center;
-  will-change: transform;
-}
-
-.sticker-figure:hover .sticker-image {
-  filter: saturate(1.06) drop-shadow(2px 3px 0 rgba(0, 51, 34, .18));
-  transform: scale(1.025);
-}
 
 .btn-primary { box-shadow: var(--resting-shadow, var(--shadow-4)); transition: box-shadow .15s ease, transform .15s ease; }
 .btn-primary:active { box-shadow: none; transform: translate(4px, 4px); }
@@ -116,18 +80,6 @@
   .glitch-hover:hover {
     animation: none !important;
   }
-
-  .sticker-reveal,
-  .sticker-parallax,
-  .sticker-drift,
-  .sticker-figure:hover .sticker-image {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .sticker-figure:hover .sticker-image { filter: none; }
 
   .animate-fade-up-1,
   .animate-fade-up-2,

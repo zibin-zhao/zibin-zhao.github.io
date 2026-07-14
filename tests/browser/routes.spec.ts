@@ -80,31 +80,46 @@ const publications = [
   },
 ] as const;
 
-const projects = [
+const researchProjects = [
   {
     name: 'CasMD',
     githubUrl: 'https://github.com/zibin-zhao/CasMD',
     demoUrl: 'https://huggingface.co/spaces/zzhaobz/HsingMD',
   },
-  { name: 'DL-SELEX', githubUrl: 'https://github.com/zibin-zhao/DL-SELEX' },
-  {
-    name: 'Yaos',
-    githubUrl: 'https://github.com/zibin-zhao/Yaos',
-    demoUrl: 'https://zibin-zhao.github.io/Yaos/',
-  },
   { name: 'TEMPO', githubUrl: 'https://github.com/zibin-zhao/TEMPO' },
+  { name: 'DL-SELEX', githubUrl: 'https://github.com/zibin-zhao/DL-SELEX' },
   { name: 'Cembra_AI', githubUrl: 'https://github.com/zibin-zhao/Cembra_AI' },
   { name: 'DL-SELEX-web-explain', githubUrl: 'https://github.com/zibin-zhao/DL-SELEX-web-explain' },
   { name: 'ECG_analysing_app', githubUrl: 'https://github.com/zibin-zhao/ECG_analysing_app' },
 ] as const;
 
-const cvEntries = [...cv.education, ...cv.experience, ...cv.leadership];
+const vibeProjects = [
+  {
+    role: 'singularity',
+    primary: { href: '/singularity/', target: null, rel: null },
+    actions: [{ href: '/singularity/', target: null, rel: null }],
+  },
+  {
+    role: 'medit',
+    primary: { href: '/medit/', target: null, rel: null },
+    actions: [{ href: '/medit/', target: null, rel: null }],
+  },
+  {
+    role: 'yaos',
+    primary: { href: 'https://zibin-zhao.github.io/Yaos/', target: '_blank', rel: 'noopener noreferrer' },
+    actions: [
+      { href: 'https://github.com/zibin-zhao/Yaos', target: '_blank', rel: 'noopener noreferrer' },
+      { href: 'https://zibin-zhao.github.io/Yaos/', target: '_blank', rel: 'noopener noreferrer' },
+    ],
+  },
+  { role: 'zen', primary: null, actions: [] },
+] as const;
 
 const routes = [
   { path: '/about/', active: 'about', selector: '[data-focus]', attribute: 'data-focus', identities: profile.focus.map((item) => item.en) },
   { path: '/research/', active: 'research', selector: '[data-publication]', attribute: 'data-publication', identities: publications.map((item) => item.title) },
-  { path: '/projects/', active: 'projects', selector: '[data-github-project]', attribute: 'data-github-project', identities: projects.map((item) => item.name) },
-  { path: '/cv/', active: 'cv', selector: '[data-cv-entry]', attribute: 'data-cv-entry', identities: cvEntries.map((item) => item.title.en) },
+  { path: '/projects/', active: 'projects', selector: '.project-group', attribute: 'aria-labelledby', identities: ['research-projects-heading', 'vibe-projects-heading', 'more-projects-heading'] },
+  { path: '/cv/', active: 'cv', selector: '[data-cv-entry]', attribute: 'data-cv-entry', identities: ['PhD @ HKUST'] },
   { path: '/contact/', active: 'contact', selector: '[data-contact-social]', attribute: 'data-contact-social', identities: profile.socials.map((item) => item.label) },
 ] as const;
 
@@ -181,18 +196,18 @@ test('renders complete publication metadata and featured state in deterministic 
   }
 });
 
-test('binds every GitHub project and per-publication action to its canonical href and safety attributes', async ({ page }) => {
+test('binds every project and publication action to its canonical href and safety attributes', async ({ page }) => {
   await page.goto('/projects/');
-  const projectCards = page.locator('[data-github-project]');
-  await expect(projectCards).toHaveCount(projects.length);
+  const projectCards = page.locator('[data-research-project]');
+  await expect(projectCards).toHaveCount(researchProjects.length);
   expect(await projectCards.evaluateAll((cards) => cards.map((card) => ({
-    name: card.getAttribute('data-github-project'),
-    links: [...card.querySelectorAll('.github-project-action')].map((link) => ({
+    name: card.getAttribute('data-research-project'),
+    links: [...card.querySelectorAll('.research-project-action')].map((link) => ({
       href: link.getAttribute('href'),
       target: link.getAttribute('target'),
       rel: link.getAttribute('rel'),
     })),
-  })))).toEqual(projects.map((project) => ({
+  })))).toEqual(researchProjects.map((project) => ({
     name: project.name,
     links: [
       { href: project.githubUrl, target: '_blank', rel: 'noopener noreferrer' },
@@ -201,6 +216,43 @@ test('binds every GitHub project and per-publication action to its canonical hre
         : []),
     ],
   })));
+  const vibeCards = page.locator('.project-board--vibe [data-vibe-role]');
+  await expect(vibeCards).toHaveCount(vibeProjects.length);
+  expect(await vibeCards.evaluateAll((cards) => cards.map((card) => ({
+    role: card.getAttribute('data-vibe-role'),
+    primary: card.querySelector('.vibe-primary-link')
+      ? {
+          href: card.querySelector('.vibe-primary-link')?.getAttribute('href'),
+          target: card.querySelector('.vibe-primary-link')?.getAttribute('target'),
+          rel: card.querySelector('.vibe-primary-link')?.getAttribute('rel'),
+        }
+      : null,
+    actions: [...card.querySelectorAll('.vibe-action')].map((link) => ({
+      href: link.getAttribute('href'),
+      target: link.getAttribute('target'),
+      rel: link.getAttribute('rel'),
+    })),
+  })))).toEqual(vibeProjects.map((project) => ({
+    role: project.role,
+    primary: project.primary,
+    actions: [...project.actions],
+  })));
+
+  for (const action of await page.locator('.research-project-action, .vibe-action').all()) {
+    await action.focus();
+    await expect(action).toBeFocused();
+    const focusPaint = await action.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth),
+        shadow: style.boxShadow,
+      };
+    });
+    expect(focusPaint.outlineStyle).toBe('solid');
+    expect(focusPaint.outlineWidth).toBeGreaterThanOrEqual(3);
+    expect(focusPaint.shadow).not.toBe('none');
+  }
 
   await page.goto('/research/');
   const publicationCards = page.locator('[data-publication]');
@@ -223,72 +275,47 @@ test('binds every GitHub project and per-publication action to its canonical hre
   })));
 });
 
-test('projects use featured full-width records in a two-column desktop board and one mobile column', async ({ page }) => {
+test('projects render three non-overlapping category groups in two desktop columns and one mobile column', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/projects/');
 
-  const board = page.locator('.project-board');
-  const cards = board.locator('[data-github-project]');
-  await expect(cards).toHaveCount(projects.length);
-  const desktop = await board.evaluate((element) => {
-    const style = getComputedStyle(element);
-    const records = [...element.querySelectorAll<HTMLElement>('[data-github-project]')];
-    return {
-      columns: style.gridTemplateColumns.split(' ').length,
-      width: element.getBoundingClientRect().width,
-      cards: records.map((record) => {
-        const box = record.getBoundingClientRect();
-        const matrix = new DOMMatrixReadOnly(getComputedStyle(record).transform);
-        return {
-          featured: record.getAttribute('data-featured') === 'true',
-          left: box.left,
-          right: box.right,
-          top: box.top,
-          bottom: box.bottom,
-          width: box.width,
-          angle: Math.atan2(matrix.b, matrix.a) * (180 / Math.PI),
-        };
-      }),
-    };
-  });
-  expect(desktop.columns).toBe(2);
-  expect(desktop.cards.map(({ featured }) => featured)).toEqual([true, true, true, false, false, false, false]);
-  for (const card of desktop.cards.slice(0, 3)) expect(card.width).toBeGreaterThan(desktop.width * .9);
-  expect(desktop.cards[3].width).toBeLessThan(desktop.cards[0].width * .6);
-  expect(desktop.cards[3].left).toBeLessThan(desktop.cards[4].left);
-  expect(desktop.cards[5].left).toBeLessThan(desktop.cards[6].left);
-  expect(Math.abs(desktop.cards[3].top - desktop.cards[4].top)).toBeLessThan(20);
-  expect(Math.abs(desktop.cards[5].top - desktop.cards[6].top)).toBeLessThan(20);
-  expect(desktop.cards.every((card) => Math.abs(card.angle) >= .25)).toBe(true);
+  const groups = page.locator('.project-group');
+  await expect(groups).toHaveCount(3);
+  await expect(groups.locator('.project-group-title .t-en')).toHaveText(['Research', 'Vibe', 'More']);
+  const researchCards = page.locator('.project-board--research [data-research-project]');
+  const vibeCards = page.locator('.project-board--vibe [data-vibe-role]');
+  const moreCards = page.locator('.project-board--more [data-github-project]');
+  expect(await researchCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-research-project'))))
+    .toEqual(researchProjects.map(({ name }) => name));
+  expect(await vibeCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-vibe-role'))))
+    .toEqual(vibeProjects.map(({ role }) => role));
+  await expect(moreCards).toHaveCount(0);
+  const visibleNames = [
+    ...(await researchCards.locator('h3').allTextContents()).map((name) => name.trim().toLowerCase()),
+    ...(await vibeCards.locator('.vibe-title').allTextContents()).map((name) => name.trim().toLowerCase()),
+  ];
+  expect(new Set(visibleNames).size).toBe(visibleNames.length);
+
+  for (const board of await page.locator('.project-board').all()) {
+    expect((await board.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length))).toBe(2);
+  }
+  for (const card of await page.locator('[data-research-project], [data-vibe-role], [data-github-project]').all()) {
+    await expect(card).toHaveCSS('background-color', /rgba?\(/);
+    expect(await card.evaluate((element) => Number.parseFloat(getComputedStyle(element).backgroundColor.split(',').at(-1) ?? '1')))
+      .toBeGreaterThanOrEqual(1);
+  }
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload();
-  const mobile = await board.evaluate((element) => {
-    const style = getComputedStyle(element);
-    const records = [...element.querySelectorAll<HTMLElement>('[data-github-project]')];
-    return {
-      columns: style.gridTemplateColumns.split(' ').length,
-      cards: records.map((record) => {
-        const box = record.getBoundingClientRect();
-        const matrix = new DOMMatrixReadOnly(getComputedStyle(record).transform);
-        return {
-          left: box.left,
-          right: box.right,
-          top: box.top,
-          bottom: box.bottom,
-          angle: Math.atan2(matrix.b, matrix.a) * (180 / Math.PI),
-        };
-      }),
-    };
-  });
-  expect(mobile.columns).toBe(1);
-  for (let index = 1; index < mobile.cards.length; index += 1) {
-    expect(mobile.cards[index].top).toBeGreaterThan(mobile.cards[index - 1].bottom);
+  for (const board of await page.locator('.project-board').all()) {
+    expect((await board.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length))).toBe(1);
   }
-  expect(mobile.cards.every((card) => Math.abs(card.angle) < .01)).toBe(true);
-  expect(Math.min(...mobile.cards.map((card) => card.left))).toBeGreaterThanOrEqual(0);
-  expect(Math.max(...mobile.cards.map((card) => card.right))).toBeLessThanOrEqual(390);
-  for (const link of await cards.all()) await expect(link).toBeVisible();
+  for (const card of await page.locator('[data-research-project], [data-vibe-role], [data-github-project]').all()) {
+    const box = await card.boundingBox();
+    if (!box) throw new Error('Mobile project card did not render');
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(390);
+  }
   await assertNoOverflowOrDockOverlap(page);
 });
 
@@ -361,8 +388,9 @@ test('renders every CV skill and complete contact index from canonical data', as
   await page.goto('/cv/');
   expect(await page.locator('[data-cv-entry]').evaluateAll((entries) => (
     entries.map((entry) => entry.getAttribute('data-cv-entry'))
-  ))).toEqual(cvEntries.map((entry) => entry.title.en));
+  ))).toEqual(['PhD @ HKUST']);
   await expect(page.locator('.cv-tools .chip')).toHaveText(cv.skills);
+  await expect(page.locator('.cv-tools .chip', { hasText: 'AI' })).toHaveCount(1);
   const download = page.locator('a[download][href="/cv.pdf"]');
   await expect(download).toBeVisible();
   await expect(download).toHaveAttribute('download', '');

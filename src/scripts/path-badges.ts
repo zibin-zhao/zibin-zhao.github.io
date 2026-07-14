@@ -22,6 +22,7 @@ const startPathBadges = () => {
   if (badges.length === 0) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  layer.dataset.motionState = reducedMotion.matches ? 'reduced' : 'running';
   let scheduledFrame: number | undefined;
 
   const updateBadges = () => {

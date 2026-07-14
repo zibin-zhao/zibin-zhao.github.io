@@ -150,82 +150,85 @@ test('renders canonical Vibe content, assets, and action semantics', async ({ pa
   await page.goto('/#vibe');
 
   const cards = page.locator('[data-vibe-role]');
-  await expect(cards).toHaveCount(5);
-  await expect(cards.locator('.vibe-title')).toHaveText(['CasMD', 'Singularity奇点', 'Medit静处', 'Yaos药师法门 · 养生', 'Zen禅德 · Zende']);
-  await expect(cards.locator('.vibe-description .t-en')).toHaveCount(5);
-  await expect(cards.locator('.vibe-description .t-zh')).toHaveCount(5);
-  await expect(cards.nth(0).locator('img')).toHaveAttribute('src', '/stitch/casmd.png');
-  await expect(cards.nth(1).locator('img')).toHaveAttribute('src', '/stitch/singularity.png');
-  expect(await cards.locator('img').evaluateAll((images) => images.map((image) => (image as HTMLImageElement).naturalWidth))).toEqual([512, 512]);
-  await expect(cards.locator('.vibe-image')).toHaveCount(2);
-  await expect(cards.nth(2).locator('.vibe-image')).toHaveCount(0);
-  await expect(cards.nth(4)).toHaveCSS('border-top-style', 'dashed');
-  await expect(cards.nth(4).locator('a')).toHaveCount(0);
-  await expect(cards.nth(4).locator('.vibe-coming-soon')).toBeVisible();
-  await expect(cards.locator('a.vibe-action')).toHaveCount(6);
-  await expect(cards.nth(0).locator('a.vibe-action')).toHaveCount(2);
+  await expect(cards).toHaveCount(4);
+  expect(await cards.evaluateAll((elements) => elements.map((element) => element.getAttribute('data-vibe-role'))))
+    .toEqual(['singularity', 'medit', 'yaos', 'zen']);
+  await expect(cards.locator('.vibe-title')).toHaveText([
+    'Singularity奇点',
+    'Medit静处',
+    'Yaos药师法门 · 养生',
+    'Zen禅德 · Zende',
+  ]);
+  await expect(cards.locator('.vibe-description .t-en')).toHaveCount(4);
+  await expect(cards.locator('.vibe-description .t-zh')).toHaveCount(4);
+  const cover = cards.nth(0).locator('img');
+  await expect(cover).toHaveAttribute('src', '/stitch/singularity-cartoon.png');
+  await expect(cover).toHaveAttribute('alt', 'Singularity project interface preview');
+  await cover.scrollIntoViewIfNeeded();
+  await expect.poll(() => cover.evaluate((image) => (image as HTMLImageElement).naturalWidth)).toBe(1024);
+  await expect(cards.locator('.vibe-image')).toHaveCount(1);
+  await expect(cards.nth(1).locator('.vibe-image')).toHaveCount(0);
+  await expect(cards.nth(3)).toHaveCSS('border-top-style', 'dashed');
+  await expect(cards.nth(3).locator('a')).toHaveCount(0);
+  await expect(cards.nth(3).locator('.vibe-coming-soon')).toBeVisible();
+  await expect(cards.locator('a.vibe-action')).toHaveCount(4);
   await expect(cards.nth(1).locator('a.vibe-action')).toHaveCount(1);
-  await expect(cards.nth(2).locator('a.vibe-action')).toHaveCount(1);
-  await expect(cards.nth(3).locator('a.vibe-action')).toHaveCount(2);
-  await expect(cards.nth(1).locator('a.vibe-action')).not.toHaveAttribute('target', '_blank');
+  await expect(cards.nth(2).locator('a.vibe-action')).toHaveCount(2);
+  await expect(cards.nth(0).locator('a.vibe-action')).not.toHaveAttribute('target', '_blank');
 });
 
-test('renders five authored cards, five deduplicated repository cards, and independent CasMD and Yaos actions', async ({ page }) => {
+test('keeps homepage Research Projects and Vibe separate, complete, and duplicate-free', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/#vibe');
+  await page.goto('/');
 
-  await expect(page.locator('.vibe-mosaic [data-vibe-role]')).toHaveCount(5);
-  const shelfCards = page.locator('.github-project-shelf [data-github-project]');
-  await expect(shelfCards).toHaveCount(5);
-  expect(await shelfCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-github-project')))).toEqual([
-    'DL-SELEX',
+  const researchRegion = page.locator('#research-projects');
+  const vibeRegion = page.locator('#vibe');
+  await expect(researchRegion.getByRole('heading', { name: 'Research Projects' })).toBeVisible();
+  await expect(vibeRegion.getByRole('heading', { name: 'Vibe' })).toBeVisible();
+  await expect(researchRegion.locator('[data-vibe-role]')).toHaveCount(0);
+  await expect(vibeRegion.locator('[data-research-project]')).toHaveCount(0);
+
+  const researchCards = researchRegion.locator('[data-research-project]');
+  expect(await researchCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-research-project')))).toEqual([
+    'CasMD',
     'TEMPO',
+    'DL-SELEX',
     'Cembra_AI',
     'DL-SELEX-web-explain',
     'ECG_analysing_app',
   ]);
+  const vibeCards = vibeRegion.locator('[data-vibe-role]');
+  expect(await vibeCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-vibe-role'))))
+    .toEqual(['singularity', 'medit', 'yaos', 'zen']);
+  await expect(vibeRegion.locator('[data-vibe-role="casmd"]')).toHaveCount(0);
 
-  const authoredProjects = [
-    {
-      role: 'casmd',
-      primary: 'https://huggingface.co/spaces/zzhaobz/HsingMD',
-      actions: [
-        'https://github.com/zibin-zhao/CasMD',
-        'https://huggingface.co/spaces/zzhaobz/HsingMD',
-      ],
-    },
-    {
-      role: 'yaos',
-      primary: 'https://zibin-zhao.github.io/Yaos/',
-      actions: [
-        'https://github.com/zibin-zhao/Yaos',
-        'https://zibin-zhao.github.io/Yaos/',
-      ],
-    },
-  ] as const;
+  const allNames = [
+    ...(await researchCards.locator('h3').allTextContents()).map((name) => name.trim().toLowerCase()),
+    ...(await vibeCards.locator('.vibe-title').allTextContents()).map((name) => name.trim().toLowerCase()),
+  ];
+  expect(new Set(allNames).size).toBe(allNames.length);
 
-  const allSecondaryActions = page.locator(
-    '[data-vibe-role="casmd"] .vibe-action, [data-vibe-role="yaos"] .vibe-action',
-  );
-  await expect(allSecondaryActions).toHaveCount(4);
+  const surfaceAlphas = await page.locator('#research-projects [data-research-project], #vibe [data-vibe-role]')
+    .evaluateAll((cards) => cards.map((card) => {
+      const color = getComputedStyle(card).backgroundColor;
+      const channels = color.match(/[\d.]+/g)?.map(Number) ?? [];
+      return channels.length === 4 ? channels[3] : 1;
+    }));
+  expect(surfaceAlphas.every((alpha) => alpha === 1)).toBe(true);
 
-  for (const project of authoredProjects) {
-    const card = page.locator(`[data-vibe-role="${project.role}"]`);
-    await expect(card.locator('.vibe-primary-link')).toHaveAttribute('href', project.primary);
-    const actions = card.locator('.vibe-action');
-    await expect(actions).toHaveCount(2);
-    expect(await actions.evaluateAll((links) => links.map((link) => link.getAttribute('href')))).toEqual([...project.actions]);
-    await expect(card.locator('.vibe-secondary-actions')).toHaveCSS('z-index', '2');
-  }
+  const researchBox = await researchRegion.boundingBox();
+  const vibeBox = await vibeRegion.boundingBox();
+  if (!researchBox || !vibeBox) throw new Error('Homepage project regions did not render');
+  expect(vibeBox.y).toBeGreaterThanOrEqual(researchBox.y + researchBox.height);
 
-  for (const action of await allSecondaryActions.all()) {
-    await expect(action).toHaveAttribute('target', '_blank');
-    await expect(action).toHaveAttribute('rel', 'noopener noreferrer');
+  const actions = page.locator('#research-projects .research-project-action, #vibe .vibe-action');
+  await expect(actions).toHaveCount(11);
+  for (const action of await actions.all()) {
     const box = await action.boundingBox();
-    if (!box) throw new Error('Authored project action did not render');
+    if (!box) throw new Error('Project action did not render');
     expect(box.width).toBeGreaterThanOrEqual(44);
     expect(box.height).toBeGreaterThanOrEqual(44);
-
+    await expect(action).toHaveAttribute('href', /^(?:https:\/\/|\/)/);
     await action.focus();
     await expect(action).toBeFocused();
     const focusPaint = await action.evaluate((element) => {
@@ -240,38 +243,6 @@ test('renders five authored cards, five deduplicated repository cards, and indep
     expect(focusPaint.outlineWidth).toBeGreaterThanOrEqual(3);
     expect(focusPaint.shadow).not.toBe('none');
   }
-
-  await page.evaluate(() => {
-    const auditWindow = window as typeof window & {
-      __vibeActionAudit?: { actions: string[]; primary: string[] };
-    };
-    auditWindow.__vibeActionAudit = { actions: [], primary: [] };
-
-    for (const role of ['casmd', 'yaos']) {
-      const card = document.querySelector(`[data-vibe-role="${role}"]`);
-      const primary = card?.querySelector<HTMLAnchorElement>('.vibe-primary-link');
-      primary?.addEventListener('click', (event) => {
-        event.preventDefault();
-        auditWindow.__vibeActionAudit?.primary.push(role);
-      });
-      for (const action of card?.querySelectorAll<HTMLAnchorElement>('.vibe-action') ?? []) {
-        action.addEventListener('click', (event) => {
-          event.preventDefault();
-          auditWindow.__vibeActionAudit?.actions.push(action.href);
-        });
-      }
-    }
-  });
-
-  const startingUrl = page.url();
-  for (const action of await allSecondaryActions.all()) await action.click();
-  expect(await page.evaluate(() => (
-    window as typeof window & { __vibeActionAudit?: { actions: string[]; primary: string[] } }
-  ).__vibeActionAudit)).toEqual({
-    actions: authoredProjects.flatMap((project) => [...project.actions]),
-    primary: [],
-  });
-  expect(page.url()).toBe(startingUrl);
 });
 
 test('preserves authored Vibe geometry, overlap, and rotation at 768px', async ({ page }) => {
@@ -283,20 +254,17 @@ test('preserves authored Vibe geometry, overlap, and rotation at 768px', async (
   const slots = page.locator('.vibe-mosaic > .fade-slot');
   const cards = page.locator('[data-vibe-role]');
   const mosaicBox = await mosaic.boundingBox();
-  const boxes = await Promise.all([0, 1, 2].map((index) => slots.nth(index).boundingBox()));
-  const cardBoxes = await Promise.all([0, 1, 2].map((index) => cards.nth(index).boundingBox()));
+  const boxes = await Promise.all([0, 1].map((index) => slots.nth(index).boundingBox()));
+  const cardBoxes = await Promise.all([0, 1].map((index) => cards.nth(index).boundingBox()));
   if (!mosaicBox || boxes.some((box) => !box) || cardBoxes.some((box) => !box)) throw new Error('Vibe geometry was not rendered');
-  const [casmd, singularity, medit] = boxes as NonNullable<(typeof boxes)[number]>[];
-  const [casmdCard, singularityCard, meditCard] = cardBoxes as NonNullable<(typeof cardBoxes)[number]>[];
+  const [singularity, medit] = boxes as NonNullable<(typeof boxes)[number]>[];
+  const [singularityCard, meditCard] = cardBoxes as NonNullable<(typeof cardBoxes)[number]>[];
 
-  expect(casmd.width / mosaicBox.width).toBeCloseTo(8 / 12, 1);
-  expect(singularity.width / mosaicBox.width).toBeCloseTo(6 / 12, 1);
+  expect(singularity.width / mosaicBox.width).toBeCloseTo(7 / 12, 1);
   expect(medit.width / mosaicBox.width).toBeCloseTo(5 / 12, 1);
-  expect(singularity.x).toBeGreaterThan(casmd.x);
-  expect(singularityCard.y).toBeLessThan(casmdCard.y + casmdCard.height);
   expect(medit.x).toBeGreaterThan(singularity.x);
   expect(meditCard.y).toBeLessThan(singularityCard.y + singularityCard.height);
-  for (const [index, angle] of [1, -2, 3, -1, 2].entries()) {
+  for (const [index, angle] of [-2, 3, -1, 2].entries()) {
     expect(await motionState(cards.nth(index))).toMatchObject({ angle });
   }
 });
@@ -308,7 +276,7 @@ test('keeps Vibe source order, bounded overlap, and anchor clearance at 390px', 
 
   const cards = page.locator('[data-vibe-role]');
   expect(await cards.evaluateAll((elements) => elements.map((element) => element.getAttribute('data-vibe-role')))).toEqual(
-    ['casmd', 'singularity', 'medit', 'yaos', 'zen'],
+    ['singularity', 'medit', 'yaos', 'zen'],
   );
   const boxes = await cards.evaluateAll((elements) => elements.map((element) => {
     const box = element.getBoundingClientRect();
@@ -374,23 +342,24 @@ test('keeps required shell anchors visible without JavaScript at 390px', async (
 
   await page.locator('.footer-routes a[href="/projects/"]').click();
   await expect(page).toHaveURL(/\/projects\/$/);
-  const projectCards = page.locator('[data-github-project]');
-  await expect(projectCards).toHaveCount(7);
-  expect(await projectCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-github-project')))).toEqual([
+  const researchCards = page.locator('[data-research-project]');
+  await expect(researchCards).toHaveCount(6);
+  expect(await researchCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-research-project')))).toEqual([
     'CasMD',
-    'DL-SELEX',
-    'Yaos',
     'TEMPO',
+    'DL-SELEX',
     'Cembra_AI',
     'DL-SELEX-web-explain',
     'ECG_analysing_app',
   ]);
-  const projectActions = projectCards.locator('.github-project-action');
-  await expect(projectActions).toHaveCount(9);
+  const vibeCards = page.locator('.project-board--vibe [data-vibe-role]');
+  expect(await vibeCards.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-vibe-role'))))
+    .toEqual(['singularity', 'medit', 'yaos', 'zen']);
+  await expect(page.locator('.project-group')).toHaveCount(3);
+  const projectActions = page.locator('.research-project-action, .vibe-action, .github-project-action');
+  await expect(projectActions).toHaveCount(11);
   for (const action of await projectActions.all()) {
-    await expect(action).toHaveAttribute('href', /^https:\/\//);
-    await expect(action).toHaveAttribute('target', '_blank');
-    await expect(action).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(action).toHaveAttribute('href', /^(?:https:\/\/|\/)/);
   }
 
   await context.close();
@@ -503,13 +472,14 @@ test('mobile footer flows after content and exposes complete 44px controls', asy
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
 
-test('homepage cards expose primary destinations and the bilingual sticker close', async ({ page }) => {
+test('homepage cards expose primary destinations, hidden interests, and the bilingual close', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
 
   await expect(page.locator('.paper-primary-link')).toHaveCount(3);
-  await expect(page.locator('.vibe-primary-link')).toHaveCount(4);
-  await expect(page.locator('[data-sticker-constellation] figure')).toHaveCount(7);
-  await expect(page.locator('[data-sticker-constellation] figcaption .t-en')).toHaveCount(7);
+  await expect(page.locator('.vibe-primary-link')).toHaveCount(3);
+  await expect(page.locator('[data-path-badges] [data-path-badge]')).toHaveCount(7);
+  await expect(page.locator('[data-path-badges] figcaption')).toHaveCount(0);
+  await expect(page.locator('ul.sr-only[aria-label="Personal interests / 个人兴趣"] li')).toHaveCount(7);
   await expect(page.getByRole('link', { name: /Start a conversation/ })).toHaveAttribute('href', /^mailto:/);
 
   await page.locator('[data-vibe-role="singularity"]').click({ position: { x: 20, y: 20 } });
@@ -517,8 +487,8 @@ test('homepage cards expose primary destinations and the bilingual sticker close
   await page.goBack({ waitUntil: 'networkidle' });
 
   await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
-  await expect(page.getByText('心理学与心灵')).toBeVisible();
-  await expect(page.getByText('冥想练习')).toBeVisible();
+  await expect(page.locator('#research-projects .research-projects-heading .t-zh').last()).toBeVisible();
+  await expect(page.locator('#vibe > h2 .t-zh')).toBeVisible();
 });
 
 test('tablet and mobile retain readable supporting type and complete action targets', async ({ page }) => {
@@ -533,7 +503,7 @@ test('tablet and mobile retain readable supporting type and complete action targ
       expect(Math.min(...sizes), selector + ' at ' + viewport.width + 'px').toBeGreaterThanOrEqual(14);
     }
 
-    for (const selector of ['.paper-links a', '.vibe-action', '.footer-pill']) {
+    for (const selector of ['.paper-links a', '.research-project-action', '.vibe-action', '.footer-pill']) {
       const facts = await page.locator(selector).evaluateAll((elements) =>
         elements.map((element) => {
           const style = getComputedStyle(element);
@@ -552,7 +522,33 @@ test('tablet and mobile retain readable supporting type and complete action targ
       }
     }
 
+    await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+    const chineseSupportingCopy = page.locator([
+      '.hero-card > .t-zh:visible',
+      '.research-project-descriptions .t-zh:visible',
+      '.vibe-description .t-zh:visible',
+    ].join(', '));
+    expect(await chineseSupportingCopy.count()).toBeGreaterThan(0);
+    for (const copy of await chineseSupportingCopy.all()) {
+      const fact = await copy.evaluate((element) => {
+        const target = element as HTMLElement;
+        const box = target.getBoundingClientRect();
+        return {
+          left: box.left,
+          right: box.right,
+          scrollWidth: target.scrollWidth,
+          clientWidth: target.clientWidth,
+        };
+      });
+      expect(fact.left, `Chinese copy left edge at ${viewport.width}px`).toBeGreaterThanOrEqual(0);
+      expect(fact.right, `Chinese copy right edge at ${viewport.width}px`).toBeLessThanOrEqual(viewport.width);
+      expect(fact.scrollWidth, `Chinese copy wrapping at ${viewport.width}px`).toBeLessThanOrEqual(fact.clientWidth);
+    }
+
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width);
+    await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   }
 });
 

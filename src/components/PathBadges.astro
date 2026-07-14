@@ -85,7 +85,11 @@ const badges = [
     .path-badge { max-width: 104px; }
   }
 
+  @media (max-width: 340px) {
+    .path-badge { max-width: 80px; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .path-badge { transition: none; }
+    .path-badge { transition: none !important; }
   }
 </style>

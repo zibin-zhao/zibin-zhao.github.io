@@ -347,7 +347,8 @@ test('reduced motion removes animation while preserving authored resting transfo
   await expect(coaster).toHaveCount(1);
   await expect(coaster).toHaveAttribute('data-motion-state', 'reduced');
   await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
-  expect((await animationFrameProbe(page)).requests).toBe(0);
+  expect((await animationFrameProbe(page)).requests).toBe(1);
+  await expect(page.locator('[data-path-badges]')).toHaveAttribute('data-motion-state', 'reduced');
 
   const animated = page.locator([
     '.animate-parallax-slow', '.animate-parallax-fast', '.animate-float', '.blob',
@@ -403,15 +404,16 @@ test('coaster module reevaluation replaces its loop and orchestration listeners'
 
   await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
   const { listeners } = await animationFrameProbe(page);
-  for (const name of [
-    'document:astro:before-swap',
-    'document:astro:page-load',
-    'document:visibilitychange',
-    'window:pagehide',
-    'window:pageshow',
-    'window:resize',
-    'media:change',
-  ]) expect(listeners[name], name).toBe(1);
+  const expectedListeners = {
+    'document:astro:before-swap': 2,
+    'document:astro:page-load': 2,
+    'document:visibilitychange': 1,
+    'window:pagehide': 2,
+    'window:pageshow': 2,
+    'window:resize': 2,
+    'media:change': 2,
+  } as const;
+  for (const [name, count] of Object.entries(expectedListeners)) expect(listeners[name], name).toBe(count);
 });
 
 test('coaster persisted page lifecycle restores normal and reduced states', async ({ page }, testInfo) => {
@@ -444,7 +446,7 @@ test('coaster persisted page lifecycle restores normal and reduced states', asyn
   expect(reducedStateWhilePersisted).toBe('reduced');
   await expect(coaster).toHaveAttribute('data-motion-state', 'reduced');
   await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(0);
-  expect((await animationFrameProbe(page)).requests).toBe(reducedRequests);
+  expect((await animationFrameProbe(page)).requests).toBe(reducedRequests + 1);
 
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect.poll(async () => (await animationFrameProbe(page)).active).toBe(1);
@@ -499,7 +501,7 @@ test('coaster switches between desktop and mobile configurations without overflo
   await expectNoHorizontalOverflow(page);
 });
 
-test('sticker constellation stays static and overflow-free at every authored width', async ({ page }, testInfo) => {
+test('reduced-motion path badges stay static and overflow-free at every authored width', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'The four authored widths are covered once in the focused mobile project.');
   await page.emulateMedia({ reducedMotion: 'reduce' });
 
@@ -508,137 +510,127 @@ test('sticker constellation stays static and overflow-free at every authored wid
     await page.goto('/', { waitUntil: 'networkidle' });
     await expectNoHorizontalOverflow(page);
 
-    const constellation = page.locator('[data-sticker-constellation]');
-    const figures = constellation.locator('figure');
-    await expect(figures).toHaveCount(7);
-    await expect(constellation.locator('figcaption')).toHaveCount(7);
+    const layer = page.locator('[data-path-badges]');
+    const badges = layer.locator('[data-path-badge]');
+    await expect(layer).toHaveCount(1);
+    await expect(layer).toHaveAttribute('aria-hidden', 'true');
+    await expect(layer).toHaveAttribute('data-motion-state', 'reduced');
+    await expect(layer).toHaveCSS('position', 'fixed');
+    await expect(layer).toHaveCSS('pointer-events', 'none');
+    await expect(layer).toHaveCSS('z-index', '1');
+    await expect(page.locator('#main-content')).toHaveCSS('z-index', '10');
+    await expect(badges).toHaveCount(7);
+    await expect(layer.locator('figcaption')).toHaveCount(0);
 
-    const sectionBox = await constellation.boundingBox();
-    if (!sectionBox) throw new Error(`Sticker constellation did not render at ${width}px`);
-    expect(sectionBox.x, `${width}px section left edge`).toBeGreaterThanOrEqual(0);
-    expect(sectionBox.x + sectionBox.width, `${width}px section right edge`).toBeLessThanOrEqual(width);
-
-    for (const figure of await figures.all()) {
-      const [figureBox, imageBox, captionBox] = await Promise.all([
-        figure.boundingBox(),
-        figure.locator('img').boundingBox(),
-        figure.locator('figcaption').boundingBox(),
-      ]);
-      if (!figureBox || !imageBox || !captionBox) throw new Error(`Sticker geometry was unavailable at ${width}px`);
-      expect(figureBox.x, `${width}px figure left edge`).toBeGreaterThanOrEqual(sectionBox.x);
-      expect(figureBox.x + figureBox.width, `${width}px figure right edge`)
-        .toBeLessThanOrEqual(sectionBox.x + sectionBox.width);
-      expect(captionBox.y, `${width}px caption/image separation`)
-        .toBeGreaterThanOrEqual(imageBox.y + imageBox.height);
-      await expect(figure).toHaveCSS('position', 'static');
+    const expectedVisible = width <= 700 ? 1 : 2;
+    await expect.poll(() => badges.evaluateAll((elements) => (
+      elements.filter((element) => element.getAttribute('data-visible') === 'true').length
+    ))).toBe(expectedVisible);
+    const visible = layer.locator('[data-path-badge][data-visible="true"]');
+    const before = await visible.evaluateAll((elements) => elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return {
+        bottom: box.bottom,
+        left: box.left,
+        right: box.right,
+        top: box.top,
+        transitionDuration: style.transitionDuration,
+      };
+    }));
+    for (const badge of before) {
+      expect(badge.left, `${width}px badge left edge`).toBeGreaterThanOrEqual(0);
+      expect(badge.right, `${width}px badge right edge`).toBeLessThanOrEqual(width);
+      expect(badge.top, `${width}px badge top edge`).toBeGreaterThanOrEqual(0);
+      expect(badge.bottom, `${width}px badge bottom edge`).toBeLessThanOrEqual(width <= 390 ? 844 : 1_024);
+      expect(badge.transitionDuration).toBe('0s');
     }
-
-    const wrappers = constellation.locator('.sticker-reveal, .sticker-parallax, .sticker-drift');
-    for (const wrapper of await wrappers.all()) {
-      await expect(wrapper).toHaveCSS('animation-name', 'none');
-      await expect(wrapper).toHaveCSS('transform', 'none');
-      await expect(wrapper).toHaveCSS('opacity', '1');
-    }
-    expect(await constellation.evaluate((element) =>
-      getComputedStyle(element).getPropertyValue('--sticker-scroll').trim(),
-    )).toBe('0px');
+    await page.waitForTimeout(250);
+    expect(await visible.evaluateAll((elements) => elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return { bottom: box.bottom, left: box.left, right: box.right, top: box.top };
+    }))).toEqual(before.map((badge) => ({
+      bottom: badge.bottom,
+      left: badge.left,
+      right: badge.right,
+      top: badge.top,
+    })));
   }
 });
 
-test('sticker captions keep a transform-safe gap through normal rest and hover endpoints', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Normal-motion sticker geometry is covered once at every authored width.');
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('DOM.enable');
-  await cdp.send('CSS.enable');
-
+test('normal-motion path badges select at most two desktop or one mobile badge across the page', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Runtime badge selection is covered once across every authored width.');
   for (const width of [1_440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: width <= 390 ? 844 : 1_024 });
     await page.goto('/', { waitUntil: 'networkidle' });
-
-    const constellation = page.locator('[data-sticker-constellation]');
-    await page.locator('.sticker-figure--coding').evaluate((element) =>
-      element.scrollIntoView({ behavior: 'instant', block: 'center' }),
-    );
-    await expect(constellation).toHaveClass(/is-revealed/);
-    for (const reveal of await constellation.locator('.sticker-reveal').all()) {
-      await expect(reveal).toHaveCSS('transform', 'none');
-    }
-    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
-    await constellation.locator('.sticker-drift').evaluateAll((elements) => {
-      for (const element of elements) (element as HTMLElement).style.animation = 'none';
-    });
-
-    await expect.poll(() => constellation.evaluate((element) =>
-      Number.parseFloat(getComputedStyle(element).getPropertyValue('--sticker-scroll')),
-    )).toBeGreaterThan(0);
-
-    const assertGaps = async (endpoint: 'rest' | 'hover') => {
-      const offset = await constellation.evaluate((element) =>
-        Number.parseFloat(getComputedStyle(element).getPropertyValue('--sticker-scroll')),
-      );
-      const facts = await constellation.locator('figure').evaluateAll((figures) => figures.map((figure) => {
-        const image = figure.querySelector('img')?.getBoundingClientRect();
-        const caption = figure.querySelector('figcaption')?.getBoundingClientRect();
-        if (!image || !caption) throw new Error('Sticker image/caption geometry is missing');
-        return {
-          gap: caption.top - image.bottom,
-          sticker: [...figure.classList].find((name) => name.startsWith('sticker-figure--')) ?? 'unknown',
-        };
-      }));
-      for (const fact of facts) {
-        expect(fact.gap, `${width}px ${fact.sticker} ${endpoint} gap at ${offset}px parallax`)
-          .toBeGreaterThanOrEqual(4);
+    const layer = page.locator('[data-path-badges]');
+    const badges = layer.locator('[data-path-badge]');
+    await expect(layer).toHaveAttribute('data-motion-state', 'running');
+    await expect(layer).toHaveCSS('pointer-events', 'none');
+    await expect(layer).toHaveCSS('z-index', '1');
+    await expect(page.locator('#main-content')).toHaveCSS('z-index', '10');
+    const opaqueContentSurfaces = page.locator([
+      '.hero-card',
+      '.pub-card',
+      '.research-project-card',
+      '.vibe-card',
+      '.field-note',
+      '.collaboration-close',
+    ].join(', '));
+    expect(await opaqueContentSurfaces.count()).toBeGreaterThan(0);
+    expect(await opaqueContentSurfaces.evaluateAll((elements) => elements.every((element) => {
+      const channels = getComputedStyle(element).backgroundColor.match(/[\d.]+/g)?.map(Number) ?? [];
+      return channels.length !== 4 || channels[3] === 1;
+    }))).toBe(true);
+    const expectedVisible = width <= 700 ? 1 : 2;
+    const seen = new Set<string>();
+    for (const progress of [.06, .20, .35, .50, .65, .80, .94]) {
+      await page.evaluate((position) => {
+        const range = document.documentElement.scrollHeight - innerHeight;
+        window.scrollTo({ top: Math.round(range * position), behavior: 'instant' });
+      }, progress);
+      await expect.poll(() => badges.evaluateAll((elements) => (
+        elements.filter((element) => element.getAttribute('data-visible') === 'true').length
+      ))).toBe(expectedVisible);
+      await expect.poll(() => layer.locator('[data-path-badge][data-visible="true"]').evaluateAll((elements) => (
+        elements.map((element) => Number(element.getAttribute('data-center')))
+      ))).toContain(progress);
+      for (const center of await layer.locator('[data-path-badge][data-visible="true"]').evaluateAll((elements) => (
+        elements.map((element) => element.getAttribute('data-center') ?? '')
+      ))) seen.add(center);
+      for (const badge of await layer.locator('[data-path-badge][data-visible="true"]').evaluateAll((elements) => (
+        elements.map((element) => {
+          const box = element.getBoundingClientRect();
+          return { bottom: box.bottom, left: box.left, right: box.right, top: box.top };
+        })
+      ))) {
+        expect(badge.left, `${width}px running badge left edge at ${progress}`).toBeGreaterThanOrEqual(0);
+        expect(badge.right, `${width}px running badge right edge at ${progress}`).toBeLessThanOrEqual(width);
+        expect(badge.top, `${width}px running badge top edge at ${progress}`).toBeGreaterThanOrEqual(0);
+        expect(badge.bottom, `${width}px running badge bottom edge at ${progress}`)
+          .toBeLessThanOrEqual(width <= 390 ? 844 : 1_024);
       }
-    };
-
-    await assertGaps('rest');
-
-    const { root } = await cdp.send('DOM.getDocument');
-    const { nodeIds } = await cdp.send('DOM.querySelectorAll', {
-      nodeId: root.nodeId,
-      selector: '[data-sticker-constellation] figure',
-    });
-    for (const nodeId of nodeIds) {
-      await cdp.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: ['hover'] });
+      await expectNoHorizontalOverflow(page);
     }
-    await page.waitForTimeout(220);
-    await assertGaps('hover');
+    expect(seen.size, `${width}px path regions represented`).toBe(7);
   }
 });
 
-test('sticker motion reveals once and clamps the shared parallax property', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Runtime sticker motion is covered once in the focused mobile project.');
-  await page.goto('/', { waitUntil: 'networkidle' });
-
-  const constellation = page.locator('[data-sticker-constellation]');
-  await constellation.scrollIntoViewIfNeeded();
-  await expect(constellation).toHaveClass(/is-revealed/);
-  const readOffset = () => constellation.evaluate((element) =>
-    Number.parseFloat(getComputedStyle(element).getPropertyValue('--sticker-scroll')),
-  );
-  expect(Math.abs(await readOffset())).toBeLessThanOrEqual(12);
-
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await page.waitForTimeout(40);
-  expect(Math.abs(await readOffset())).toBeLessThanOrEqual(12);
-  await expect(constellation).toHaveClass(/is-revealed/);
-});
-
 test('a failed Vibe image reveals the designed fallback without hiding card content', async ({ page }) => {
-  await page.route('**/stitch/casmd.png', (route) => route.abort('failed'));
+  await page.route('**/stitch/singularity-cartoon.png', (route) => route.abort('failed'));
   await page.goto('/#vibe', { waitUntil: 'networkidle' });
 
-  const card = page.locator('[data-vibe-role="casmd"]');
+  const card = page.locator('[data-vibe-role="singularity"]');
   await expect(card.locator('.vibe-image-fallback')).toBeVisible();
-  await expect(card.locator('.vibe-image-fallback')).toContainText('CasMD preview unavailable');
-  await expect(card.locator('.vibe-title')).toContainText('CasMD');
+  await expect(card.locator('.vibe-image-fallback')).toContainText('Singularity preview unavailable');
+  await expect(card.locator('.vibe-title')).toContainText('Singularity');
   await expect(card.locator('.vibe-description')).toBeVisible();
   const actions = card.locator('.vibe-action');
-  await expect(actions).toHaveCount(2);
+  await expect(actions).toHaveCount(1);
   for (const action of await actions.all()) await expect(action).toBeVisible();
 });
 
-test('canonical homepage keeps the readable tablet sticker composition and authored anchors', async ({ page }, testInfo) => {
+test('canonical homepage keeps readable tablet project regions and authored anchors', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'canonical-768', 'Canonical geometry belongs to the 768px source-comparison project.');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/', { waitUntil: 'networkidle' });
@@ -666,32 +658,34 @@ test('canonical homepage keeps the readable tablet sticker composition and autho
       guideLeftX: (document.querySelector('.guide-left') as HTMLElement).offsetLeft,
       guideRightX: (document.querySelector('.guide-right') as HTMLElement).offsetLeft
         + (document.querySelector('.guide-right') as HTMLElement).offsetWidth,
-      githubShelf: box('.github-project-shelf'),
+      badgeLayer: box('[data-path-badges]'),
       hero: box('.stitch-hero'),
       heroCard: box('.hero-card'),
       research: box('#research'),
       researchBanner: box('.research-heading h2'),
       researchCards: [...document.querySelectorAll('.pub-card')].map((_, index) => box(`.pub-card--${index + 1}`)),
+      researchProjects: box('#research-projects'),
+      researchProjectCards: [...document.querySelectorAll('[data-research-project]')]
+        .map((card) => box(`[data-research-project="${card.getAttribute('data-research-project')}"]`)),
       vibe: box('#vibe'),
-      vibeCards: ['casmd', 'singularity', 'medit', 'yaos', 'zen'].map((role) => box(`[data-vibe-role="${role}"]`)),
+      vibeCards: ['singularity', 'medit', 'yaos', 'zen'].map((role) => box(`[data-vibe-role="${role}"]`)),
       vibeHeading: box('#vibe > h2'),
       vibeNote: box('.field-note'),
-      stickerConstellation: box('[data-sticker-constellation]'),
     };
   });
 
-  expect(geometry.documentHeight).toBeGreaterThanOrEqual(5_600);
-  expect(geometry.documentHeight).toBeLessThanOrEqual(5_680);
+  expect(geometry.documentHeight).toBeGreaterThanOrEqual(4_400);
+  expect(geometry.documentHeight).toBeLessThanOrEqual(4_500);
   expect(geometry.hero.bottom).toBeGreaterThanOrEqual(740);
   expect(geometry.hero.bottom).toBeLessThanOrEqual(800);
   expect(geometry.research.top).toBeGreaterThanOrEqual(790);
   expect(geometry.research.top).toBeLessThanOrEqual(840);
   expect(geometry.research.height).toBeGreaterThanOrEqual(760);
   expect(geometry.research.height).toBeLessThanOrEqual(820);
-  expect(geometry.vibe.top).toBeGreaterThanOrEqual(1_640);
-  expect(geometry.vibe.top).toBeLessThanOrEqual(1_710);
-  expect(geometry.vibe.height).toBeGreaterThanOrEqual(3_730);
-  expect(geometry.vibe.height).toBeLessThanOrEqual(3_800);
+  expect(geometry.researchProjects.top).toBeGreaterThanOrEqual(1_640);
+  expect(geometry.researchProjects.top).toBeLessThanOrEqual(1_760);
+  expect(geometry.vibe.top).toBeGreaterThan(geometry.researchProjects.bottom);
+  expect(geometry.vibe.bottom).toBeLessThanOrEqual(geometry.documentHeight);
   expect(geometry.heroCard.width).toBeGreaterThanOrEqual(370);
   expect(geometry.heroCard.width).toBeLessThanOrEqual(410);
   expect(geometry.heroCard.left).toBeGreaterThanOrEqual(180);
@@ -717,50 +711,38 @@ test('canonical homepage keeps the readable tablet sticker composition and autho
   }
   expect(geometry.researchCards[2].height).toBeGreaterThanOrEqual(210);
   expect(geometry.researchCards[2].height).toBeLessThanOrEqual(235);
-  expect(geometry.vibeHeading.width).toBeGreaterThanOrEqual(150);
-  expect(geometry.vibeHeading.width).toBeLessThanOrEqual(180);
-  expect(geometry.vibeHeading.left).toBeGreaterThanOrEqual(560);
-  expect(geometry.vibeHeading.left).toBeLessThanOrEqual(590);
-  expect(geometry.vibeHeading.top).toBeGreaterThanOrEqual(1_640);
-  expect(geometry.vibeHeading.top).toBeLessThanOrEqual(1_690);
+  expect(geometry.vibeHeading.width).toBeGreaterThanOrEqual(70);
+  expect(geometry.vibeHeading.width).toBeLessThanOrEqual(90);
+  expect(geometry.vibeHeading.right).toBeGreaterThanOrEqual(730);
+  expect(geometry.vibeHeading.right).toBeLessThanOrEqual(780);
+  expect(geometry.vibeHeading.top).toBeGreaterThanOrEqual(geometry.vibe.top - 2);
+  expect(geometry.vibeHeading.bottom).toBeLessThanOrEqual(geometry.vibe.bottom + 2);
   expect(geometry.vibeNote.width).toBeGreaterThanOrEqual(285);
   expect(geometry.vibeNote.width).toBeLessThanOrEqual(305);
-  expect(geometry.vibeNote.top).toBeGreaterThanOrEqual(1_660);
-  expect(geometry.vibeNote.top).toBeLessThanOrEqual(1_710);
-  const [casmd, singularity, medit, yaos, zen] = geometry.vibeCards;
-  expect(casmd.left).toBeGreaterThanOrEqual(25);
-  expect(casmd.left).toBeLessThanOrEqual(50);
-  expect(casmd.width).toBeGreaterThanOrEqual(430);
-  expect(casmd.width).toBeLessThanOrEqual(470);
-  expect(casmd.top).toBeGreaterThanOrEqual(1_790);
-  expect(casmd.top).toBeLessThanOrEqual(1_840);
+  expect(geometry.vibeNote.top).toBeGreaterThanOrEqual(geometry.vibe.top);
+  expect(geometry.vibeNote.bottom).toBeLessThanOrEqual(geometry.vibe.bottom);
+  const [singularity, medit, yaos, zen] = geometry.vibeCards;
   expect(singularity.width).toBeGreaterThanOrEqual(280);
-  expect(singularity.width).toBeLessThanOrEqual(300);
-  expect(singularity.left).toBeGreaterThanOrEqual(80);
-  expect(singularity.left).toBeLessThanOrEqual(105);
-  expect(singularity.top).toBeGreaterThanOrEqual(2_140);
-  expect(singularity.top).toBeLessThanOrEqual(2_190);
+  expect(singularity.width).toBeLessThanOrEqual(420);
   expect(medit.width).toBeGreaterThanOrEqual(275);
-  expect(medit.width).toBeLessThanOrEqual(290);
-  expect(medit.left).toBeGreaterThanOrEqual(385);
-  expect(medit.left).toBeLessThanOrEqual(405);
-  expect(medit.top).toBeGreaterThanOrEqual(2_120);
-  expect(medit.top).toBeLessThanOrEqual(2_170);
+  expect(medit.width).toBeLessThanOrEqual(360);
+  expect(medit.left).toBeGreaterThan(singularity.left);
+  expect(medit.top).toBeLessThan(singularity.bottom);
   for (const card of [yaos, zen]) {
     expect(card.width).toBeGreaterThanOrEqual(270);
     expect(card.width).toBeLessThanOrEqual(290);
   }
-  expect(yaos.left).toBeGreaterThanOrEqual(85);
-  expect(yaos.left).toBeLessThanOrEqual(125);
-  expect(zen.left).toBeGreaterThanOrEqual(375);
-  expect(zen.left).toBeLessThanOrEqual(415);
-  for (const card of [yaos, zen]) {
-    expect(card.top).toBeGreaterThanOrEqual(2_570);
-    expect(card.top).toBeLessThanOrEqual(2_610);
+  expect(yaos.left).toBeLessThan(zen.left);
+  expect(Math.abs(yaos.top - zen.top)).toBeLessThanOrEqual(8);
+  expect(geometry.researchProjects.top).toBeGreaterThan(geometry.research.bottom);
+  expect(geometry.vibe.top).toBeGreaterThanOrEqual(geometry.researchProjects.bottom);
+  expect(geometry.collaborationClose.top).toBeGreaterThan(Math.max(yaos.bottom, zen.bottom) + 20);
+  expect(geometry.badgeLayer).toMatchObject({ left: 0, top: 0, width: 768 });
+  expect(geometry.researchProjectCards).toHaveLength(6);
+  for (const card of [...geometry.researchProjectCards, ...geometry.vibeCards]) {
+    expect(card.left).toBeGreaterThanOrEqual(0);
+    expect(card.right).toBeLessThanOrEqual(768);
   }
-  expect(geometry.githubShelf.top).toBeGreaterThan(Math.max(yaos.bottom, zen.bottom) + 40);
-  expect(geometry.stickerConstellation.top).toBeGreaterThan(geometry.githubShelf.bottom + 40);
-  expect(geometry.collaborationClose.top).toBeGreaterThan(geometry.stickerConstellation.bottom + 20);
   expect(geometry.guideLeftX).toBeCloseTo(768 * .15, 0);
   expect(geometry.guideRightX).toBeCloseTo(768 * .76, 0);
   expect(geometry.footerSocials.left).toBeGreaterThanOrEqual(20);
@@ -1094,15 +1076,15 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
 
   if (testInfo.project.name === 'canonical-768') {
     const canonicalHeight = await captureFull('home-768-full.png');
-    expect(canonicalHeight).toBeGreaterThanOrEqual(5_600);
-    expect(canonicalHeight).toBeLessThanOrEqual(5_680);
+    expect(canonicalHeight).toBeGreaterThanOrEqual(4_400);
+    expect(canonicalHeight).toBeLessThanOrEqual(4_500);
     await captureSection('research-768.png', page.locator('#research'), {
       bottom: page.locator('.pub-card--3'),
-      capBefore: page.locator('#vibe > h2'),
+      capBefore: page.locator('#research-projects'),
       top: page.locator('.research-heading h2'),
     });
     await captureSection('vibe-768.png', page.locator('#vibe'), {
-      after: page.locator('.pub-card--3'),
+      after: page.locator('#research-projects'),
       bottom: page.locator('.collaboration-close'),
       top: page.locator('#vibe > h2'),
     });
@@ -1119,7 +1101,7 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
   } else if (testInfo.project.name === 'desktop') {
     await captureFull('home-1440-full.png');
     await captureSection('vibe-1440.png', page.locator('#vibe'), {
-      after: page.locator('.pub-card--3'),
+      after: page.locator('#research-projects'),
       bottom: page.locator('.collaboration-close'),
       top: page.locator('#vibe > h2'),
     });
@@ -1129,7 +1111,7 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
   } else if (testInfo.project.name === 'mobile') {
     await captureFull('home-390-full.png');
     await captureSection('vibe-390.png', page.locator('#vibe'), {
-      after: page.locator('.pub-card--3'),
+      after: page.locator('#research-projects'),
       bottom: page.locator('.collaboration-close'),
       top: page.locator('#vibe > h2'),
     });
@@ -1141,7 +1123,7 @@ test('capture deterministic source-comparison artifacts', async ({ page }, testI
     await page.evaluate(() => document.fonts.ready);
     await captureFull('home-320-full.png');
     await captureSection('vibe-320.png', page.locator('#vibe'), {
-      after: page.locator('.pub-card--3'),
+      after: page.locator('#research-projects'),
       bottom: page.locator('.collaboration-close'),
       top: page.locator('#vibe > h2'),
     });
