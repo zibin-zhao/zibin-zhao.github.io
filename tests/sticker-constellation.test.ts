@@ -59,7 +59,10 @@ describe('homepage path badges', () => {
     expect(component).toMatch(/\[data-guide='right'\]\s*\{[^}]*right:\s*24%;/);
     expect(component).toMatch(/\.path-badges\s*\{[^}]*position:\s*fixed;[^}]*z-index:\s*[1-9];[^}]*pointer-events:\s*none;/);
     const responsiveRules = component.slice(component.indexOf('@media (max-width: 700px)'));
-    expect(responsiveRules).not.toMatch(/\[data-guide='(?:left|right)'\]/);
+    expect(responsiveRules).toMatch(/\[data-guide='left'\]\s*\{[^}]*--badge-anchor-x:\s*8px;/);
+    expect(responsiveRules).toMatch(/\[data-guide='right'\]\s*\{[^}]*--badge-anchor-x:\s*-8px;/);
+    expect(responsiveRules).toMatch(/\[data-guide='left'\]::before\s*\{[^}]*left:\s*-16px;[^}]*right:\s*auto;/);
+    expect(responsiveRules).toMatch(/\[data-guide='right'\]::before\s*\{[^}]*right:\s*-16px;[^}]*left:\s*auto;/);
   });
 
   it('clips every motion wrapper to its guide with a cream paper tab behind the image', () => {

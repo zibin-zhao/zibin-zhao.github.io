@@ -118,3 +118,64 @@ test('renders each decorative badge as a paper-tab attachment on its dashed guid
     });
   }
 });
+
+for (const width of [390, 320]) {
+  test(`${width}px keeps each narrow badge beside its guide with the painted tab bridging the gap`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/', { waitUntil: 'networkidle' });
+
+    for (const fixture of [
+      { center: .06, guide: 'left' },
+      { center: .20, guide: 'right' },
+    ] as const) {
+      await page.evaluate((progress) => {
+        const range = document.documentElement.scrollHeight - innerHeight;
+        scrollTo({ top: Math.round(range * progress), behavior: 'instant' });
+      }, fixture.center);
+      const badge = page.locator(`[data-path-badge][data-center="${fixture.center}"]`);
+      await expect(badge).toHaveAttribute('data-visible', 'true');
+
+      const geometry = await badge.evaluate((element, expectedGuide) => {
+        const badgeElement = element as HTMLElement;
+        const badgeBox = badgeElement.getBoundingClientRect();
+        const guide = document.querySelector<HTMLElement>(`.guide-${expectedGuide}`);
+        if (!guide) throw new Error(`Missing ${expectedGuide} dashed guide`);
+        const guideX = expectedGuide === 'left'
+          ? guide.offsetLeft
+          : guide.offsetLeft + guide.offsetWidth;
+        const tab = getComputedStyle(badgeElement, '::before');
+        const probe = document.createElement('span');
+        Object.assign(probe.style, {
+          blockSize: tab.blockSize,
+          borderBottom: tab.borderBottom,
+          borderLeft: tab.borderLeft,
+          borderRight: tab.borderRight,
+          borderTop: tab.borderTop,
+          bottom: tab.bottom,
+          boxSizing: tab.boxSizing,
+          display: tab.display,
+          inlineSize: tab.inlineSize,
+          left: tab.left,
+          position: tab.position,
+          right: tab.right,
+          top: tab.top,
+          transform: tab.transform,
+          transformOrigin: tab.transformOrigin,
+        });
+        badgeElement.append(probe);
+        const tabBox = probe.getBoundingClientRect();
+        probe.remove();
+
+        return {
+          badgeBesideGuide: expectedGuide === 'left'
+            ? badgeBox.left >= guideX
+            : badgeBox.right <= guideX,
+          tabIntersectsGuide: tabBox.left <= guideX && tabBox.right >= guideX,
+        };
+      }, fixture.guide);
+
+      expect(geometry).toEqual({ badgeBesideGuide: true, tabIntersectsGuide: true });
+    }
+  });
+}

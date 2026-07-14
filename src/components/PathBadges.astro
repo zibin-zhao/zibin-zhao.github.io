@@ -119,6 +119,10 @@ const badges = [
 
   @media (max-width: 700px) {
     .path-badge { max-width: 104px; }
+    [data-guide='left'] { --badge-anchor-x: 8px; }
+    [data-guide='right'] { --badge-anchor-x: -8px; }
+    [data-guide='left']::before { left: -16px; right: auto; }
+    [data-guide='right']::before { right: -16px; left: auto; }
   }
 
   @media (max-width: 340px) {
