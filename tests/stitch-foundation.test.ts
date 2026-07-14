@@ -6,6 +6,17 @@ const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
 const compact = (value: string) => value.replace(/\s+/g, '');
 
 describe('Stitch shell', () => {
+  it('forwards the home route flag so only the homepage mounts path badges', () => {
+    const shell = read('src/layouts/StitchShell.astro');
+    const atmosphere = read('src/components/StitchAtmosphere.astro');
+
+    expect(shell).toContain('<StitchAtmosphere home={home} />');
+    expect(atmosphere).toContain("import PathBadges from './PathBadges.astro'");
+    expect(atmosphere).toContain('home?: boolean');
+    expect(atmosphere).toContain('const { home = false } = Astro.props');
+    expect(atmosphere).toContain('{home && <PathBadges />}');
+  });
+
   it('uses the source-faithful hero and cart asset', () => {
     expect(existsSync(new URL('src/components/StitchHero.astro', root))).toBe(true);
     const hero = read('src/components/StitchHero.astro');

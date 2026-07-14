@@ -15,7 +15,7 @@ const { title, description, active, home = false } = Astro.props;
 ---
 <Base title={title} description={description}>
   <div class:list={['stitch-shell', home && 'stitch-shell--home']}>
-    <StitchAtmosphere />
+    <StitchAtmosphere home={home} />
     <StitchHeader />
     <main id="main-content" class="stitch-main" tabindex="-1">
       <slot />

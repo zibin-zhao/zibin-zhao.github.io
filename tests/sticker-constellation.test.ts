@@ -7,26 +7,14 @@ const read = (path: string) => {
   return existsSync(url) ? readFileSync(url, 'utf8') : '';
 };
 
-describe('sticker constellation', () => {
-  it('replaces the old Beyond panel after the GitHub project shelf', () => {
-    const vibe = read('src/components/StitchVibe.astro');
-
-    expect(vibe).not.toContain('beyond-lab');
-    expect(vibe).not.toContain('Beyond the lab');
-    expect(vibe).not.toContain('interest-groups');
-    expect(vibe).toContain("import StickerConstellation from './StickerConstellation.astro'");
-    expect(vibe).toContain('<StickerConstellation />');
-    expect(vibe.indexOf('<StickerConstellation />'))
-      .toBeGreaterThan(vibe.indexOf('<GithubProjectShelf projects={githubProjects} />'));
-  });
-
-  it('renders exactly seven useful, local sticker figures with bilingual physical captions', () => {
-    const componentPath = 'src/components/StickerConstellation.astro';
+describe('homepage path badges', () => {
+  it('replaces the standalone constellation with seven decorative guide badges', () => {
+    const componentPath = 'src/components/PathBadges.astro';
     const component = read(componentPath);
-    expect(existsSync(new URL(componentPath, root))).toBe(true);
 
-    const figures = component.match(/<figure\b[\s\S]*?<\/figure>/g) ?? [];
-    expect(figures).toHaveLength(7);
+    expect(existsSync(new URL(componentPath, root))).toBe(true);
+    expect(existsSync(new URL('src/components/StickerConstellation.astro', root))).toBe(false);
+    expect(existsSync(new URL('src/scripts/sticker-motion.ts', root))).toBe(false);
 
     const expectedFiles = [
       'dna-ai',
@@ -37,77 +25,80 @@ describe('sticker constellation', () => {
       'meditation',
       'coding-lab',
     ];
-    const sources = figures.flatMap((figure) => [...figure.matchAll(/src="(\/stickers\/[^"]+\.png)"/g)]
-      .map((match) => match[1]));
+    const sources = [...component.matchAll(/src:\s*'((?:\/stickers\/)[^']+\.png)'/g)]
+      .map((match) => match[1]);
 
     expect(sources).toEqual(expectedFiles.map((name) => `/stickers/${name}.png`));
-    expect(figures[1]).toContain('alt="Violin, piano keys, guitar, and drums arranged as musical instruments"');
-    expect(figures[1]).toContain('<T en="Violin · piano · guitar · drums" zh="小提琴 · 钢琴 · 吉他 · 架子鼓" />');
-    for (const [index, figure] of figures.entries()) {
-      expect(existsSync(new URL(`public${sources[index]}`, root))).toBe(true);
-      expect(figure).toMatch(/<img\b[^>]*width="768"[^>]*height="768"/);
-      expect(figure).toContain('loading="lazy"');
-      expect(figure).toContain('decoding="async"');
-      const alt = figure.match(/alt="([^"]+)"/)?.[1] ?? '';
-      expect(alt.length).toBeGreaterThan(12);
-      expect(alt).toMatch(/[A-Za-z]{4}/);
-      expect(figure).toMatch(/<figcaption>[\s\S]*<T en="[^"]+" zh="[^"]+" \/>[\s\S]*<\/figcaption>/);
-      for (const property of ['depth', 'angle', 'duration', 'delay']) {
-        expect(figure).toContain(`--sticker-${property}:`);
-      }
+    for (const source of sources) expect(existsSync(new URL(`public${source}`, root))).toBe(true);
+
+    const visualLayer = component.match(/<div\b[^>]*data-path-badges[^>]*>[\s\S]*?<\/div>/)?.[0] ?? '';
+    expect(visualLayer).toContain('aria-hidden="true"');
+    expect(visualLayer).toMatch(/<img\b[^>]*data-path-badge/);
+    expect(visualLayer).toContain('alt=""');
+    expect(visualLayer).toContain('width="768"');
+    expect(visualLayer).toContain('height="768"');
+    expect(component).not.toMatch(/<figcaption\b|<section\b|<h[1-6]\b/);
+  });
+
+  it('authors scroll centers and alternates the badges between the two dashed guides', () => {
+    const component = read('src/components/PathBadges.astro');
+    const centers = [...component.matchAll(/center:\s*(0?\.\d+)/g)]
+      .map((match) => Number(match[1]));
+    const guides = [...component.matchAll(/guide:\s*'(left|right)'/g)]
+      .map((match) => match[1]);
+
+    expect(centers).toEqual([0.06, 0.20, 0.35, 0.50, 0.65, 0.80, 0.94]);
+    expect(guides).toEqual(['left', 'right', 'left', 'right', 'left', 'right', 'left']);
+    expect(component).toContain('data-center={badge.center}');
+    expect(component).toContain('data-guide={badge.guide}');
+    for (const property of ['size', 'top', 'tilt']) {
+      expect(component).toContain(`--badge-${property}`);
     }
+    expect(component).toMatch(/\[data-guide='left'\]\s*\{[^}]*left:\s*15%;/);
+    expect(component).toMatch(/\[data-guide='right'\]\s*\{[^}]*right:\s*24%;/);
+    expect(component).toMatch(/\.path-badges\s*\{[^}]*position:\s*fixed;[^}]*z-index:\s*[1-9];[^}]*pointer-events:\s*none;/);
+    const responsiveRules = component.slice(component.indexOf('@media (max-width: 700px)'));
+    expect(responsiveRules).not.toMatch(/\[data-guide='(?:left|right)'\]/);
   });
 
-  it('isolates reveal, parallax, and idle drift in nested transform wrappers', () => {
-    const component = read('src/components/StickerConstellation.astro');
-    const figures = component.match(/<figure\b[\s\S]*?<\/figure>/g) ?? [];
+  it('keeps one bilingual interest list available without visible badge copy', () => {
+    const component = read('src/components/PathBadges.astro');
+    const hiddenLists = component.match(/<ul\b[^>]*class="sr-only"[^>]*>[\s\S]*?<\/ul>/g) ?? [];
 
-    expect(component).toContain('data-sticker-constellation');
-    expect(component).toMatch(/<section\b[^>]*aria-label="[^"]+"/);
-    expect(component).not.toMatch(/<h[1-6]\b/);
-    for (const figure of figures) {
-      expect(figure).toMatch(/class="sticker-reveal"[\s\S]*class="sticker-parallax"[\s\S]*class="sticker-drift"/);
+    expect(hiddenLists).toHaveLength(1);
+    for (const interest of [
+      'DNA and AI / DNA 与 AI',
+      'Music / 音乐',
+      'Chinese calligraphy / 中国书法',
+      'Reading / 阅读',
+      'Psychology / 心理学',
+      'Meditation and Buddhism / 冥想与佛学',
+      'Coding experiments / 编程实验',
+    ]) {
+      expect(hiddenLists[0]).toContain(`<li>${interest}</li>`);
     }
+    expect(component).not.toMatch(/<figcaption\b|class="[^"\n]*(?:caption|label)[^"\n]*"/);
   });
 
-  it('keeps each semantic figcaption as the direct final child of its figure', () => {
-    const component = read('src/components/StickerConstellation.astro');
-    const figures = component.match(/<figure\b[\s\S]*?<\/figure>/g) ?? [];
+  it('uses one scheduled frame to select at most two desktop or one mobile badge', () => {
+    const scriptPath = 'src/scripts/path-badges.ts';
+    const script = read(scriptPath);
 
-    expect(figures).toHaveLength(7);
-    for (const figure of figures) {
-      const captionStart = figure.indexOf('<figcaption>');
-      expect(captionStart).toBeGreaterThan(0);
-      expect(figure.lastIndexOf('</div>')).toBeLessThan(captionStart);
-      expect(figure).toMatch(/<figcaption>[\s\S]*<\/figcaption>\s*<\/figure>$/);
-    }
-  });
+    expect(existsSync(new URL(scriptPath, root))).toBe(true);
+    expect(script.match(/requestAnimationFrame/g) ?? []).toHaveLength(1);
+    expect(script.match(/addEventListener\(['"]scroll['"]/g) ?? []).toHaveLength(1);
+    expect(script).toMatch(/addEventListener\(['"]scroll['"],\s*\w+,\s*\{\s*passive:\s*true\s*\}/);
+    expect(script.match(/addEventListener\(['"]resize['"]/g) ?? []).toHaveLength(1);
+    expect(script).toContain("addEventListener('astro:before-swap'");
+    expect(script).toContain("addEventListener('astro:page-load'");
+    expect(script).toContain("addEventListener('pagehide'");
+    expect(script).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
+    expect(script).toContain("removeEventListener('change'");
+    expect(script).toContain('cancelAnimationFrame');
 
-  it('queues a single transform-led parallax update and a one-time reveal', () => {
-    const motion = read('src/scripts/sticker-motion.ts');
-    expect(existsSync(new URL('src/scripts/sticker-motion.ts', root))).toBe(true);
-
-    expect(motion.match(/requestAnimationFrame/g) ?? []).toHaveLength(1);
-    expect(motion.match(/addEventListener\(['"]scroll['"]/g) ?? []).toHaveLength(1);
-    expect(motion).toMatch(/addEventListener\(['"]scroll['"],\s*\w+,\s*\{\s*passive:\s*true\s*\}/);
-    expect(motion.match(/new IntersectionObserver/g) ?? []).toHaveLength(1);
-    expect(motion).toContain('.unobserve(');
-    expect(motion).toMatch(/Math\.max\(-12,\s*Math\.min\(12,/);
-    expect(motion).toContain("style.setProperty('--sticker-scroll'");
-    expect(motion).not.toMatch(/style\.(?:top|right|bottom|left|width|height|margin|padding)/);
-  });
-
-  it('makes the constellation fully static when reduced motion is requested', () => {
-    const css = read('src/styles/stitch-motion.css');
-    const reduced = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'));
-
-    expect(reduced).toContain('.sticker-reveal');
-    expect(reduced).toContain('.sticker-parallax');
-    expect(reduced).toContain('.sticker-drift');
-    expect(reduced).toContain('.sticker-figure:hover');
-    expect(reduced).toContain('animation: none !important');
-    expect(reduced).toContain('transition: none !important');
-    expect(reduced).toContain('transform: none !important');
-    expect(reduced).toContain('opacity: 1 !important');
+    expect(script).toMatch(/document\.documentElement\.scrollHeight\s*-\s*window\.innerHeight/);
+    expect(script).toMatch(/window\.innerWidth\s*<=\s*700\s*\?\s*1\s*:\s*2/);
+    expect(script).toContain("badge.dataset.visible = visible.has(badge) ? 'true' : 'false'");
+    expect(script).toMatch(/Math\.abs\(\w+\.center\s*-\s*progress\)/);
   });
 });

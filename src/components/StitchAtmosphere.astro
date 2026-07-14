@@ -1,5 +1,12 @@
 ---
+import PathBadges from './PathBadges.astro';
 import RollerCoasterAtmosphere from './RollerCoasterAtmosphere.astro';
+
+interface Props {
+  home?: boolean;
+}
+
+const { home = false } = Astro.props;
 ---
 <div class="stitch-atmosphere" aria-hidden="true">
   <i class="drift-line guide-left animate-parallax-slow"></i>
@@ -10,6 +17,7 @@ import RollerCoasterAtmosphere from './RollerCoasterAtmosphere.astro';
   <span class="atmosphere-note note-pathway animate-float">→ Optimizing pathway...</span>
   <span class="atmosphere-note note-question animate-float">?!!</span>
 </div>
+{home && <PathBadges />}
 <RollerCoasterAtmosphere />
 
 <style>

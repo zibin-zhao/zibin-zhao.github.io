@@ -27,15 +27,15 @@ describe('playful researcher refinement', () => {
   it('adds the bilingual personal close without unexplained homepage numbering', () => {
     const research = read('src/components/FeaturedResearch.astro');
     const vibe = read('src/components/StitchVibe.astro');
-    const constellation = read('src/components/StickerConstellation.astro');
+    const pathBadges = read('src/components/PathBadges.astro');
 
     expect(research).not.toContain('02 —');
     expect(vibe).not.toContain('04 —');
     expect(vibe).not.toContain('<strong>LOL</strong>');
-    expect(vibe).toContain('Side Quests');
+    expect(vibe).toContain('<T en="Vibe" zh="随性实验" />');
 
-    for (const marker of ['Violin', '小提琴', 'Chinese calligraphy', '书法', 'Psychology', '心理学', 'Meditation', '冥想']) {
-      expect(constellation).toContain(marker);
+    for (const marker of ['DNA and AI', 'Music', 'Chinese calligraphy', 'Reading', 'Psychology', 'Meditation and Buddhism', 'Coding experiments']) {
+      expect(pathBadges).toContain(marker);
     }
     expect(vibe).toContain('Start a conversation');
   });

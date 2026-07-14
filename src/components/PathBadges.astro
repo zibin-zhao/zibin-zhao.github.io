@@ -1,0 +1,91 @@
+---
+const badges = [
+  { src: '/stickers/dna-ai.png', guide: 'left', center: 0.06, size: 'clamp(92px, 9vw, 138px)', top: '18%', tilt: '-7deg' },
+  { src: '/stickers/instruments.png', guide: 'right', center: 0.20, size: 'clamp(108px, 11vw, 164px)', top: '67%', tilt: '6deg' },
+  { src: '/stickers/calligraphy.png', guide: 'left', center: 0.35, size: 'clamp(88px, 8vw, 126px)', top: '43%', tilt: '-4deg' },
+  { src: '/stickers/reading.png', guide: 'right', center: 0.50, size: 'clamp(98px, 9vw, 144px)', top: '24%', tilt: '5deg' },
+  { src: '/stickers/psychology.png', guide: 'left', center: 0.65, size: 'clamp(96px, 9vw, 140px)', top: '73%', tilt: '-6deg' },
+  { src: '/stickers/meditation.png', guide: 'right', center: 0.80, size: 'clamp(92px, 8vw, 132px)', top: '48%', tilt: '4deg' },
+  { src: '/stickers/coding-lab.png', guide: 'left', center: 0.94, size: 'clamp(104px, 10vw, 152px)', top: '27%', tilt: '-5deg' },
+] as const;
+---
+
+<div class="path-badges" data-path-badges aria-hidden="true">
+  {badges.map((badge) => (
+    <img
+      class="path-badge"
+      data-path-badge
+      data-guide={badge.guide}
+      data-center={badge.center}
+      data-visible="false"
+      src={badge.src}
+      width="768"
+      height="768"
+      loading="lazy"
+      decoding="async"
+      alt=""
+      style={`--badge-size: ${badge.size}; --badge-top: ${badge.top}; --badge-tilt: ${badge.tilt};`}
+    />
+  ))}
+</div>
+
+<ul class="sr-only" aria-label="Personal interests / 个人兴趣">
+  <li>DNA and AI / DNA 与 AI</li>
+  <li>Music / 音乐</li>
+  <li>Chinese calligraphy / 中国书法</li>
+  <li>Reading / 阅读</li>
+  <li>Psychology / 心理学</li>
+  <li>Meditation and Buddhism / 冥想与佛学</li>
+  <li>Coding experiments / 编程实验</li>
+</ul>
+
+<script>import '../scripts/path-badges.ts';</script>
+
+<style>
+  .path-badges {
+    position: fixed;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .path-badge {
+    position: absolute;
+    top: var(--badge-top);
+    width: var(--badge-size);
+    height: auto;
+    opacity: 0;
+    filter: drop-shadow(3px 4px 0 color-mix(in srgb, var(--ink) 28%, transparent));
+    transform: translate(var(--badge-anchor-x), -50%) rotate(var(--badge-tilt)) scale(.8);
+    transition: opacity 220ms ease, transform 280ms ease;
+  }
+
+  [data-guide='left'] { left: 15%; --badge-anchor-x: -50%; }
+  [data-guide='right'] { right: 24%; --badge-anchor-x: 50%; }
+
+  .path-badge[data-visible='true'] {
+    opacity: .88;
+    transform: translate(var(--badge-anchor-x), -50%) rotate(var(--badge-tilt)) scale(1);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (max-width: 700px) {
+    .path-badge { max-width: 104px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .path-badge { transition: none; }
+  }
+</style>
