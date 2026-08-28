@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { profile } from '../data/profile';
-const { title = 'Zibin Zhao', description = 'Curious builder doing a PhD at HKUST — exploring AI and biology through molecular diagnostics, CRISPR, and aptamer design.' } = Astro.props;
+const { title = 'Zibin Zhao', description = 'Curious builder doing a PhD at HKUST — exploring AI and biology through molecular diagnostics, CRISPR, and aptamer design.', home = false } = Astro.props;
 const ogImage = Astro.site ? new URL('og.png', Astro.site).href : '/og.png';
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.pathname;
 const personSchema = {
@@ -23,7 +23,8 @@ const personSchema = {
 };
 ---
 <!doctype html>
-<html lang="en" data-lang="en">
+<!-- 夜航主页为中文单语页, 文档语言必须与画面一致, 读屏才不会用英文音韵念中文 -->
+<html lang={home ? 'zh' : 'en'} data-lang={home ? 'zh' : 'en'}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

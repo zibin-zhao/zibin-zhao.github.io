@@ -35,3 +35,6 @@ blob-report/
 
 # video render frames (intermediate); keep video/intro.html, render.mjs, assets, and public/intro.mp4
 video/frames/
+
+# local review-tool artifacts
+.impeccable/

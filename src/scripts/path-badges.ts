@@ -25,10 +25,10 @@ const startPathBadges = () => {
   layer.dataset.motionState = reducedMotion.matches ? 'reduced' : 'running';
   let scheduledFrame: number | undefined;
 
-  const updateBadges = () => {
+  const updateBadges = (forcedProgress?: number) => {
     scheduledFrame = undefined;
     const scrollRange = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-    const progress = Math.max(0, Math.min(1, window.scrollY / scrollRange));
+    const progress = forcedProgress ?? Math.max(0, Math.min(1, window.scrollY / scrollRange));
     const visibleCount = window.innerWidth <= 700 ? 1 : 2;
     const visible = new Set(
       [...badges]
@@ -42,19 +42,26 @@ const startPathBadges = () => {
     }
   };
 
-  const scheduleUpdate = () => {
+  const scheduleUpdate = (forcedProgress?: number) => {
     if (scheduledFrame !== undefined) return;
-    scheduledFrame = window.requestAnimationFrame(updateBadges);
+    scheduledFrame = window.requestAnimationFrame(() => updateBadges(forcedProgress));
   };
+  // 夜航册页: 兴趣徽章跟随帧推进, 而不是滚动
+  window.addEventListener('nightdeck:frame', (event) => {
+    const progress = (event as CustomEvent<{ progress?: number }>).detail?.progress;
+    if (typeof progress === 'number') scheduleUpdate(progress);
+  });
   const handleMotionChange = () => startPathBadges();
 
-  window.addEventListener('scroll', scheduleUpdate, { passive: true });
-  window.addEventListener('resize', scheduleUpdate);
+  const onScroll = () => scheduleUpdate();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  const onResize = () => scheduleUpdate();
+  window.addEventListener('resize', onResize);
   reducedMotion.addEventListener('change', handleMotionChange);
 
   stopController = () => {
-    window.removeEventListener('scroll', scheduleUpdate);
-    window.removeEventListener('resize', scheduleUpdate);
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', onResize);
     reducedMotion.removeEventListener('change', handleMotionChange);
     if (scheduledFrame !== undefined) window.cancelAnimationFrame(scheduledFrame);
   };

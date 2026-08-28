@@ -225,7 +225,7 @@ test('no-JS Prompts keeps all content, stage anchors, and footer links', async (
   await expect(page.locator('.ptext')).toHaveCount(promptTexts.length);
   await expect(page.locator('.stagenav a')).toHaveCount(promptPack.stages.length);
   await expect(page.locator('.foot .home[href="/"]')).toBeVisible();
-  await expect(page.locator('.footer-routes a')).toHaveCount(6);
+  await expect(page.locator('.footer-routes a')).toHaveCount(7);
   await expect(page.locator('.draw-control[href="/prompts/"]')).toBeVisible();
   await page.locator('.stagenav a[href="#stage-8"]').click();
   await expect(page).toHaveURL(/#stage-8$/);

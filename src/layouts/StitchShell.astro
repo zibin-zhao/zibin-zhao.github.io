@@ -13,7 +13,7 @@ interface Props {
 
 const { title, description, active, home = false } = Astro.props;
 ---
-<Base title={title} description={description}>
+<Base title={title} description={description} home={home}>
   <div class:list={['stitch-shell', home && 'stitch-shell--home']}>
     <StitchAtmosphere home={home} />
     <StitchHeader />
@@ -35,7 +35,7 @@ const { title, description, active, home = false } = Astro.props;
     padding-bottom: calc(var(--footer-reserve) + env(safe-area-inset-bottom));
   }
   @media (min-width: 701px) and (max-width: 960px) {
-    .stitch-main { padding-bottom: calc(190px + env(safe-area-inset-bottom)); }
+    .stitch-main { padding-bottom: calc(var(--footer-reserve) + env(safe-area-inset-bottom)); }
   }
   @media (max-width: 700px) {
     .stitch-main { padding-bottom: 32px; }

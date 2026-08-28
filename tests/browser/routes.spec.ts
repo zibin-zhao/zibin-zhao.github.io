@@ -453,7 +453,7 @@ test('all archive routes keep ordinary English anchors without JavaScript', asyn
     expect(response?.status()).toBe(200);
     await expect(page.getByRole('button', { name: 'Switch language / 切换语言' })).toBeHidden();
     await expect(page.locator('.index-sheet-heading h1 .t-en')).toBeVisible();
-    await expect(page.locator('.footer-routes a')).toHaveCount(6);
+    await expect(page.locator('.footer-routes a')).toHaveCount(7);
     for (const anchor of await page.locator('.footer-routes a').all()) await expect(anchor).toBeVisible();
     await assertNoOverflowOrDockOverlap(page);
   }

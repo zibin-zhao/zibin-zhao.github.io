@@ -17,17 +17,23 @@ describe('Stitch shell', () => {
     expect(atmosphere).toContain('{home && <PathBadges />}');
   });
 
-  it('uses the source-faithful hero and cart asset', () => {
-    expect(existsSync(new URL('src/components/StitchHero.astro', root))).toBe(true);
-    const hero = read('src/components/StitchHero.astro');
+  it('opens the homepage with the nacre gate as the authored hero', () => {
+    expect(existsSync(new URL('src/components/StitchNacreGate.astro', root))).toBe(true);
+    const gate = read('src/components/StitchNacreGate.astro');
     const page = read('src/pages/index.astro');
 
-    for (const marker of ['hero-wordmark', 'collaboration-sticker', 'hero-card', 'scroll-sticker']) {
-      expect(hero).toContain(marker);
+    for (const marker of ['id="night-gate"', 'gate-lamp', '螺钿夜航', '/night/']) {
+      expect(gate).toContain(marker);
     }
-    expect(hero).toContain('src="/stitch/cart.png"');
-    expect(page).toContain('<StitchHero />');
-    for (const legacy of ['<About />', '<Projects />', '<CvTimeline />', '<Contact />']) {
+    const deck = read('src/components/StitchNightDeck.astro');
+    for (const marker of ['id="night-deck"', 'data-frame="4"', '螺钿夜航', 'deck-noscript']) {
+      expect(deck).toContain(marker);
+    }
+    expect(page).toContain('<StitchNightDeck />');
+    for (const legacy of ['<StitchNacreGate />', '<NightJourney />']) {
+      expect(page).not.toContain(legacy);
+    }
+    for (const legacy of ['<About />', '<Projects />', '<CvTimeline />', '<Contact />', '<StitchHero />']) {
       expect(page).not.toContain(legacy);
     }
   });
@@ -35,18 +41,16 @@ describe('Stitch shell', () => {
   it('uses canonical records for the authored featured-research composition', () => {
     expect(existsSync(new URL('src/components/FeaturedResearch.astro', root))).toBe(true);
     expect(existsSync(new URL('src/pages/research.astro', root))).toBe(true);
-    const featured = read('src/components/FeaturedResearch.astro');
+    const deck = read('src/components/StitchNightDeck.astro');
     const home = read('src/pages/index.astro');
     const archive = read('src/pages/research.astro');
 
-    expect(featured).toContain("getCollection('publications')");
-    expect(featured).toContain('selectByTitles');
-    expect(featured).toContain('HOME_RESEARCH_TITLES');
-    expect(featured).toContain('id="research"');
-    expect(featured).toContain('fade-slot');
-    expect(featured).toContain('pub-card');
-    expect(home).toContain('<FeaturedResearch />');
-    expect(home.indexOf('<FeaturedResearch />')).toBeGreaterThan(home.indexOf('<StitchHero />'));
+    expect(deck).toContain("getCollection('publications')");
+    expect(deck).toContain('selectByTitles');
+    expect(deck).toContain('HOME_RESEARCH_TITLES');
+    expect(deck).toContain('data-frame="1"');
+    expect(deck).toContain('pub-row');
+    expect(home).toContain('<StitchNightDeck />');
     expect(archive).toContain('<StitchShell title="Research — Zibin Zhao" active="research">');
     expect(archive).toContain('<IndexSheet number="02" title="Research & Publications" titleZh="研究与论文">');
     expect(archive).toContain('<PubList />');
@@ -57,30 +61,25 @@ describe('Stitch shell', () => {
     expect(existsSync(new URL('src/components/StitchVibe.astro', root))).toBe(true);
     expect(existsSync(new URL('src/components/StitchVibeCard.astro', root))).toBe(true);
     const researchProjects = read('src/components/StitchResearchProjects.astro');
-    const vibe = read('src/components/StitchVibe.astro');
-    const card = read('src/components/StitchVibeCard.astro');
+    const deck = read('src/components/StitchNightDeck.astro');
     const home = read('src/pages/index.astro');
 
     expect(researchProjects).toContain('id="research-projects"');
-    expect(vibe).toContain("getCollection('vibe')");
-    expect(vibe).toContain('selectByTitles');
-    expect(vibe).toContain('HOME_VIBE_TITLES');
-    expect(vibe.match(/<StitchVibeCard\b/g)).toHaveLength(4);
-    for (const role of ['singularity', 'medit', 'yaos', 'zen']) {
-      expect(vibe).toContain(`vibe-card--${role}`);
+    expect(deck).toContain("getCollection('vibe')");
+    expect(deck).toContain('selectByTitles');
+    expect(deck).toContain('HOME_VIBE_TITLES');
+    expect(deck).toContain("getGithubProjects");
+    expect(deck).toContain('partitionGithubProjects');
+    const researchFrame = deck.indexOf('data-frame="1"');
+    const projectsFrame = deck.indexOf('data-frame="2"');
+    const vibeFrame = deck.indexOf('data-frame="3"');
+    expect(researchFrame).toBeGreaterThanOrEqual(0);
+    expect(researchFrame).toBeLessThan(projectsFrame);
+    expect(projectsFrame).toBeLessThan(vibeFrame);
+    for (const title of ['Singularity', 'Medit', 'Yaos', 'Zen']) {
+      expect(deck).not.toContain(`'${title}'`);
     }
-    expect(vibe).not.toContain('vibe-card--casmd');
-    expect(vibe).toContain('<T en="Vibe" zh="随性实验" />');
-    expect(vibe).toContain('id="vibe"');
-    expect(vibe).not.toContain('GithubProjectShelf');
-    expect(vibe).not.toContain('StickerConstellation');
-    expect(vibe).not.toContain('getGithubProjects');
-    expect(card).toContain("role: 'singularity' | 'medit' | 'yaos' | 'zen'");
-    expect(card).not.toContain("'casmd'");
-    expect(home).toContain('<StitchResearchProjects />');
-    expect(home).toContain('<StitchVibe />');
-    expect(home.indexOf('<StitchResearchProjects />')).toBeGreaterThan(home.indexOf('<FeaturedResearch />'));
-    expect(home.indexOf('<StitchVibe />')).toBeGreaterThan(home.indexOf('<StitchResearchProjects />'));
+    expect(home).toContain('<StitchNightDeck />');
   });
 
   it('owns rotation inside fade wrappers and preserves canonical Vibe geometry', () => {

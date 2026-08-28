@@ -1,13 +1,12 @@
 ---
 import StitchShell from '../layouts/StitchShell.astro';
-import StitchHero from '../components/StitchHero.astro';
-import FeaturedResearch from '../components/FeaturedResearch.astro';
-import StitchResearchProjects from '../components/StitchResearchProjects.astro';
-import StitchVibe from '../components/StitchVibe.astro';
+import StitchNightDeck from '../components/StitchNightDeck.astro';
+import '../styles/night-home.css';
 ---
-<StitchShell home>
-  <StitchHero />
-  <FeaturedResearch />
-  <StitchResearchProjects />
-  <StitchVibe />
+<StitchShell
+  home
+  title="赵子彬 Zibin Zhao — 生物工程 × 人工智能 · 香港科技大学"
+  description="赵子彬的螺钿夜航主页：香港科技大学生物工程 × 人工智能，研究、造物与生活。"
+>
+  <StitchNightDeck />
 </StitchShell>

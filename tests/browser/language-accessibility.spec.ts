@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test('exposes the active language and persisted target across navigation', async ({ page }) => {
-  await page.goto('/');
+  // 语言开关住在档案子页; 夜航主页已诚实单语 (zh), 不再承载切换
+  await page.goto('/about/');
 
   let toggle = page.getByRole('button', { name: 'Switch language / 切换语言' });
   await expect(toggle).toHaveAttribute('aria-pressed', 'false');
@@ -13,23 +14,30 @@ test('exposes the active language and persisted target across navigation', async
   await expect(toggle).toHaveAttribute('aria-label', /中文已启用；切换到 English/);
   await expect(toggle.locator('.target:visible')).toHaveText('EN');
 
-  await page.goto('/about/');
+  await page.goto('/research/');
   toggle = page.getByRole('button', { name: 'Switch language / 切换语言' });
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
   await expect(toggle).toHaveAttribute('aria-pressed', 'true');
   await expect(toggle).toHaveAttribute('aria-label', /中文已启用；切换到 English/);
 
   await toggle.click();
-  await page.goto('/research/');
+  await page.goto('/cv/');
   toggle = page.getByRole('button', { name: 'Switch language / 切换语言' });
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(toggle).toHaveAttribute('aria-pressed', 'false');
   await expect(toggle).toHaveAttribute('aria-label', /English active; switch to 中文/);
 });
 
+test('the nacre homepage is honestly monolingual: zh document, no dead toggle', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+  await expect(page.locator('html')).toHaveAttribute('data-lang', 'zh');
+  await expect(page.locator('.langtoggle')).toBeHidden();
+});
+
 test('keeps the language hit target accessible without colliding at 390px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await page.goto('/research/');
 
   const toggleBox = await page.getByRole('button', { name: 'Switch language / 切换语言' }).boundingBox();
   const talkBox = await page.locator('.talk').boundingBox();
@@ -72,7 +80,7 @@ test('keeps one bilingual interest list available without exposing decorative ba
   ]);
   await expect(page.getByRole('heading', { name: /Beyond the lab/i })).toHaveCount(0);
 
-  await page.getByRole('button', { name: 'Switch language / 切换语言' }).click();
+  // 首页单语: 文档语言本就是中文, 无需切换
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
   await expect(interestList).toHaveCount(1);
   await expect(badgeLayer.locator('[data-path-badge]')).toHaveCount(7);
@@ -106,7 +114,7 @@ test('renders each decorative badge as a paper-tab attachment on its dashed guid
 
   for (const contract of contracts) {
     expect(contract).toEqual({
-      background: 'rgb(255, 250, 224)',
+      background: 'rgb(16, 16, 22)',
       content: '""',
       guideAttached: true,
       imageCount: 1,
@@ -130,8 +138,7 @@ for (const width of [390, 320]) {
       { center: .20, guide: 'right' },
     ] as const) {
       await page.evaluate((progress) => {
-        const range = document.documentElement.scrollHeight - innerHeight;
-        scrollTo({ top: Math.round(range * progress), behavior: 'instant' });
+        window.dispatchEvent(new CustomEvent('nightdeck:frame', { detail: { progress } }));
       }, fixture.center);
       const badge = page.locator(`[data-path-badge][data-center="${fixture.center}"]`);
       await expect(badge).toHaveAttribute('data-visible', 'true');

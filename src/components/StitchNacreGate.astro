@@ -1,0 +1,674 @@
+---
+---
+
+<section class="nacre-gate" id="night-gate" aria-label="第零幕 · 夜航门厅">
+  <canvas class="gate-canvas" id="gate-canvas" aria-hidden="true"></canvas>
+  <div class="gate-vignette" aria-hidden="true"></div>
+  <div class="gate-inner">
+    <p class="gate-kicker">
+      <span class="kicker-zh">螺钿夜航</span>
+    </p>
+    <div class="gate-doors">
+      <div class="doors">
+        <a class="door door-primary" href="/night/">
+          <span class="door-zh">入夜 · 四幕</span>
+        </a>
+        <button class="door" id="gate-lamp" type="button">
+          <span class="door-zh">顺流而下</span>
+        </button>
+      </div>
+    </div>
+    <p class="gate-hint" aria-hidden="true">移动 · 掌灯 <em>／</em> 轻点 · 风起</p>
+  </div>
+</section>
+
+<style>
+  .nacre-gate {
+    position: relative;
+    /* Fixed pixel heights: vh here would reflow the document when the
+       artifact projection inflates the viewport. */
+    height: 800px;
+    overflow: hidden;
+    background: #060608;
+    color: #ece7d8;
+    font-family: 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif;
+  }
+  @media (min-width: 1600px) {
+    .nacre-gate {
+      height: 860px;
+    }
+  }
+  .gate-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .gate-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(120% 90% at 50% 42%, transparent 55%, rgba(2, 2, 4, 0.55) 100%);
+  }
+  .gate-vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .gate-inner {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(18px, 3vw, 30px) clamp(20px, 3.4vw, 36px);
+    pointer-events: none;
+  }
+  .gate-kicker {
+    margin: 0;
+  }
+  .kicker-zh {
+    display: block;
+    font-size: 0.95rem;
+    letter-spacing: 0.42em;
+  }
+  .kicker-en {
+    display: block;
+    margin-top: 7px;
+    font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    color: rgba(236, 231, 216, 0.3);
+  }
+  .gate-doors {
+    max-width: 560px;
+    margin-right: auto;
+    margin-bottom: clamp(24px, 6vh, 64px);
+  }
+  .doors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .door {
+    pointer-events: auto;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 14px 18px;
+    background: rgba(6, 6, 8, 0.4);
+    border: 1px solid rgba(236, 231, 216, 0.35);
+    color: #ece7d8;
+    font-family: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 300ms ease, background 300ms ease, transform 300ms ease;
+  }
+  .door:hover,
+  .door:focus-visible {
+    border-color: rgba(236, 231, 216, 0.9);
+    background: rgba(20, 20, 24, 0.55);
+    transform: translateY(-2px);
+  }
+  .door:focus-visible {
+    outline: 1px solid rgba(236, 231, 216, 0.6);
+    outline-offset: 4px;
+  }
+  .door-primary {
+    border-color: rgba(181, 55, 44, 0.65);
+  }
+  .door-primary:hover,
+  .door-primary:focus-visible {
+    border-color: #b5372c;
+  }
+  .door-zh {
+    font-size: 1rem;
+    letter-spacing: 0.26em;
+  }
+  .door-en {
+    font-family: ui-monospace, 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    font-size: 0.56rem;
+    letter-spacing: 0.26em;
+    color: rgba(236, 231, 216, 0.45);
+  }
+  .gate-hint {
+    align-self: flex-end;
+    margin: 0;
+    font-size: 0.66rem;
+    letter-spacing: 0.24em;
+    color: rgba(236, 231, 216, 0.3);
+  }
+  .gate-hint em {
+    font-style: normal;
+    opacity: 0.45;
+    margin: 0 0.35em;
+  }
+  @media (max-width: 560px) {
+    .nacre-gate {
+      height: 640px;
+    }
+    .kicker-zh {
+      letter-spacing: 0.3em;
+    }
+    .gate-hint {
+      align-self: center;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .door {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  type Fragment = {
+    tx: number;
+    ty: number;
+    sx: number;
+    sy: number;
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    rot: number;
+    hue: number;
+    sat: number;
+    lit: number;
+    tone: number;
+    phase: number;
+    delay: number;
+  };
+
+  const section = document.getElementById('night-gate');
+  const canvas = document.getElementById('gate-canvas') as HTMLCanvasElement | null;
+  const lampButton = document.getElementById('gate-lamp');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const MORPH_MS = 2400;
+  const CHIP_DUR = 1400;
+
+  const state = {
+    w: 0,
+    h: 0,
+    dpr: 1,
+    fragments: [] as Fragment[],
+    mode: 'morph' as 'morph' | 'fast' | 'static',
+    modeSince: 0,
+    lightX: 0,
+    lightTargetX: 0,
+    lastPointerAt: 0,
+    timer: 0,
+    inView: true,
+  };
+
+  let bgLayer: HTMLCanvasElement | null = null;
+  let shellLayer: HTMLCanvasElement | null = null;
+  let mainCtx: CanvasRenderingContext2D | null = null;
+
+  const rand = (min: number, max: number) => min + Math.random() * (max - min);
+  const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+  const styleCache = new Map<number, string>();
+  function quantizedStyle(hue: number, sat: number, lit: number, alpha: number): string {
+    const h = Math.round(hue / 8);
+    const s = Math.round(sat / 8);
+    const l = Math.round(lit / 5);
+    const a = Math.round(alpha * 20);
+    if (a <= 0) return 'rgba(0, 0, 0, 0)';
+    const key = ((h * 64 + s) * 64 + l) * 24 + a;
+    let style = styleCache.get(key);
+    if (style === undefined) {
+      style = `hsla(${h * 8}, ${s * 8}%, ${l * 5}%, ${a / 20})`;
+      if (styleCache.size < 8192) styleCache.set(key, style);
+    }
+    return style;
+  }
+
+  function makeNacre(): { hue: number; sat: number; lit: number } {
+    if (Math.random() < 0.14) {
+      return { hue: rand(30, 60), sat: rand(8, 15), lit: rand(62, 76) };
+    }
+    const hues = [328, 342, 38, 52, 148, 168, 188, 204, 262, 282];
+    return {
+      hue: hues[Math.floor(Math.random() * hues.length)] + rand(-8, 8),
+      sat: rand(40, 62),
+      lit: rand(52, 66),
+    };
+  }
+
+  function drawSceneMask(w: number, h: number): HTMLCanvasElement {
+    const mask = document.createElement('canvas');
+    mask.width = w;
+    mask.height = h;
+    const m = mask.getContext('2d');
+    if (!m) return mask;
+    m.fillStyle = '#000';
+    m.fillRect(0, 0, w, h);
+    m.lineCap = 'round';
+    const u = (f: number) => f * w;
+    const v = (f: number) => f * h;
+    const minDim = Math.min(w, h);
+    const white = 'rgb(255,255,255)';
+    const bright = 'rgb(200,200,200)';
+    const mid = 'rgb(150,150,150)';
+    const faint = 'rgb(110,110,110)';
+    const waterline = v(0.615);
+    const moonX = u(0.74);
+    const moonY = v(0.24);
+    const moonR = Math.min(74, Math.max(22, minDim * 0.07));
+
+    m.fillStyle = bright;
+    for (let i = 0; i < 30; i++) {
+      const x = rand(u(0.03), u(0.97));
+      const y = rand(v(0.05), v(0.48));
+      if (Math.hypot(x - moonX, y - moonY) < moonR * 2) continue;
+      m.beginPath();
+      m.arc(x, y, rand(0.6, 1.3), 0, Math.PI * 2);
+      m.fill();
+    }
+    m.fillStyle = white;
+    m.beginPath();
+    m.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+    m.fill();
+
+    // 圭峰远山
+    const range = (points: Array<[number, number]>, color: string) => {
+      m.fillStyle = color;
+      m.beginPath();
+      m.moveTo(u(points[0][0]), v(points[0][1]));
+      for (const [fx, fy] of points) m.lineTo(u(fx), v(fy));
+      m.lineTo(u(points[points.length - 1][0]), waterline + 4);
+      m.lineTo(u(points[0][0]), waterline + 4);
+      m.closePath();
+      m.fill();
+    };
+    range(
+      [
+        [0.0, 0.6],
+        [0.1, 0.5],
+        [0.2, 0.565],
+        [0.3, 0.538],
+        [0.4, 0.6],
+        [0.47, 0.615],
+      ],
+      faint,
+    );
+    range(
+      [
+        [0.03, 0.615],
+        [0.13, 0.578],
+        [0.23, 0.615],
+      ],
+      mid,
+    );
+
+    // 孤舟蓑翁
+    m.fillStyle = white;
+    m.beginPath();
+    m.moveTo(u(0.3), v(0.603));
+    m.quadraticCurveTo(u(0.37), v(0.648), u(0.445), v(0.651));
+    m.quadraticCurveTo(u(0.52), v(0.647), u(0.552), v(0.606));
+    m.quadraticCurveTo(u(0.43), v(0.622), u(0.3), v(0.603));
+    m.closePath();
+    m.fill();
+    const fx = u(0.43);
+    m.beginPath();
+    m.moveTo(fx, v(0.532));
+    m.lineTo(u(0.4), v(0.556));
+    m.lineTo(u(0.46), v(0.556));
+    m.closePath();
+    m.fill();
+    m.beginPath();
+    m.ellipse(fx, v(0.556), u(0.035), Math.max(2, h * 0.007), 0, 0, Math.PI * 2);
+    m.fill();
+    m.beginPath();
+    m.arc(fx, v(0.568), Math.max(4, h * 0.011), 0, Math.PI * 2);
+    m.fill();
+    m.beginPath();
+    m.ellipse(u(0.427), v(0.6), u(0.026), h * 0.037, -0.12, 0, Math.PI * 2);
+    m.fill();
+    m.strokeStyle = white;
+    m.lineWidth = Math.max(2, h * 0.0032);
+    m.beginPath();
+    m.moveTo(u(0.447), v(0.585));
+    m.lineTo(u(0.467), v(0.572));
+    m.stroke();
+    m.lineWidth = Math.max(1.4, h * 0.002);
+    m.beginPath();
+    m.moveTo(u(0.463), v(0.575));
+    m.lineTo(u(0.545), v(0.532));
+    m.stroke();
+    m.strokeStyle = mid;
+    m.lineWidth = 1;
+    m.beginPath();
+    m.moveTo(u(0.545), v(0.532));
+    m.quadraticCurveTo(u(0.551), v(0.6), u(0.553), v(0.66));
+    m.stroke();
+
+    // 船头灯
+    m.strokeStyle = white;
+    m.lineWidth = Math.max(1.6, h * 0.0024);
+    m.beginPath();
+    m.moveTo(u(0.318), v(0.612));
+    m.lineTo(u(0.305), v(0.545));
+    m.stroke();
+    m.fillStyle = white;
+    m.beginPath();
+    m.arc(u(0.3035), v(0.537), Math.max(4.5, h * 0.012), 0, Math.PI * 2);
+    m.fill();
+
+    // 芦苇
+    for (let i = 0; i < 6; i++) {
+      const baseX = rand(u(0.02), u(0.12));
+      const tipY = rand(v(0.42), v(0.58));
+      const bend = rand(u(0.02), u(0.05));
+      m.strokeStyle = bright;
+      m.lineWidth = rand(2, 3.2);
+      m.beginPath();
+      m.moveTo(baseX, h + 8);
+      m.quadraticCurveTo(baseX + bend * 0.4, v(0.76), baseX + bend, tipY);
+      m.stroke();
+    }
+    for (let i = 0; i < 3; i++) {
+      const baseX = rand(u(0.88), u(0.97));
+      const tipY = rand(v(0.46), v(0.58));
+      const bend = -rand(u(0.02), u(0.04));
+      m.strokeStyle = bright;
+      m.lineWidth = rand(2, 3);
+      m.beginPath();
+      m.moveTo(baseX, h + 8);
+      m.quadraticCurveTo(baseX + bend * 0.4, v(0.78), baseX + bend, tipY);
+      m.stroke();
+    }
+
+    // 涟漪与月光柱
+    const ripple = (x: number, y: number, len: number, color: string) => {
+      m.fillStyle = color;
+      m.save();
+      m.translate(x, y);
+      m.rotate(rand(-0.03, 0.03));
+      const r = Math.max(1, h * 0.0012);
+      m.beginPath();
+      m.roundRect(-len / 2, -r / 2, len, r, r);
+      m.fill();
+      m.restore();
+    };
+    for (let i = 0; i < 70; i++) {
+      const x = rand(u(0.04), u(0.96));
+      const y = rand(v(0.632), v(0.95));
+      if (x > u(0.26) && x < u(0.6) && y > v(0.585) && y < v(0.68)) continue;
+      ripple(x, y, rand(u(0.02), u(0.08)), Math.random() < 0.35 ? bright : mid);
+    }
+    for (let i = 0; i < 20; i++) {
+      const y = v(0.625) + (i / 19) * (v(0.9) - v(0.625));
+      ripple(moonX + Math.sin(i * 1.7) * u(0.028) + rand(-6, 6), y, rand(u(0.018), u(0.05)), bright);
+    }
+    return mask;
+  }
+
+  function buildFragments(w: number, h: number): Fragment[] {
+    const mask = drawSceneMask(w, h);
+    const mctx = mask.getContext('2d');
+    if (!mctx) return [];
+    const image = mctx.getImageData(0, 0, w, h).data;
+    const step = Math.max(3, Math.round(Math.min(w, h) / 185));
+    const fragments: Fragment[] = [];
+    for (let y = step / 2; y < h; y += step) {
+      for (let x = step / 2; x < w; x += step) {
+        const px = (Math.floor(y) * w + Math.floor(x)) * 4;
+        const tone = image[px] / 255;
+        if (tone <= 0.05 || Math.random() > tone * 0.95) continue;
+        const nacre = makeNacre();
+        fragments.push({
+          tx: x + rand(-step * 0.5, step * 0.5),
+          ty: y + rand(-step * 0.5, step * 0.5),
+          sx: rand(-w * 0.1, w * 1.1),
+          sy: rand(-h * 0.2, h * 1.2),
+          x: 0,
+          y: 0,
+          w: step * rand(0.55, 1.15),
+          h: Math.max(1, step * rand(0.22, 0.42)),
+          rot: rand(-0.6, 0.6),
+          hue: nacre.hue,
+          sat: nacre.sat,
+          lit: nacre.lit,
+          tone,
+          phase: rand(0, Math.PI * 2),
+          delay: rand(0, 500),
+        });
+      }
+    }
+    for (const f of fragments) {
+      f.x = f.sx;
+      f.y = f.sy;
+    }
+    return fragments;
+  }
+
+  function paintBase(w: number, h: number, dpr: number): HTMLCanvasElement | null {
+    const layer = document.createElement('canvas');
+    layer.width = Math.round(w * dpr);
+    layer.height = Math.round(h * dpr);
+    const c = layer.getContext('2d');
+    if (!c) return null;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const gradient = c.createLinearGradient(0, 0, 0, h);
+    gradient.addColorStop(0, '#0b0b10');
+    gradient.addColorStop(0.55, '#08080b');
+    gradient.addColorStop(1, '#050507');
+    c.fillStyle = gradient;
+    c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 14; i++) {
+      const x = rand(0, w);
+      const y = rand(0, h);
+      const r = rand(Math.min(w, h) * 0.08, Math.min(w, h) * 0.4);
+      const blotch = c.createRadialGradient(x, y, 0, x, y, r);
+      blotch.addColorStop(0, Math.random() < 0.5 ? 'rgba(30, 25, 21, 0.3)' : 'rgba(13, 16, 22, 0.3)');
+      blotch.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      c.fillStyle = blotch;
+      c.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    return layer;
+  }
+
+  function bakeShell(fragments: Fragment[], w: number, h: number, dpr: number): HTMLCanvasElement | null {
+    const layer = document.createElement('canvas');
+    layer.width = Math.round(w * dpr);
+    layer.height = Math.round(h * dpr);
+    const c = layer.getContext('2d');
+    if (!c) return null;
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let lastStyle = '';
+    for (const f of fragments) {
+      const glint = f.tone > 0.85 && f.delay < 100 ? 0.12 : 0;
+      const style = quantizedStyle(f.hue, f.sat * 0.6, f.lit, 0.19 + 0.26 * f.tone + glint);
+      if (style !== lastStyle) {
+        c.fillStyle = style;
+        lastStyle = style;
+      }
+      const cos = Math.cos(f.rot);
+      const sin = Math.sin(f.rot);
+      c.setTransform(cos * dpr, sin * dpr, -sin * dpr, cos * dpr, f.tx * dpr, f.ty * dpr);
+      c.fillRect(-f.w / 2, -f.h / 2, f.w, f.h);
+    }
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return layer;
+  }
+
+  function render(now: number): void {
+    if (!mainCtx || !bgLayer) return;
+    const ctx = mainCtx;
+    const { w, h, dpr, fragments } = state;
+    const elapsed = now - state.modeSince;
+
+    if (!reduceMotion.matches) {
+      const idle = now - state.lastPointerAt > 3500;
+      if (idle) {
+        const tide = 0.5 + 0.5 * Math.sin((now / 24000) * Math.PI * 2 - Math.PI / 2);
+        state.lightTargetX = w * (0.28 + 0.4 * tide);
+      }
+      state.lightX += (state.lightTargetX - state.lightX) * 0.08;
+    }
+
+    const settled = state.mode === 'fast' || state.mode === 'static';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(bgLayer, 0, 0, w, h);
+
+    const bandW = Math.max(140, w * 0.3);
+    const sigma2 = (bandW / 2) * (bandW / 2);
+    if (settled) {
+      if (shellLayer) ctx.drawImage(shellLayer, 0, 0, w, h);
+      ctx.globalCompositeOperation = 'lighter';
+      for (const f of fragments) {
+        const d = f.tx - state.lightX + (h * 0.35 - f.ty) * 0.22;
+        const intensity = Math.exp(-(d * d) / (2 * sigma2));
+        if (intensity < 0.02) continue;
+        const hue = f.hue + (d / bandW) * 52 + Math.sin(now * 0.00035 + f.phase) * 8;
+        ctx.fillStyle = quantizedStyle(hue, f.sat, f.lit * 0.9 + intensity * 22, (0.15 + 0.72 * intensity) * f.tone);
+        const cos = Math.cos(f.rot);
+        const sin = Math.sin(f.rot);
+        ctx.setTransform(cos * dpr, sin * dpr, -sin * dpr, cos * dpr, f.tx * dpr, f.ty * dpr);
+        const gw = f.w * (1 + intensity * 0.35);
+        const gh = f.h * (1 + intensity * 0.35);
+        ctx.fillRect(-gw / 2, -gh / 2, gw, gh);
+      }
+    } else {
+      for (const f of fragments) {
+        const k = easeInOut(Math.min(1, Math.max(0, (elapsed - f.delay) / CHIP_DUR)));
+        f.x = f.sx + (f.tx - f.sx) * k;
+        f.y = f.sy + (f.ty - f.sy) * k;
+        const d = f.x - state.lightX + (h * 0.35 - f.y) * 0.22;
+        const intensity = Math.exp(-(d * d) / (2 * sigma2));
+        const alpha = (0.08 + 0.14 * f.tone) * (0.35 + 0.65 * k) + intensity * 0.5 * f.tone;
+        ctx.fillStyle = quantizedStyle(f.hue, f.sat, f.lit, Math.min(1, alpha));
+        const cos = Math.cos(f.rot);
+        const sin = Math.sin(f.rot);
+        ctx.setTransform(cos * dpr, sin * dpr, -sin * dpr, cos * dpr, f.x * dpr, f.y * dpr);
+        ctx.fillRect(-f.w / 2, -f.h / 2, f.w, f.h);
+      }
+    }
+
+    const sheen = ctx.createLinearGradient(state.lightX - bandW, 0, state.lightX + bandW, 0);
+    sheen.addColorStop(0, 'rgba(205, 220, 255, 0)');
+    sheen.addColorStop(0.5, 'rgba(205, 220, 255, 0.04)');
+    sheen.addColorStop(1, 'rgba(205, 220, 255, 0)');
+    ctx.fillStyle = sheen;
+    ctx.fillRect(state.lightX - bandW, 0, bandW * 2, h);
+    ctx.globalCompositeOperation = 'source-over';
+
+    if (state.mode === 'morph' && elapsed > MORPH_MS + 200) {
+      state.mode = reduceMotion.matches ? 'static' : 'fast';
+      state.modeSince = now;
+      shellLayer = bakeShell(fragments, w, h, dpr);
+    }
+  }
+
+  // The homepage enforces a single requestAnimationFrame loop (the coaster
+  // atmosphere), so the gate renders from a low-frequency timer instead and
+  // idles whenever the tab is hidden or the gate is scrolled away.
+  const TICK_MS = 33;
+  function tick(): void {
+    if (document.hidden || !state.inView) return;
+    render(performance.now());
+  }
+  function startLoop(): void {
+    if (state.timer !== 0 || reduceMotion.matches) return;
+    state.timer = window.setInterval(() => tick(), TICK_MS);
+  }
+  function stopLoop(): void {
+    if (state.timer !== 0) {
+      window.clearInterval(state.timer);
+      state.timer = 0;
+    }
+  }
+
+  function setup(): void {
+    if (!canvas || !section) return;
+    stopLoop();
+    const w = section.clientWidth;
+    const h = section.clientHeight;
+    if (w < 10 || h < 10) return;
+    const dpr = Math.min(1.75, window.devicePixelRatio || 1);
+    state.w = w;
+    state.h = h;
+    state.dpr = dpr;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    mainCtx = canvas.getContext('2d', { alpha: false });
+    bgLayer = paintBase(w, h, dpr);
+    state.fragments = buildFragments(w, h);
+    state.lightX = w * 0.28;
+    state.lightTargetX = state.lightX;
+    state.mode = 'morph';
+    state.modeSince = performance.now();
+    if (reduceMotion.matches) {
+      for (const f of state.fragments) {
+        f.x = f.tx;
+        f.y = f.ty;
+      }
+      state.mode = 'static';
+      shellLayer = bakeShell(state.fragments, w, h, dpr);
+      render(performance.now());
+      return;
+    }
+    shellLayer = null;
+    startLoop();
+  }
+
+  if (canvas && section) {
+    setup();
+
+    new ResizeObserver(() => {
+      window.clearTimeout((window as unknown as { __gateResize?: number }).__gateResize);
+      (window as unknown as { __gateResize?: number }).__gateResize = window.setTimeout(() => setup(), 250);
+    }).observe(section);
+
+    section.addEventListener('pointermove', (event) => {
+      if (reduceMotion.matches) return;
+      const rect = section.getBoundingClientRect();
+      state.lightTargetX = event.clientX - rect.left;
+      state.lastPointerAt = performance.now();
+    });
+
+    section.addEventListener('pointerdown', (event) => {
+      if (reduceMotion.matches || state.mode === 'morph') return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('a, button')) return;
+      const rect = section.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      state.lastPointerAt = performance.now();
+      for (const f of state.fragments) {
+        const dx = f.tx - x;
+        const dy = f.ty - y;
+        const dist = Math.hypot(dx, dy) || 1;
+        if (dist > 240) continue;
+        const force = Math.pow(1 - dist / 240, 2) * 50;
+        f.sx = f.tx - (dx / dist) * force * 1.6;
+        f.sy = f.ty - (dy / dist) * force * 1.1;
+        f.delay = rand(0, 260);
+      }
+      state.mode = 'morph';
+      state.modeSince = performance.now();
+      shellLayer = null;
+    });
+
+    lampButton?.addEventListener('click', () => {
+      document.getElementById('research')?.scrollIntoView({ behavior: reduceMotion.matches ? 'instant' : 'smooth', block: 'start' });
+    });
+
+
+    new IntersectionObserver(
+      (entries) => {
+        state.inView = (entries[0]?.intersectionRatio ?? 0) > 0.12;
+      },
+      { threshold: [0, 0.15, 0.5] },
+    ).observe(section);
+  }
+</script>

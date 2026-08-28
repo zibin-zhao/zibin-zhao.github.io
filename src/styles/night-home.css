@@ -1,0 +1,207 @@
+/* 方案 A 终版: 主页即夜航, 无白昼。
+   同一份 DOM、同一套版式，设计令牌整体翻面成漆底珠光。
+   档案子页 (/about /research /cv …) 保持纸面 —— 夜读人，昼查档。 */
+
+.stitch-shell--home {
+  color-scheme: dark;
+  --surface: #0a0a0e;
+  --surface-low: #0f0f15;
+  --surface-container: #14141b;
+  --surface-high: #191921;
+  --ink: #ece7d8;
+  --on-surface: #e6e2d4;
+  --muted: #b6b1a3;
+  --outline: #97a09a;
+  --outline-variant: #3b423c;
+  --green: #8ccf9a;
+  --green-bright: #aee8b4;
+  --orange: #ffb95f;
+  --blue: #8fd3f0;
+  --grid-line: rgba(236, 231, 216, 0.05);
+  --paper: #0a0a0e;
+  --paper-deep: #14141b;
+  --paper-card: #0f0f15;
+  /* 漆器逻辑: 阴影是刻进漆面的凹槽, 描边是露出的贝线 */
+  --stroke: 2px solid rgba(236, 231, 216, 0.85);
+  --shadow-2: 2px 2px 0 rgba(0, 0, 0, 0.55);
+  --shadow-4: 4px 4px 0 rgba(0, 0, 0, 0.55);
+  --shadow-6: 6px 6px 0 rgba(0, 0, 0, 0.55);
+  --shadow-8: 8px 8px 0 rgba(0, 0, 0, 0.55);
+  /* 主页页脚坞已隐藏, 保留量归零: 否则白吃 190px 高度, 移动端内容被裁 */
+  --footer-reserve: 0px;
+  background: #060608;
+}
+
+body:has(.stitch-shell--home) {
+  background: #060608;
+}
+
+/* ---- 站头按钮: LET'S TALK 落回漆面 ---- */
+.stitch-shell--home .talk {
+  background: #101016;
+  color: var(--ink);
+  border-color: rgba(236, 231, 216, 0.4);
+}
+
+/* ---- 页脚坞: 主页为固定坞(帧甲不滚动) ---- */
+.stitch-shell--home .stitch-footer {
+  position: fixed !important;
+  inset: auto 0 0;
+}
+
+/* ---- 页脚坞: 药丸全部夜化, 色相只留在文字上 ---- */
+.stitch-shell--home .footer-pill {
+  background: #101016;
+  border-color: rgba(236, 231, 216, 0.32);
+  color: var(--on-surface);
+}
+.stitch-shell--home .footer-pill:hover {
+  background: #1a1a22;
+}
+.stitch-shell--home .footer-pill[aria-current='page'] {
+  background: #1a1a22;
+}
+.stitch-shell--home .footer-pill.green { color: #aee8b4; }
+.stitch-shell--home .footer-pill.orange { color: #ffb95f; }
+.stitch-shell--home .footer-pill.blue { color: #8fd3f0; }
+.stitch-shell--home .footer-pill.mint { color: #a9d8c8; }
+
+/* 纸带变成暗金题签 */
+.stitch-shell--home .footer-decoration {
+  background: #0f0f15;
+  color: var(--muted);
+  border-top: 1px solid rgba(236, 231, 216, 0.22);
+  transform: none;
+}
+
+/* 画笔圆钮: 印章红描边 */
+.stitch-shell--home .draw-control {
+  color: #b5372c;
+}
+.stitch-shell--home .draw-disc {
+  border-color: #b5372c;
+  box-shadow: 2px 2px 0 rgba(181, 55, 44, 0.55);
+}
+
+/* ---- 氛围层: 贴纸与纸签收进夜色 ---- */
+.stitch-shell--home .atmosphere-blob {
+  border-color: rgba(236, 231, 216, 0.12);
+}
+.stitch-shell--home .atmosphere-note {
+  background: #101016;
+  color: var(--muted);
+  border-color: rgba(236, 231, 216, 0.22);
+}
+
+/* 兴趣纸签: 墨拓效果 —— 彩色贴纸转成暗色印章 */
+.stitch-shell--home [data-path-badge]::before {
+  background: #101016;
+  border: 1px solid rgba(236, 231, 216, 0.3);
+}
+.stitch-shell--home .path-badge-image {
+  filter: grayscale(1) brightness(0.95) opacity(0.9);
+}
+
+/* 移动端: 药丸压成单行紧凑排布, 固定坞保持纤薄 */
+@media (max-width: 700px) {
+  html.js .stitch-shell--home .footer-socials,
+  html.js .stitch-shell--home .footer-routes {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+  }
+  html.js .stitch-shell--home .footer-pill {
+    min-height: 40px;
+    padding: 4px 5px;
+    font-size: 0.52rem;
+    letter-spacing: 0;
+  }
+}
+
+/* ---- Vibe 卡的夜色题画 ---- */
+.vibe-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  margin-bottom: 4px;
+}
+
+/* ---- 全站中文: 夜航主页不混英文 ---- */
+.stitch-shell--home .t-en {
+  display: none !important;
+}
+.stitch-shell--home .t-zh {
+  display: inline !important;
+}
+
+/* ---- 首页诚实单语: 内容锁定中文, 开关撤下, 免得点之无效 ---- */
+.stitch-shell--home .langtoggle {
+  display: none !important;
+}
+
+/* ---- 氛围漂浮字是亮色主题的残留, 漆面上只当垃圾 ---- */
+.stitch-shell--home .atmosphere-note {
+  display: none;
+}
+
+/* ---- 君子不斜: 扶正一切东倒西歪 ---- */
+.stitch-shell--home .talk-angle,
+.stitch-shell--home .footer-routes .route-angle,
+.stitch-shell--home .footer-socials .footer-pill,
+.stitch-shell--home .draw-control,
+.stitch-shell--home .draw-disc,
+.stitch-shell--home .site-stamp {
+  transform: none !important;
+}
+
+/* 跑马灯是英文的, 夜里不留字 */
+.stitch-shell--home .footer-decoration {
+  display: none;
+}
+
+/* ---- 站头: 印章与文字提到珠光亮度 ---- */
+.stitch-shell--home .site-stamp {
+  color: rgba(236, 231, 216, 0.78);
+  border-color: rgba(236, 231, 216, 0.28);
+  background: rgba(10, 10, 14, 0.6);
+}
+.stitch-shell--home .site-stamp .t-en,
+.stitch-shell--home .site-stamp .t-zh {
+  color: rgba(236, 231, 216, 0.78);
+}
+.stitch-shell--home .talk {
+  border-color: rgba(236, 231, 216, 0.45);
+}
+
+/* ---- 极简站头: 只留 zibinzhao 与小语言钮 ---- */
+.stitch-shell--home .site-stamp {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+.stitch-shell--home .site-stamp .t-en,
+.stitch-shell--home .site-stamp .t-zh {
+  display: none;
+}
+.stitch-shell--home .site-stamp .stamp-compact {
+  display: inline;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  color: rgba(236, 231, 216, 0.8);
+}
+.stitch-shell--home .talk-angle,
+.stitch-shell--home .talk {
+  display: none;
+}
+.stitch-shell--home .site-stamp .stamp-wide {
+  display: none;
+}
+
+/* ---- 主页无页脚坞: 导航由帧甲承担 ---- */
+.stitch-shell--home .stitch-footer {
+  display: none;
+}
