@@ -1,55 +1,47 @@
 import { defineConfig, devices } from '@playwright/test';
 import process from 'node:process';
 
-// Playwright enables color in child processes; avoid Node warning about conflicting inherited flags.
+// Regression traffic is local. Do not route preview readiness checks through a machine proxy.
+for (const name of [
+  'HTTP_PROXY',
+  'HTTPS_PROXY',
+  'ALL_PROXY',
+  'http_proxy',
+  'https_proxy',
+  'all_proxy',
+])
+  delete process.env[name];
 delete process.env.NO_COLOR;
-
-const host = '127.0.0.1';
-const port = 43217;
-const baseURL = `http://${host}:${port}`;
+const baseURL = 'http://127.0.0.1:43229';
 
 export default defineConfig({
-  testDir: './tests',
-  testMatch: '**/*.spec.ts',
+  testDir: './tests/browser',
   fullyParallel: false,
   workers: 1,
-  reporter: 'line',
+  reporter: [
+    ['line'],
+    ['json', { outputFile: 'artifacts/past-designs-2026-09-09/deduplicated/browser-results.json' }],
+  ],
+  use: { baseURL, trace: 'retain-on-failure' },
   outputDir: 'test-results/playwright',
-  use: {
-    ...devices['Desktop Chrome'],
-    baseURL,
-    trace: 'retain-on-failure',
-  },
   webServer: {
-    command: `npm run build && npm run preview -- --host ${host} --port ${port}`,
-    env: {
-      ...process.env,
-      GITHUB_PROJECTS_OFFLINE: '1',
-    },
+    command: 'npm run preview -- --host 127.0.0.1 --port 43229 --ignore-lock',
+    // Astro 7 normally backgrounds agent-started servers; Playwright must own its server process.
+    env: { ASTRO_PREVIEW_BACKGROUND: '0' },
     url: baseURL,
     reuseExistingServer: false,
-    timeout: 120_000,
+    timeout: 60000,
   },
   projects: [
     {
-      name: 'regression',
-      testMatch: '**/browser/*.spec.ts',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'canonical-768',
-      testMatch: '**/e2e/stitch.spec.ts',
-      use: { viewport: { width: 768, height: 1024 } },
-    },
-    {
       name: 'desktop',
-      testMatch: '**/e2e/stitch.spec.ts',
-      use: { viewport: { width: 1440, height: 1000 } },
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } },
     },
+    { name: 'mobile', use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } } },
     {
-      name: 'mobile',
-      testMatch: '**/e2e/stitch.spec.ts',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } },
+      name: 'webkit-phone',
+      testMatch: ['**/lanting.spec.ts', '**/past-designs.spec.ts'],
+      use: { ...devices['iPhone 13'] },
     },
   ],
 });

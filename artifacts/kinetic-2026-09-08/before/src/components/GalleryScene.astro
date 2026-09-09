@@ -1,0 +1,42 @@
+---
+import type { Page, Lang } from '../lib/i18n';
+interface Props {
+  page: Page;
+  lang?: Lang;
+}
+const { page, lang = 'en' } = Astro.props;
+---
+
+<div
+  class:list={['gallery-scene', { 'gallery-scene-inner': page !== 'home' }]}
+  data-gallery-scene
+  data-layout={page === 'home' ? 'field' : 'interior'}
+  data-scene={page}
+  data-state="loading"
+>
+  <div data-scene-fallback aria-hidden="true">
+    <div class="fallback-orbit"></div><div class="fallback-sculpture"></div><div
+      class="fallback-plinth"
+    >
+    </div>
+  </div>
+  <canvas class="gallery-canvas" aria-hidden="true"></canvas>
+</div>
+{
+  page !== 'home' && (
+    <div class="inner-scene-tools" data-gallery-controls hidden>
+      <button
+        type="button"
+        data-gallery-motion
+        aria-pressed="false"
+        data-label-pause={lang === 'en' ? 'Pause motion' : '暂停动效'}
+        data-label-play={lang === 'en' ? 'Play motion' : '开启动效'}
+      >
+        {lang === 'en' ? 'Pause motion' : '暂停动效'}
+      </button>
+    </div>
+  )
+}
+<script>
+  import '../scripts/gallery-scene';
+</script>

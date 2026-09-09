@@ -1,0 +1,10 @@
+---
+import PastDesign from '../../../views/PastDesign.astro';
+import { pastDesigns } from '../../../data/past-designs';
+export function getStaticPaths() {
+  return pastDesigns.map((entry) => ({ params: { version: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+---
+
+<PastDesign entry={entry} lang="zh" />

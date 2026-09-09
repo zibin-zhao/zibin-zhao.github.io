@@ -1,0 +1,59 @@
+---
+import CopyButton from './CopyButton.astro';
+import type { Stage } from '../data/prompts';
+import type { Lang } from '../lib/i18n';
+interface Props {
+  stage: Stage;
+  index: number;
+  title: string;
+  lang: Lang;
+}
+const { stage, index, title, lang } = Astro.props;
+---
+
+<details class="prompt-stage" id={`step-${index + 1}`} open={index === 0}>
+  <summary
+    ><span class="step-num">{String(index + 1).padStart(2, '0')}</span><h2>{title}</h2></summary
+  >
+  <p class="prompt-tool">
+    {lang === 'en' ? 'Original tool suggestion' : '原流程建议工具'} · <span lang="en"
+      >{stage.tool}</span
+    >
+  </p>
+  {
+    stage.note && (
+      <p class="prompt-note" lang="en">
+        {stage.note}
+      </p>
+    )
+  }
+  {
+    stage.blocks.map((block, j) => (
+      <div class="prompt-block">
+        {block.label && (
+          <p class="prompt-label" lang="en">
+            {block.label}
+          </p>
+        )}
+        <pre class="prompt-text" id={`prompt-${index}-${j}`} lang="en" set:text={block.text} />
+        <CopyButton
+          target={`prompt-${index}-${j}`}
+          label={lang === 'en' ? 'Copy prompt' : '复制提示词'}
+          success={lang === 'en' ? 'Prompt copied.' : '提示词已复制。'}
+          failure={
+            lang === 'en'
+              ? 'Copy was blocked. The prompt is selected; copy it manually or download the full pack.'
+              : '复制受到限制。文本已选中，请手动复制，或下载完整提示词。'
+          }
+        />
+      </div>
+    ))
+  }
+  {
+    stage.afterNote && (
+      <p class="prompt-note" lang="en">
+        {stage.afterNote}
+      </p>
+    )
+  }
+</details>

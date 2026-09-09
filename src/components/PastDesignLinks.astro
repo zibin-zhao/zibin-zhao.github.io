@@ -1,0 +1,27 @@
+---
+import { pastDesigns, pastPath } from '../data/past-designs';
+import { t, type Lang } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<nav class="past-design-links" aria-label={lang === 'zh' ? '过往网站设计' : 'Past website designs'}>
+  <span>{lang === 'zh' ? '往昔' : 'Past designs'}</span>
+  <ol>
+    {
+      pastDesigns.map((entry) => (
+        <li>
+          <a
+            href={pastPath(entry.id, lang)}
+            aria-label={`${entry.number} · ${t(entry.title, lang)} · ${entry.date}`}
+            title={`${t(entry.title, lang)} · ${entry.date}`}
+          >
+            {entry.number}
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>

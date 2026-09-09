@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+artifacts/
+public/medit/
+public/singularity/
+src/styles/global 2.css

@@ -1,5 +1,12 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "public/medit", "public/singularity"]
+  "exclude": [
+    "dist",
+    "artifacts",
+    ".worktrees",
+    "public/medit",
+    "public/singularity",
+    "public/past-designs"
+  ]
 }

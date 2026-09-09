@@ -1,0 +1,58 @@
+---
+import { pages, pageNames, pathFor, t, type Lang, type Page } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+  page: Page;
+}
+const { lang, page } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="header-inner container">
+    <a class="brand" href={pathFor('home', lang)}
+      ><span class="sr-only">Zibin Zhao </span><span class="brand-mark" aria-hidden="true"
+      ></span><span class="brand-caption"
+        >Z / Z<span>{lang === 'en' ? 'An open collection' : '一个开放的收藏'}</span></span
+      ></a
+    >
+    <div class="header-tools">
+      <a
+        class="language-link"
+        href={pathFor(page, lang === 'en' ? 'zh' : 'en')}
+        lang={lang === 'en' ? 'zh-CN' : 'en'}
+        hreflang={lang === 'en' ? 'zh-CN' : 'en'}
+        aria-label={lang === 'en' ? '用中文阅读本页' : 'Read this page in English'}
+        >{lang === 'en' ? '中文' : 'EN'}</a
+      >
+      <details class="mobile-menu">
+        <summary>{lang === 'en' ? 'Index' : '索引'} <span aria-hidden="true">＋</span></summary>
+        <nav class="desktop-nav" aria-label={lang === 'en' ? 'Collection index' : '收藏索引'}>
+          {
+            pages.map((item, index) => (
+              <a href={pathFor(item, lang)} aria-current={page === item ? 'page' : undefined}>
+                <span class="index-number" aria-hidden="true">
+                  {String(index).padStart(2, '0')}
+                </span>
+                {t(pageNames[item], lang)}
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))
+          }
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    }
+  });
+  document.addEventListener('click', (event) => {
+    if (menu?.open && event.target instanceof Node && !menu.contains(event.target))
+      menu.open = false;
+  });
+</script>

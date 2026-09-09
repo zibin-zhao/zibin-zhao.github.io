@@ -1,0 +1,67 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Lang } from '../lib/i18n';
+interface Props {
+  publications: CollectionEntry<'publications'>[];
+  lang: Lang;
+}
+const { publications, lang } = Astro.props;
+---
+
+<ol class="publication-list">
+  {
+    publications.map(({ id, data: pub }) => (
+      <li class="publication" id={`pub-${id}`}>
+        <>
+          <span class="pub-year">{pub.year}</span>
+          <div>
+            <div class="pub-meta">
+              <span>{pub.venue}</span>
+              {pub.kind === 'preprint' && (
+                <span class="pub-kind">
+                  {lang === 'en' ? 'Preprint · not peer reviewed' : '预印本 · 未经同行评审'}
+                </span>
+              )}
+              {pub.firstAuthor && (
+                <span class="pub-kind">{lang === 'en' ? 'First author' : '第一作者'}</span>
+              )}
+            </div>
+            <h3 lang="en">
+              <a href={pub.links?.doi || pub.links?.pdf || pub.links?.scholar}>{pub.title}</a>
+            </h3>
+            <p class="pub-authors" lang="en">
+              {pub.authors
+                ?.split(/(Z Zhao|Zibin Zhao)/)
+                .map((part) =>
+                  /^(Z Zhao|Zibin Zhao)$/.test(part) ? <strong>{part}</strong> : part,
+                )}
+            </p>
+            <div class="pub-links">
+              <a href={pub.links?.doi || pub.links?.pdf || pub.links?.scholar}>
+                {pub.kind === 'preprint'
+                  ? lang === 'en'
+                    ? 'Read preprint'
+                    : '阅读预印本'
+                  : lang === 'en'
+                    ? 'Read article'
+                    : '阅读论文'}{' '}
+                ↗
+              </a>
+              {pub.links?.code && <a href={pub.links.code}>{lang === 'en' ? 'Code' : '代码'} ↗</a>}
+              {pub.links?.preprint && (
+                <a href={pub.links.preprint}>
+                  {lang === 'en' ? 'Earlier preprint' : '早期预印本'} ↗
+                </a>
+              )}
+              {pub.links?.correction && (
+                <a href={pub.links.correction}>
+                  {lang === 'en' ? 'Author correction' : '作者更正'} ↗
+                </a>
+              )}
+            </div>
+          </div>
+        </>
+      </li>
+    ))
+  }
+</ol>

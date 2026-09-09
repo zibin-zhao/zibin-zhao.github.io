@@ -1,0 +1,256 @@
+---
+import { getCollection } from 'astro:content';
+import InkText from '../components/InkText.astro';
+import { buildArchiveLeaves } from '../lib/archive-content';
+import { pathFor, type Lang } from '../lib/i18n';
+import { columns, fragments, inkSource, sourceSize } from '../data/lanting';
+import { profile } from '../data/profile';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const en = lang === 'en';
+const entries = buildArchiveLeaves(lang, await getCollection('publications'));
+entries.push(
+  {
+    id: 'about',
+    title: 'Zibin Zhao',
+    kicker: en ? 'The person between the lines' : '字里行间的这个人',
+    summary: en
+      ? 'Bioengineering at HKUST. Curious about the rest.'
+      : '在香港科技大学研究生物工程。也对这个世界的其他部分好奇。',
+    detail: en
+      ? 'Research, small useful tools, and experiments that begin with a little curiosity.'
+      : '做研究，制作日常小工具，也做一些从好奇心开始的实验。',
+    links: [{ label: en ? 'More about me' : '认识我', href: pathFor('about', lang) }],
+  },
+  {
+    id: 'prompts',
+    title: en ? 'Prompt library' : '提示词库',
+    kicker: en ? 'Notes to think with' : '思考的手边笔记',
+    summary: en
+      ? 'A reusable research workflow in eight stages.'
+      : '一个分为八个阶段、可以复用的研究工作流程。',
+    detail: en
+      ? 'Read and copy the original source prompts, or download the complete text pack.'
+      : '阅读和复制原始提示词，也可以下载完整文本。',
+    links: [
+      { label: en ? 'Open the library' : '打开提示词库', href: pathFor('prompts', lang) },
+      { label: en ? 'Download all prompts' : '下载完整提示词', href: '/prompt-pack.txt' },
+    ],
+  },
+  {
+    id: 'contact',
+    title: en ? 'Say hello' : '打个招呼',
+    kicker: 'Zibin Zhao',
+    summary: profile.email,
+    detail: en ? 'For research, projects, or a conversation.' : '关于研究、项目，或只是聊一聊。',
+    links: [
+      { label: en ? 'Write an email' : '写封邮件', href: `mailto:${profile.email}` },
+      { label: en ? 'Elsewhere' : '其他联系方式', href: pathFor('contact', lang) },
+    ],
+  },
+  {
+    id: 'cv',
+    title: 'Curriculum vitae',
+    kicker: 'Zibin Zhao',
+    summary: en ? 'Education, research, publications, and experience.' : '教育、研究、论文与经历。',
+    detail: en
+      ? 'The full record is available as an accessible page and a downloadable PDF.'
+      : '可以在线阅读，也可以下载 PDF。',
+    links: [
+      { label: en ? 'Read CV' : '阅读履历', href: pathFor('cv', lang) },
+      { label: 'PDF', href: '/cv.pdf' },
+    ],
+  },
+);
+const contour =
+  'M9 3 L44 4 Q45 18 56 18 Q67 18 66 4 L93 3 L96 72 Q82 71 82 83 Q82 95 96 94 L97 197 L63 198 Q65 184 53 184 Q42 184 44 198 L5 197 L4 123 Q18 125 18 113 Q18 102 4 103 L3 6 Z';
+---
+
+<div class="lanting-home" data-lanting data-lang={lang}>
+  <div class="scroll-heading">
+    <h1 id="home-title">
+      <span class="sr-only">Zibin Zhao · </span><InkText text="蘭亭" /><span class="sr-only"
+        >{en ? 'A collection between the lines' : '藏在字里行间的作品'}</span
+      >
+    </h1>
+    {en && <p>A collection between the lines.</p>}
+  </div>
+  <div
+    class="manuscript"
+    data-manuscript
+    aria-label={en ? 'Explore the calligraphy' : '探索书法中的内容'}
+  >
+    {
+      columns.map((center, index) => {
+        const fragment = fragments.find((item) => item.column === index);
+        const regionTop = fragment?.cut[0] ?? 0;
+        const regionHeight = fragment ? fragment.cut[1] - fragment.cut[0] : 0;
+        const clipId = `column-${index}`;
+        return (
+          <div
+            class="ink-column"
+            style={{ '--column': index, '--stagger': `${[0, 12, -7, 18, 2, -14, 6][index % 7]}px` }}
+          >
+            <svg
+              class="column-ink"
+              viewBox={`${center - 34} 8 68 644`}
+              preserveAspectRatio="xMidYMin meet"
+              aria-hidden="true"
+              focusable="false"
+            >
+              {fragment && (
+                <defs>
+                  <clipPath id={clipId}>
+                    <rect x={center - 34} y="8" width="68" height={regionTop - 8} />
+                    <rect
+                      x={center - 34}
+                      y={regionTop + regionHeight}
+                      width="68"
+                      height={660 - regionTop - regionHeight}
+                    />
+                  </clipPath>
+                </defs>
+              )}
+              <image
+                href={inkSource}
+                width={sourceSize.width}
+                height={sourceSize.height}
+                clip-path={fragment ? `url(#${clipId})` : undefined}
+              />
+            </svg>
+            {fragment && (
+              <a
+                class="paper-fragment"
+                href={entries[fragment.entry]!.links[0]!.href}
+                data-fragment={fragment.id}
+                data-entry={fragment.entry}
+                aria-label={`${fragment.glyphs} · ${entries[fragment.entry]!.title}`}
+                style={{
+                  '--top': `${((regionTop - 8) / 644) * 100}%`,
+                  '--height': `${(regionHeight / 644) * 100}%`,
+                  '--length': [...fragment.glyphs].length,
+                }}
+              >
+                <svg
+                  class="fragment-edge"
+                  viewBox="0 0 100 200"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <path d={contour} />
+                </svg>
+                <InkText text={fragment.glyphs} />
+                <span class="fragment-caption" aria-hidden="true">
+                  {entries[fragment.entry]!.title}
+                  <span>↗</span>
+                </span>
+              </a>
+            )}
+          </div>
+        );
+      })
+    }
+  </div>
+  <div class="sheet-colophon">
+    <p>
+      {en ? 'Feng Chengsu, after Wang Xizhi.' : '王羲之《兰亭序》，冯承素摹本集字。'}<br />{
+        en ? 'New stories, gathered into old writing.' : '旧笔墨里，藏着新的故事。'
+      }
+    </p>
+    <a href="https://commons.wikimedia.org/wiki/File:LantingXu.jpg"
+      >{en ? 'The original sheet' : '查看摹本来源'} ↗</a
+    >
+  </div>
+  <div class="discovery-dock" data-discovery-dock>
+    <p class="discovery-hint">
+      <span class="hint-pointer" aria-hidden="true">◌</span>{
+        en ? (
+          <span>Move closer. Find something.</span>
+        ) : (
+          <>
+            <>
+              <InkText text="觀之" />
+              <span class="sr-only">走近一点，字里有东西。</span>
+            </>
+          </>
+        )
+      }
+    </p>
+    <button
+      class="reveal-button"
+      data-reveal
+      hidden
+      type="button"
+      aria-pressed="false"
+      aria-label={en ? 'Reveal hidden entries' : '显影：显示隐藏入口'}
+      ><InkText text="一觀" /><span class="reveal-count" data-found-count aria-hidden="true"
+        >0 / {fragments.length}</span
+      ></button
+    >
+  </div>
+  <section class="collection-index container" id="collection" aria-labelledby="collection-title">
+    <div class="index-heading">
+      <h2 id="collection-title">{en ? 'Everything in the writing' : '字里行间的全部内容'}</h2><p>
+        {en ? 'Follow a thread, or choose a work.' : '顺着好奇找，也可以直接翻阅。'}
+      </p>
+    </div>
+    <div class="index-links">
+      {
+        entries.map((entry, index) => (
+          <a href={entry.links[0]!.href} data-index-entry={index}>
+            {entry.title}
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))
+      }
+    </div>
+    <a class="text-link" id="research-title" href={pathFor('research', lang)}
+      >{en ? 'All research and publications' : '全部研究与论文'}</a
+    >
+  </section>
+  <dialog class="paper-reader" data-paper-reader aria-labelledby="reader-title">
+    <div class="reader-sheet">
+      <div class="reader-topline">
+        <span data-reader-cue aria-hidden="true"></span><button
+          type="button"
+          data-reader-close
+          aria-label={en ? 'Close reading view' : '关闭阅读'}>×</button
+        >
+      </div>
+      <h2 id="reader-title" data-reader-title></h2>
+      {
+        entries.map((entry, index) => (
+          <article class="reader-entry" data-reader-entry={index} data-title={entry.title} hidden>
+            <p class="reader-kicker">{entry.kicker}</p>
+            <p class="reader-summary">{entry.summary}</p>
+            <p class="reader-detail">{entry.detail}</p>
+            <div class="reader-links">
+              {entry.links.map((link) => (
+                <a href={link.href}>
+                  {link.label}
+                  <span aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </div>
+          </article>
+        ))
+      }
+      <div class="reader-navigation">
+        <button type="button" data-reader-prev aria-label={en ? 'Previous entry' : '上一个内容'}
+          >←</button
+        ><label class="sr-only" for="reader-selection">{en ? 'Choose an entry' : '选择内容'}</label
+        ><select id="reader-selection" data-reader-select
+          >{entries.map((entry, index) => <option value={index}>{entry.title}</option>)}</select
+        ><button type="button" data-reader-next aria-label={en ? 'Next entry' : '下一个内容'}
+          >→</button
+        >
+      </div>
+      <p class="sr-only" aria-live="polite" data-reader-status></p>
+    </div>
+  </dialog>
+</div>
+<script>
+  import '../scripts/lanting';
+</script>

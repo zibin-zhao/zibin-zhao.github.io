@@ -1,0 +1,60 @@
+---
+import { pages, pageNames, pathFor, t, type Lang, type Page } from '../lib/i18n';
+import InkText from './InkText.astro';
+interface Props {
+  lang: Lang;
+  page: Page;
+}
+const { lang, page } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="header-inner container">
+    <a class="brand" href={pathFor('home', lang)}>Zibin Zhao</a>
+    <nav class="quick-nav" aria-label={lang === 'en' ? 'Selected pages' : '主要页面'}>
+      <a href={pathFor('research', lang)}>{lang === 'en' ? 'Research' : '研究'}</a>
+      <a href={pathFor('projects', lang)}>{lang === 'en' ? 'Projects' : '项目'}</a>
+      <a href={pathFor('about', lang)}>{lang === 'en' ? 'About' : '关于我'}</a>
+    </nav>
+    <div class="header-tools">
+      <a
+        class="language-link"
+        href={pathFor(page, lang === 'en' ? 'zh' : 'en')}
+        lang={lang === 'en' ? 'zh-CN' : 'en'}
+        hreflang={lang === 'en' ? 'zh-CN' : 'en'}
+        aria-label={lang === 'en' ? '用中文阅读本页' : 'Read this page in English'}
+        >{lang === 'en' ? page === 'home' ? <InkText text="言" /> : '中文' : 'EN'}</a
+      >
+      <details class="mobile-menu">
+        <summary
+          ><span class:list={{ 'sr-only': page === 'home' && lang === 'zh' }}
+            >{lang === 'en' ? 'Menu' : '目录'}</span
+          ><span aria-hidden="true">＋</span></summary
+        >
+        <nav class="desktop-nav" aria-label={lang === 'en' ? 'Site navigation' : '网站导航'}>
+          {
+            pages.map((item) => (
+              <a href={pathFor(item, lang)} aria-current={page === item ? 'page' : undefined}>
+                {t(pageNames[item], lang)}
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))
+          }
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>('.mobile-menu');
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menu?.open) {
+      menu.open = false;
+      menu.querySelector('summary')?.focus();
+    }
+  });
+  document.addEventListener('click', (event) => {
+    if (menu?.open && event.target instanceof Node && !menu.contains(event.target))
+      menu.open = false;
+  });
+</script>

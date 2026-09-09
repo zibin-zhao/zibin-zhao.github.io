@@ -1,0 +1,40 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import Home from '../views/Home.astro';
+import Research from '../views/Research.astro';
+import Projects from '../views/Projects.astro';
+import About from '../views/About.astro';
+import Cv from '../views/Cv.astro';
+import Contact from '../views/Contact.astro';
+import Prompts from '../views/Prompts.astro';
+import { pages, type Lang, type Page } from '../lib/i18n';
+export function getStaticPaths() {
+  return (['en', 'zh'] as const).flatMap((lang) =>
+    pages.map((page) => ({
+      params: {
+        route:
+          [lang === 'zh' ? 'zh' : '', page === 'home' ? '' : page].filter(Boolean).join('/') ||
+          undefined,
+      },
+      props: { lang, page },
+    })),
+  );
+}
+interface Props {
+  lang: Lang;
+  page: Page;
+}
+const { lang, page } = Astro.props;
+const views = {
+  home: Home,
+  research: Research,
+  projects: Projects,
+  about: About,
+  cv: Cv,
+  contact: Contact,
+  prompts: Prompts,
+};
+const View = views[page];
+---
+
+<SiteLayout lang={lang} page={page}><View lang={lang} /></SiteLayout>

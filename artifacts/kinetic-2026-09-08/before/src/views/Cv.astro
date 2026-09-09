@@ -1,0 +1,94 @@
+---
+import { getCollection } from 'astro:content';
+import PageIntro from '../components/PageIntro.astro';
+import PublicationList from '../components/PublicationList.astro';
+import { cv } from '../data/cv';
+import { profile } from '../data/profile';
+import { pathFor, t, type Lang } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const publications = (await getCollection('publications'))
+  .filter((p) => ['dl-selex', 'nature-biotech-cas12a', 'onepot-snp-genotyping'].includes(p.id))
+  .sort((a, b) => b.data.year - a.data.year);
+const groups = [
+  { title: { en: 'Education', zh: '教育背景' }, entries: cv.education },
+  { title: { en: 'Experience', zh: '经历' }, entries: cv.experience },
+  { title: { en: 'Leadership', zh: '组织与活动' }, entries: cv.leadership },
+];
+---
+
+<div class="container">
+  <PageIntro
+    label={lang === 'en' ? 'Curriculum vitae' : '个人履历'}
+    title="Zibin Zhao"
+    description={lang === 'en'
+      ? 'Bioengineering PhD student at HKUST. Research across molecular diagnostics, computational biology, and deep learning.'
+      : '香港科技大学生物工程博士生。研究方向涉及分子诊断、计算生物学与深度学习。'}
+    ><p class="print-only">{profile.email} · zibinzhao.com</p><div class="actions no-print">
+      <a class="button" href="/cv.pdf" download
+        >{lang === 'en' ? 'Download CV' : '下载履历'} <span>PDF ↓</span></a
+      ><a class="text-link" href={`mailto:${profile.email}`}
+        >{lang === 'en' ? 'Email me' : '发送邮件'} ↗</a
+      >
+    </div></PageIntro
+  >
+  {
+    groups.map((group) => (
+      <section class="cv-section">
+        <>
+          <h2>{t(group.title, lang)}</h2>
+          <div>
+            {group.entries.map((entry) => (
+              <article class="cv-entry">
+                {t(entry.period, lang) && <p class="period">{t(entry.period, lang)}</p>}
+                <h3>{t(entry.title, lang)}</h3>
+                <p class="org">{t(entry.org, lang)}</p>
+                {entry.notes[lang].length > 0 && (
+                  <ul>
+                    {entry.notes[lang].map((note) => (
+                      <li>{note}</li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            ))}
+          </div>
+        </>
+      </section>
+    ))
+  }
+  <section class="cv-section">
+    <h2>{lang === 'en' ? 'Selected publications' : '代表论文'}</h2><div>
+      <PublicationList publications={publications} lang={lang} /><a
+        class="text-link no-print"
+        href={pathFor('research', lang)}
+        >{lang === 'en' ? 'Full publication list' : '完整论文列表'} ↗</a
+      >
+    </div>
+  </section>
+  <section class="cv-section">
+    <h2>{lang === 'en' ? 'Technical skills' : '技术技能'}</h2><ul class="skills-list">
+      {cv.skills.filter((s) => s !== 'AI').map((skill) => <li>{skill}</li>)}<li>
+        {lang === 'en' ? 'Deep learning' : '深度学习'}
+      </li><li>{lang === 'en' ? 'Molecular dynamics' : '分子动力学'}</li>
+    </ul>
+  </section>
+  <section class="cv-section">
+    <h2>{lang === 'en' ? 'Languages' : '语言'}</h2><p>
+      {
+        lang === 'en'
+          ? 'Mandarin and Cantonese (native); English (professional proficiency).'
+          : '普通话、粤语（母语）；英语（专业工作水平）。'
+      }
+    </p>
+  </section>
+  <p class="muted no-print" style="font-size:.8rem;padding-block:24px 64px">
+    {
+      lang === 'en'
+        ? 'Website record updated September 2026. Publications link to their original sources.'
+        : '网站记录更新于 2026 年 9 月。论文条目链接至原始来源。'
+    }
+  </p>
+</div>

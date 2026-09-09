@@ -1,0 +1,66 @@
+---
+import PageIntro from '../components/PageIntro.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { projects, categoryLabels } from '../data/projects';
+import { t, type Lang } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const categories = ['all', 'research', 'tools', 'play'] as const;
+---
+
+<div class="container">
+  <PageIntro
+    title={lang === 'en' ? 'Projects' : '项目'}
+    description={lang === 'en'
+      ? 'Research code, web applications, and a few graphics experiments. The links go to the working application, paper, or source.'
+      : '研究代码、Web 应用，还有一些图形实验。可以直接打开应用，也可以看论文和源代码。'}
+  />
+  <div class="filters" hidden aria-label={lang === 'en' ? 'Filter projects' : '筛选项目'}>
+    {
+      categories.map((category) => (
+        <button type="button" data-filter={category} aria-pressed={category === 'all'}>
+          {t(categoryLabels[category], lang)}
+        </button>
+      ))
+    }
+  </div>
+  <p class="sr-only" role="status" id="filter-status" data-lang={lang}></p>
+  <div class="project-grid" id="project-results">
+    {projects.map((project) => <WorkCard project={project} lang={lang} />)}
+  </div>
+  <p class="project-endnote">
+    {lang === 'en' ? 'Other small projects live on ' : '其他小项目放在 '}<a
+      href="https://github.com/zibin-zhao">GitHub <span aria-hidden="true">↗</span></a
+    >{lang === 'en' ? '.' : '。'}
+  </p>
+</div>
+<script>
+  const filters = document.querySelector<HTMLElement>('.filters');
+  const cards = [...document.querySelectorAll<HTMLElement>('#project-results .project-card')];
+  const status = document.querySelector<HTMLElement>('#filter-status');
+  if (filters) {
+    filters.hidden = false;
+    filters.addEventListener('click', (event) => {
+      const button =
+        event.target instanceof Element
+          ? event.target.closest<HTMLButtonElement>('button[data-filter]')
+          : null;
+      if (!button) return;
+      filters
+        .querySelectorAll('button')
+        .forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+      cards.forEach((card) => {
+        card.hidden =
+          button.dataset.filter !== 'all' && card.dataset.category !== button.dataset.filter;
+      });
+      const count = cards.filter((card) => !card.hidden).length;
+      if (status)
+        status.textContent =
+          status.dataset.lang === 'zh'
+            ? '显示 ' + count + ' 个项目'
+            : 'Showing ' + count + ' projects';
+    });
+  }
+</script>

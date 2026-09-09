@@ -1,0 +1,94 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>提示词库 | Zibin Zhao</title><meta name="description" content="八步研究综述提示词库：从范围界定到阅读、写作和核验。复制单条提示词，或下载完整文本。"><meta name="theme-color" content="#14201d"><link rel="icon" type="image/svg+xml" href="/past-designs/12-dark/favicon.svg"><meta property="og:type" content="website"><meta property="og:site_name" content="Zibin Zhao"><meta property="og:title" content="提示词库 | Zibin Zhao"><meta property="og:description" content="八步研究综述提示词库：从范围界定到阅读、写作和核验。复制单条提示词，或下载完整文本。"><meta property="og:url" content="https://zibinzhao.com/zh/prompts/"><meta property="og:locale" content="zh_CN"><meta property="og:locale:alternate" content="en_US"><meta property="og:image" content="https://zibinzhao.com/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Zibin Zhao. Bioengineering at HKUST. Research and projects."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="提示词库 | Zibin Zhao"><meta name="twitter:description" content="八步研究综述提示词库：从范围界定到阅读、写作和核验。复制单条提示词，或下载完整文本。"><meta name="twitter:image" content="https://zibinzhao.com/og.png"><link rel="stylesheet" href="/past-designs/12-dark/_astro/SiteLayout.BDoagpZQ.css"><meta name="robots" content="noindex,follow"><style>html[data-archive-embedded] [data-archive-return]{display:none!important}</style><script>if(window.self!==window.top)document.documentElement.dataset.archiveEmbedded="true";</script></head><body class="page-prompts"><a class="skip-link" href="#main">跳转到正文</a><header class="site-header"><div class="container header-inner"><a class="brand" href="/past-designs/12-dark/zh/index.html" aria-label="Zibin Zhao"><span class="brand-mark" aria-hidden="true"></span><span>Zibin Zhao</span></a><nav class="desktop-nav" aria-label="主导航"><a href="/past-designs/12-dark/zh/research/index.html">研究</a><a href="/past-designs/12-dark/zh/projects/index.html">项目</a><a href="/past-designs/12-dark/zh/about/index.html">关于</a><a href="/past-designs/12-dark/zh/cv/index.html">履历</a><a href="/past-designs/12-dark/zh/contact/index.html">联系</a></nav><div class="header-tools"><a class="language-link" href="/past-designs/12-dark/prompts/index.html" lang="en" hreflang="en" aria-label="Read this page in English">EN</a><details class="mobile-menu"><summary>菜单 <span aria-hidden="true">＋</span></summary><nav aria-label="移动导航"><a href="/past-designs/12-dark/zh/index.html">首页<span aria-hidden="true">↗</span></a><a href="/past-designs/12-dark/zh/research/index.html">研究<span aria-hidden="true">↗</span></a><a href="/past-designs/12-dark/zh/projects/index.html">项目<span aria-hidden="true">↗</span></a><a href="/past-designs/12-dark/zh/about/index.html">关于<span aria-hidden="true">↗</span></a><a href="/past-designs/12-dark/zh/cv/index.html">履历<span aria-hidden="true">↗</span></a><a href="/past-designs/12-dark/zh/contact/index.html">联系<span aria-hidden="true">↗</span></a><a href="/past-designs/12-dark/zh/prompts/index.html" aria-current="page">提示词库<span aria-hidden="true">↗</span></a></nav></details></div></div></header><script type="module">var e=document.querySelector(`.mobile-menu`);document.addEventListener(`keydown`,t=>{t.key===`Escape`&&e?.open&&(e.open=!1,e.querySelector(`summary`)?.focus())}),document.addEventListener(`click`,t=>{e?.open&&t.target instanceof Node&&!e.contains(t.target)&&(e.open=!1)});</script><main id="main" tabindex="-1"><div class="container"><div class="page-intro"><h1>提示词库</h1><p class="intro-copy">从确定问题到核验终稿，共八个步骤。以一个连续的研究主题为例，提供可以复用的提示词。</p><div class="actions"><a class="button" href="/past-designs/12-dark/prompt-pack.txt" download>下载全部提示词 <span>TXT ↓</span></a><span class="muted" style="font-size:.85rem">英文提示词 · 8 个步骤</span></div></div><div class="note-panel"><p><strong>从你自己的问题开始。</strong>示例主题是 CRISPR-Cas 复合物的分子动力学。请替换主题、时间范围和方括号内的输入，保留证据核查要求；使用任何结论之前，回到原始来源核验。</p><p>工具名称沿用原始工作流程。你可以使用偏好工具中的同类功能，具体菜单与可用功能可能变化。</p></div><div class="prompts-layout"><nav class="prompt-toc" aria-label="综述写作步骤"><p class="eyebrow">工作流程</p><ol><li><a href="#step-1">01 · 明确范围</a></li><li><a href="#step-2">02 · 建立全局认识</a></li><li><a href="#step-3">03 · 检索与筛选</a></li><li><a href="#step-4">04 · 提取证据</a></li><li><a href="#step-5">05 · 综合与提纲</a></li><li><a href="#step-6">06 · 逐节起草</a></li><li><a href="#step-7">07 · 建立核验清单</a></li><li><a href="#step-8">08 · 学术语言润色</a></li></ol><a class="text-link" href="#main">返回顶部 ↑</a></nav><div><details class="prompt-stage" id="step-1" open><summary><span class="step-num">01</span><h2>明确范围</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">frontier LLM</span></p><div class="prompt-block"><pre class="prompt-text" id="prompt-0-0" lang="en">I&#39;m planning a review article and want to sharpen its scope before I start searching.
+
+Working topic: molecular dynamics (MD) simulations of CRISPR-Cas effector
+complexes, focused on what they reveal about conformational mechanisms —
+target recognition, R-loop formation, conformational gating, and cleavage
+activation.
+
+Help me by:
+1. Proposing 3 candidate research questions at different scope levels
+   (broad / focused / narrow), each phrased as a single answerable question.
+2. For the focused option, drafting explicit inclusion and exclusion criteria:
+   date range, simulation types to include (classical all-atom, enhanced
+   sampling, QM/MM, coarse-grained), which Cas families are in vs out of scope,
+   and what counts as in-scope vs merely adjacent.
+3. Listing 4–6 sub-themes a thorough review of this question must cover.
+
+Ask me clarifying questions first if anything about the scope is ambiguous.</pre><button type="button" class="copy-button" data-copy-target="prompt-0-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span><script type="module">document.querySelectorAll(`[data-copy-target]`).forEach(e=>{e.hidden=!1,e.addEventListener(`click`,async()=>{let t=document.getElementById(e.dataset.copyTarget??``),n=e.nextElementSibling;if(t&&n)try{await navigator.clipboard.writeText(t.textContent??``),n.textContent=e.dataset.success??`Copied.`}catch{let r=window.getSelection(),i=document.createRange();i.selectNodeContents(t),r?.removeAllRanges(),r?.addRange(i),n.textContent=e.dataset.failure??`Could not copy. Select the text and copy it manually.`}})});</script></div></details><details class="prompt-stage" id="step-2"><summary><span class="step-num">02</span><h2>建立全局认识</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">Perplexity · Academic Focus + Deep Research</span></p><p class="prompt-note" lang="en">Turn on Academic Focus and run it in Deep Research mode. Treat the output as a map, not a draft — click and verify the sources it cites.</p><div class="prompt-block"><pre class="prompt-text" id="prompt-1-0" lang="en">Act as a research analyst. Give me a structured, cited overview of the use of
+molecular dynamics simulations to study CRISPR-Cas effector complexes from
+2018 to 2026.
+
+Cover:
+- Which Cas systems MD has been applied to (Cas9, Cas12 family, Cas13, etc.)
+  and what mechanistic questions each line of work addressed
+- The dominant simulation approaches — classical all-atom MD, enhanced sampling
+  (metadynamics, umbrella sampling, replica exchange), QM/MM, coarse-grained —
+  and the force fields used for protein–nucleic acid complexes
+- Landmark papers and their most-cited findings
+- Open questions and known methodological limitations
+
+For every claim, cite a peer-reviewed source with a working link. Explicitly
+flag where the evidence is thin, preliminary, or contested.</pre><button type="button" class="copy-button" data-copy-target="prompt-1-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div></details><details class="prompt-stage" id="step-3"><summary><span class="step-num">03</span><h2>检索与筛选</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">Elicit</span></p><div class="prompt-block"><p class="prompt-label" lang="en">Search question — paste into Elicit&#39;s main query box</p><pre class="prompt-text" id="prompt-2-0" lang="en">What do molecular dynamics simulations reveal about the conformational
+mechanisms of CRISPR-Cas effector complexes during target recognition,
+R-loop formation, and cleavage?</pre><button type="button" class="copy-button" data-copy-target="prompt-2-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div><div class="prompt-block"><p class="prompt-label" lang="en">Screening criteria — apply while reviewing the result list</p><pre class="prompt-text" id="prompt-2-1" lang="en">INCLUDE: peer-reviewed primary studies, 2018–2026, that run MD (any flavor)
+on a CRISPR-Cas effector–nucleic acid complex and report a conformational or
+mechanistic result.
+
+EXCLUDE: pure experimental papers with no simulation; docking-only or static
+structure-prediction papers with no dynamics; reviews; Cas systems outside
+[your chosen families]; simulations under [e.g., 50 ns] with no enhanced
+sampling.</pre><button type="button" class="copy-button" data-copy-target="prompt-2-1" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div></details><details class="prompt-stage" id="step-4"><summary><span class="step-num">04</span><h2>提取证据</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">Elicit columns · SciSpace · Scite</span></p><div class="prompt-block"><p class="prompt-label" lang="en">Elicit custom columns — add these so the corpus drops into a comparable grid</p><pre class="prompt-text" id="prompt-3-0" lang="en">- Cas effector studied
+- Simulation method + force field
+- Timescale (ns/µs) and system size (atoms)
+- Enhanced sampling used? (which)
+- Key conformational finding
+- Validated against experiment? (how)
+- Stated limitations</pre><button type="button" class="copy-button" data-copy-target="prompt-3-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div><div class="prompt-block"><p class="prompt-label" lang="en">Per-paper deep read — paste into SciSpace / any chat-with-PDF tool with the paper open</p><pre class="prompt-text" id="prompt-3-1" lang="en">Summarize this paper&#39;s MD methodology in 5 bullets: system built, force field,
+solvation and ions, ensemble + timescale, and enhanced-sampling method (if any).
+Then state the single main conformational conclusion, and quote the specific
+result — with its numbers — that supports it.
+
+Do not infer beyond the text. If a detail isn&#39;t stated, write &quot;not reported.&quot;</pre><button type="button" class="copy-button" data-copy-target="prompt-3-1" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div><div class="prompt-block"><p class="prompt-label" lang="en">Reception check — paste into Scite for any finding you plan to lean on</p><pre class="prompt-text" id="prompt-3-2" lang="en">Has the finding that [e.g., &quot;the REC2 domain gates HNH activation in Cas9&quot;]
+been supported, mentioned, or contradicted by later studies?</pre><button type="button" class="copy-button" data-copy-target="prompt-3-2" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div></details><details class="prompt-stage" id="step-5"><summary><span class="step-num">05</span><h2>综合与提纲</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">frontier LLM</span></p><p class="prompt-note" lang="en">Feed it your finished extraction table. This is where you decide the argument — the model only organizes.</p><div class="prompt-block"><pre class="prompt-text" id="prompt-4-0" lang="en">Below is my extraction table from [N] papers on MD simulations of CRISPR-Cas
+complexes.
+
+[PASTE TABLE]
+
+Using ONLY the information in this table:
+1. Group the papers into 4–6 coherent themes and name each theme.
+2. For each theme, state the consensus finding and note any disagreements
+   between papers.
+3. Identify 2–3 genuine gaps the table reveals — questions that none of these
+   papers answer.
+4. Propose a section-by-section outline for a review built around these themes.
+   Under each section, list which papers (first author + year) support it.
+
+Do not add any paper, fact, or citation that is not in the table. If something
+is missing, say so rather than filling it in.</pre><button type="button" class="copy-button" data-copy-target="prompt-4-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div></details><details class="prompt-stage" id="step-6"><summary><span class="step-num">06</span><h2>逐节起草</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">frontier LLM · sources-only</span></p><p class="prompt-note" lang="en">Draft section by section. Paste in only the verified sources for that section.</p><div class="prompt-block"><pre class="prompt-text" id="prompt-5-0" lang="en">Draft the &quot;[SECTION NAME — e.g., Enhanced-sampling approaches to R-loop
+formation]&quot; section of my review. Target ~[600] words.
+
+Rules:
+- Use ONLY the sources pasted below. Introduce no other papers, facts, or
+  citations.
+- Cite as [Author, Year], matching the provided sources exactly.
+- Preserve every number, unit, and statistical value exactly as written —
+  never round, rephrase, or &quot;improve&quot; them.
+- Where sources disagree, present the disagreement; do not smooth it over.
+- Academic register. No filler, no &quot;in conclusion.&quot;
+
+Sources:
+[PASTE each verified paper or your notes, tagged with Author + Year]</pre><button type="button" class="copy-button" data-copy-target="prompt-5-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div></details><details class="prompt-stage" id="step-7"><summary><span class="step-num">07</span><h2>建立核验清单</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">frontier LLM</span></p><p class="prompt-note" lang="en">The model can&#39;t verify citations — it just extracts them so you can check each one by hand.</p><div class="prompt-block"><pre class="prompt-text" id="prompt-6-0" lang="en">Here is a section of my review draft. Extract every factual or numerical claim
+and the [Author, Year] it is attributed to. Output a table with columns:
+Claim | Cited source | Verified? (leave this column blank for me).
+
+Do NOT judge whether any citation is correct — you cannot verify sources. Only
+pull out the claims and their attributed sources so I can check each manually.
+
+[PASTE draft section]</pre><button type="button" class="copy-button" data-copy-target="prompt-6-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div><p class="prompt-note" lang="en">Then open every DOI yourself and fill the &quot;Verified?&quot; column.</p></details><details class="prompt-stage" id="step-8"><summary><span class="step-num">08</span><h2>学术语言润色</h2></summary><p class="prompt-tool">原流程建议工具 · <span lang="en">frontier LLM · or Writefull / Paperpal</span></p><div class="prompt-block"><pre class="prompt-text" id="prompt-7-0" lang="en">Line-edit the following for academic journal register. Tighten wordiness, fix
+grammar, and sharpen vague phrasing (e.g., replace bare &quot;significant&quot; with the
+specific statistical claim). Do NOT change any technical claim, number,
+citation, or the argument.
+
+Show the edited text, then a short list of the substantive changes you made.
+
+[PASTE text]</pre><button type="button" class="copy-button" data-copy-target="prompt-7-0" data-success="提示词已复制。" data-failure="复制受到限制。文本已选中，请手动复制，或下载完整提示词。" hidden>复制提示词</button><span class="live-status" role="status" aria-live="polite"></span></div></details></div></div></div><script type="module">var e=e=>{let t=document.getElementById(e.slice(1));t instanceof HTMLDetailsElement&&(t.open=!0)};e(location.hash),window.addEventListener(`hashchange`,()=>e(location.hash)),document.querySelector(`.prompt-toc`)?.addEventListener(`click`,t=>{let n=t.target instanceof Element?t.target.closest(`a`):null;n&&e(n.hash)});</script></main><footer class="site-footer"><div class="container footer-inner"><span>© 2026 Zibin Zhao</span><nav aria-label="页脚导航"><a href="/past-designs/12-dark/zh/prompts/index.html">提示词库</a><a href="https://github.com/zibin-zhao">GitHub <span aria-hidden="true">↗</span></a><a href="/past-designs/12-dark/zh/contact/index.html">联系</a></nav></div></footer><a href="/zh/past/12-dark/" target="_top" data-archive-return style="position:fixed;right:12px;bottom:12px;z-index:2147483647;background:#eee5d3;color:#302a22;padding:10px 14px;border:1px solid #8a7861;border-radius:30px;font:12px/1.4 system-ui;text-decoration:none">← 回到往昔</a></body></html>

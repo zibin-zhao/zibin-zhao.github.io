@@ -1,19 +1,18 @@
-# Quality-gate decisions
+# Quality gates
 
-## ESLint accessibility coverage
+The current Lanting prototype preserves the portfolio contract and verifies the collected-character interface. Its base evidence is in `docs/lanting-verification.md`; the added history archive is documented in `docs/past-designs.md`. Older nature and gallery receipts describe previous implementations.
 
-This project uses ESLint 10 and `eslint-plugin-astro` for its authored Astro templates. It intentionally does not install `eslint-plugin-jsx-a11y` 6.10.2: that package declares an ESLint peer range of `^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9`, so forcing it into the ESLint 10 dependency tree would leave the installation invalid.
+| Gate          | Check                                                                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static        | `npm run verify`: formatting, lint, Astro check, unit tests, build                                                                                                                          |
+| Interaction   | `npm run test:browser`: eleven insertions, thirteen reading records, exact project content, reveal, pointer proximity, focus, Escape, touch, return position, reduced motion, no JavaScript |
+| Portfolio     | Fourteen routes, language continuity, filters, clipboard success and failure, exact prompt downloads, 404, and both application entry points                                                |
+| Accessibility | Axe WCAG A/AA tags through WCAG 2.2; explicit keyboard checks and 320 px / 200% text reflow. Automated checks do not certify conformance.                                                   |
+| Visual        | Inspect actual desktop and phone sheet, discovered piece, expanded reader, and reveal state                                                                                                 |
+| Source        | Retain original image hash, artwork attribution, license metadata, and individually reviewed collected characters                                                                           |
+| Font coverage | Disclose that long-form Chinese still requires a complete licensed typeface; do not relabel the fallback                                                                                    |
+| Delivery      | Review this task's complete change relative to the fork snapshot; distinguish local preview from publication                                                                                |
 
-The repository contains no JSX or React source. Authored Astro templates remain covered by `eslint-plugin-astro`'s recommended flat configuration. Revisit this decision if JSX is introduced or `eslint-plugin-jsx-a11y` publishes ESLint 10 support.
+Do not regenerate a verified CV for a homepage-only change. Production deployment, paid font acquisition, external application flows, and field performance remain separate from the local checks.
 
-## Visual artifact updates
-
-`npm run test:browser` is read-only with respect to tracked artifacts. Its screenshot exercise writes into Playwright's ignored per-test output directory so browser or compositor variation cannot dirty the worktree.
-
-`npm run test:visual:update` intentionally refreshes the seven tracked PNGs in `artifacts/stitch`. It runs only the deterministic capture test at the canonical, desktop, and mobile viewports with `UPDATE_STITCH_ARTIFACTS=1`; review those files before committing them.
-
-## esbuild security override
-
-Astro delegates its development and production bundling to Vite, which previously resolved the transitive `esbuild` dependency to 0.27.7. The npm advisory database flagged that release, so the root `overrides` entry pins the complete Astro/Vite dependency graph to `esbuild` 0.28.1. Although esbuild is build-time tooling, its development and preview servers accept browser requests; a clean security audit is therefore part of the release gate rather than an accepted production-only exception.
-
-Remove the override only after Astro and Vite's own dependency ranges resolve to an audited esbuild release at or above 0.28.1. Before removal, verify a clean install with no duplicate older esbuild, then run `npm audit`, `npm ls esbuild`, and the full `npm run verify` gate.
+Archive checks cover the eight final design versions and local assets, consecutive footer numbering, version selection, inner routes, full-page return, language context, 320-pixel wrapper layout, and no-JavaScript navigation. Superseded viewer URLs must redirect to their family's final version. Accessibility checks cover the new viewer and current portfolio; they do not retroactively certify every historical design. Historic replays use noindex metadata and are omitted from the current portfolio sitemap.
