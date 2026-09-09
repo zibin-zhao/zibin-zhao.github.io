@@ -1,0 +1,81 @@
+---
+import type { ArchiveLeaf } from '../lib/archive-content';
+import type { Lang } from '../lib/i18n';
+interface Props {
+  entries: ArchiveLeaf[];
+  lang: Lang;
+}
+const { entries, lang } = Astro.props;
+---
+
+<script
+  is:inline
+  type="application/json"
+  data-archive-content
+  set:html={JSON.stringify(entries).replace(/</g, '\\u003c')}
+/>
+<div class="archive-launch" data-gallery-controls hidden>
+  <button type="button" data-archive-open aria-expanded="false" aria-controls="archive-reader">
+    <span>{lang === 'en' ? 'Open the collection' : '翻开这份收藏'}</span>
+    <span aria-hidden="true">↗</span>
+    <small>{lang === 'en' ? '9 things to explore' : '9 件工作，逐页探索'}</small>
+  </button>
+</div>
+
+<section
+  id="archive-reader"
+  class="archive-viewer"
+  data-archive-viewer
+  aria-labelledby="archive-title"
+  hidden
+>
+  <div class="archive-reader-top">
+    <span data-archive-position>01 / 09</span>
+    <button
+      type="button"
+      data-archive-close
+      aria-label={lang === 'en' ? 'Close the collection' : '收起收藏'}>×</button
+    >
+  </div>
+  <div class="archive-copy" aria-live="polite" aria-atomic="true">
+    <p class="archive-kicker" data-archive-kicker></p>
+    <h2 id="archive-title" data-archive-title></h2>
+    <p class="archive-summary" data-archive-summary></p>
+    <p class="archive-detail" data-archive-detail></p>
+  </div>
+  <nav
+    class="archive-links"
+    data-archive-links
+    aria-label={lang === 'en' ? 'Open this work' : '打开这项工作'}
+  >
+  </nav>
+  <div class="archive-paging">
+    <button type="button" data-archive-prev aria-label={lang === 'en' ? 'Previous item' : '上一件'}
+      >← <span>{lang === 'en' ? 'Previous' : '上一件'}</span></button
+    >
+    <span>{lang === 'en' ? 'Pick a leaf. Follow a thought.' : '点选一页，顺着好奇心翻阅。'}</span>
+    <button type="button" data-archive-next aria-label={lang === 'en' ? 'Next item' : '下一件'}
+      ><span>{lang === 'en' ? 'Next' : '下一件'}</span> →</button
+    >
+  </div>
+  <div
+    class="archive-selector-list"
+    role="group"
+    aria-label={lang === 'en' ? 'Nine works in the collection' : '收藏中的九件工作'}
+  >
+    {
+      entries.map((entry, index) => (
+        <button
+          type="button"
+          data-archive-select={index}
+          data-title={entry.title}
+          aria-pressed="false"
+        >
+          <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <span>{entry.title}</span>
+        </button>
+      ))
+    }
+  </div>
+</section>
+<div class="archive-hover" data-archive-hover aria-hidden="true" hidden></div>

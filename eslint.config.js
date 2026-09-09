@@ -6,6 +6,9 @@ export default [
   {
     ignores: [
       '.astro/**',
+      'artifacts/**',
+      'test-results/**',
+      'playwright-report/**',
       '.worktrees/**',
       'dist/**',
       'public/medit/**',
@@ -27,6 +30,10 @@ export default [
         process: 'readonly',
       },
     },
+  },
+  {
+    files: ['tools/generate-exports.mjs'],
+    languageOptions: { globals: { document: 'readonly' } },
   },
   {
     files: ['**/*.astro'],

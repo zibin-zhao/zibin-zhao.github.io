@@ -1,6 +1,6 @@
 // Content for the /prompts page. Prompt TEXT is reproduced verbatim from the
 // source pack and must stay in English (these are literal copy-paste prompts).
-// Only the page chrome is bilingual (handled in the page via <T/>).
+// Page navigation and instructions are localized in src/views/Prompts.astro.
 
 export type PromptBlock = { label?: string; text: string };
 export type Stage = {
@@ -25,7 +25,7 @@ export const promptPack = {
 
   stages: [
     {
-      num: '0',
+      num: '1',
       title: 'Sharpen the scope',
       tool: 'frontier LLM',
       frontier: true,
@@ -52,11 +52,10 @@ Ask me clarifying questions first if anything about the scope is ambiguous.`,
       ],
     },
     {
-      num: '1',
+      num: '2',
       title: 'Orientation',
       tool: 'Perplexity · Academic Focus + Deep Research',
-      note:
-        'Turn on Academic Focus and run it in Deep Research mode. Treat the output as a map, not a draft — click and verify the sources it cites.',
+      note: 'Turn on Academic Focus and run it in Deep Research mode. Treat the output as a map, not a draft — click and verify the sources it cites.',
       blocks: [
         {
           text: `Act as a research analyst. Give me a structured, cited overview of the use of
@@ -78,7 +77,7 @@ flag where the evidence is thin, preliminary, or contested.`,
       ],
     },
     {
-      num: '2',
+      num: '3',
       title: 'Search & screen',
       tool: 'Elicit',
       blocks: [
@@ -102,7 +101,7 @@ sampling.`,
       ],
     },
     {
-      num: '3',
+      num: '4',
       title: 'Extraction',
       tool: 'Elicit columns · SciSpace · Scite',
       blocks: [
@@ -117,7 +116,8 @@ sampling.`,
 - Stated limitations`,
         },
         {
-          label: 'Per-paper deep read — paste into SciSpace / any chat-with-PDF tool with the paper open',
+          label:
+            'Per-paper deep read — paste into SciSpace / any chat-with-PDF tool with the paper open',
           text: `Summarize this paper's MD methodology in 5 bullets: system built, force field,
 solvation and ions, ensemble + timescale, and enhanced-sampling method (if any).
 Then state the single main conformational conclusion, and quote the specific
@@ -137,8 +137,7 @@ been supported, mentioned, or contradicted by later studies?`,
       title: 'Synthesis & outline',
       tool: 'frontier LLM',
       frontier: true,
-      note:
-        'Feed it your finished extraction table. This is where you decide the argument — the model only organizes.',
+      note: 'Feed it your finished extraction table. This is where you decide the argument — the model only organizes.',
       blocks: [
         {
           text: `Below is my extraction table from [N] papers on MD simulations of CRISPR-Cas
@@ -190,8 +189,7 @@ Sources:
       title: 'Build a verification checklist',
       tool: 'frontier LLM',
       frontier: true,
-      note:
-        "The model can't verify citations — it just extracts them so you can check each one by hand.",
+      note: "The model can't verify citations — it just extracts them so you can check each one by hand.",
       blocks: [
         {
           text: `Here is a section of my review draft. Extract every factual or numerical claim

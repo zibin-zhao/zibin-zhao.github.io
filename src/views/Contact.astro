@@ -1,0 +1,57 @@
+---
+import PageIntro from '../components/PageIntro.astro';
+import CopyButton from '../components/CopyButton.astro';
+import { profile } from '../data/profile';
+import type { Lang } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<div class="container">
+  <PageIntro
+    title={lang === 'en' ? 'Contact' : '联系'}
+    description={lang === 'en'
+      ? 'Email is the easiest way to reach me.'
+      : '邮件是联系我最方便的方式。'}
+  />
+  <section class="section two-column" aria-label={lang === 'en' ? 'Contact details' : '联系方式'}>
+    <div>
+      <a class="contact-email" href={'mailto:' + profile.email}
+        ><span id="contact-address">{profile.email}</span></a
+      >
+      <div>
+        <CopyButton
+          target="contact-address"
+          label={lang === 'en' ? 'Copy email address' : '复制邮箱'}
+          success={lang === 'en' ? 'Email address copied.' : '邮箱已复制。'}
+          failure={lang === 'en'
+            ? 'Copy was blocked. The address is selected; copy it manually or use the email link.'
+            : '复制受到限制。邮箱已选中，请手动复制，或点击邮箱发送邮件。'}
+        />
+      </div>
+      <ul class="contact-methods">
+        {
+          profile.socials.map((social) => (
+            <li>
+              <a href={social.href}>
+                {social.label}
+                <span aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class="contact-note">
+      <p>
+        {
+          lang === 'en'
+            ? 'Research collaboration, a tool you’re building, or feedback on something here: a short email with a little context is enough.'
+            : '科研合作、正在做的工具，或是对这里某个项目的反馈，都可以直接写信。简单说说背景就好。'
+        }
+      </p>
+    </div>
+  </section>
+</div>

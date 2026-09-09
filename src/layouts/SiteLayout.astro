@@ -1,0 +1,131 @@
+---
+import '@fontsource/manrope/latin-400.css';
+import '@fontsource/manrope/latin-500.css';
+import '@fontsource/manrope/latin-600.css';
+import '@fontsource/manrope/latin-700.css';
+import '@fontsource/bodoni-moda/latin-400.css';
+import '../styles/global.css';
+import '../styles/grail.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { pathFor, t, pageNames, descriptions, type Lang, type Page } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+  page: Page;
+  notFound?: boolean;
+}
+const { lang, page, notFound = false } = Astro.props;
+const title = notFound
+  ? lang === 'en'
+    ? 'Page not found | Zibin Zhao'
+    : '页面未找到 | Zibin Zhao'
+  : page === 'home'
+    ? lang === 'en'
+      ? 'Zibin Zhao | Research and projects'
+      : 'Zibin Zhao | 研究与项目'
+    : `${t(pageNames[page], lang)} | Zibin Zhao`;
+const description = t(descriptions[page], lang);
+const canonical = new URL(pathFor(page, lang), Astro.site).href;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Zibin Zhao',
+  url: 'https://zibinzhao.com/',
+  sameAs: ['https://github.com/zibin-zhao', 'https://orcid.org/0000-0002-3121-9131'],
+  jobTitle: 'Bioengineering PhD student',
+  affiliation: {
+    '@type': 'CollegeOrUniversity',
+    name: 'The Hong Kong University of Science and Technology',
+  },
+};
+---
+
+<!doctype html>
+<html lang={lang === 'en' ? 'en' : 'zh-CN'}>
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title><meta name="description" content={description} /><meta
+      name="theme-color"
+      content="#000000"
+    /><link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {
+      notFound ? (
+        <meta name="robots" content="noindex" />
+      ) : (
+        <>
+          <>
+            <link rel="canonical" href={canonical} />
+            <link
+              rel="alternate"
+              hreflang="en"
+              href={new URL(pathFor(page, 'en'), Astro.site).href}
+            />
+            <link
+              rel="alternate"
+              hreflang="zh-CN"
+              href={new URL(pathFor(page, 'zh'), Astro.site).href}
+            />
+            <link
+              rel="alternate"
+              hreflang="x-default"
+              href={new URL(pathFor(page, 'en'), Astro.site).href}
+            />
+          </>
+        </>
+      )
+    }
+    <meta property="og:type" content="website" /><meta
+      property="og:site_name"
+      content="Zibin Zhao"
+    /><meta property="og:title" content={title} /><meta
+      property="og:description"
+      content={description}
+    /><meta property="og:url" content={canonical} /><meta
+      property="og:locale"
+      content={lang === 'en' ? 'en_US' : 'zh_CN'}
+    /><meta property="og:locale:alternate" content={lang === 'en' ? 'zh_CN' : 'en_US'} />
+    <meta property="og:image" content="https://zibinzhao.com/og.png" /><meta
+      property="og:image:width"
+      content="1200"
+    /><meta property="og:image:height" content="630" /><meta
+      property="og:image:alt"
+      content="Zibin Zhao. Bioengineering at HKUST. Research and projects."
+    />
+    <meta name="twitter:card" content="summary_large_image" /><meta
+      name="twitter:title"
+      content={title}
+    /><meta name="twitter:description" content={description} /><meta
+      name="twitter:image"
+      content="https://zibinzhao.com/og.png"
+    />
+    {
+      page === 'home' && !notFound && (
+        <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+      )
+    }
+  </head>
+  <body class={`page-${page}`}>
+    <a class="skip-link" href="#main">{lang === 'en' ? 'Skip to content' : '跳转到正文'}</a>
+    <SiteHeader lang={lang} page={page} />
+    <main id="main" tabindex="-1">
+      {
+        page === 'home' || notFound ? (
+          <slot />
+        ) : (
+          <div class="reading-sheet">
+            <>
+              <a class="sheet-close" href={pathFor('home', lang)}>
+                <span aria-hidden="true">↖</span>
+                {lang === 'en' ? 'Back to the collection' : '回到作品集'}
+              </a>
+              <slot />
+            </>
+          </div>
+        )
+      }
+    </main><SiteFooter lang={lang} />
+    <script>
+      import '../scripts/gallery-interface';
+    </script>
+  </body>
+</html>

@@ -24,7 +24,7 @@ export const cv: {
     {
       title: { en: 'B.S., Biomedical Engineering', zh: '生物医学工程学士' },
       org: { en: 'University of Melbourne', zh: '墨尔本大学' },
-      period: { en: '', zh: '' },
+      period: { en: '2018–2020', zh: '2018–2020' },
       notes: { en: ['First Class Honours'], zh: ['一等荣誉'] },
     },
   ],
@@ -32,7 +32,7 @@ export const cv: {
     {
       title: { en: 'Co-founder & CEO', zh: '联合创始人兼 CEO' },
       org: { en: 'PealthMed Ltd', zh: 'PealthMed Ltd' },
-      period: { en: 'Present', zh: '至今' },
+      period: { en: '', zh: '' },
       notes: { en: [], zh: [] },
     },
     {
@@ -40,9 +40,27 @@ export const cv: {
       org: { en: 'The Hong Kong University of Science and Technology', zh: '香港科技大学' },
       period: { en: '2021–2022', zh: '2021–2022' },
       notes: {
-        en: ['Wearable wireless real-time 12-lead ECG monitoring', 'Filter bank + deep learning for heart-disease classification'],
+        en: [
+          'Wearable wireless real-time 12-lead ECG monitoring',
+          'Filter bank + deep learning for heart-disease classification',
+        ],
         zh: ['可穿戴无线实时 12 导联心电监测', '滤波器组 + 深度学习用于心脏病分类'],
       },
+    },
+    {
+      title: { en: 'Teaching Assistant', zh: '助教' },
+      org: { en: 'Shanghai Jiao Tong University', zh: '上海交通大学' },
+      period: { en: '2020–2021', zh: '2020–2021' },
+      notes: { en: [], zh: [] },
+    },
+    {
+      title: { en: 'Laboratory Intern', zh: '实验室实习生' },
+      org: {
+        en: 'Haihe Animal Science & Technology Co., Ltd.',
+        zh: 'Haihe Animal Science & Technology Co., Ltd.',
+      },
+      period: { en: '2018–2019', zh: '2018–2019' },
+      notes: { en: [], zh: [] },
     },
   ],
   leadership: [
@@ -50,7 +68,7 @@ export const cv: {
       title: { en: 'President & Event Director', zh: '会长兼活动总监' },
       org: { en: 'Chinese Music Group, University of Melbourne', zh: '墨尔本大学中乐团' },
       period: { en: '2020', zh: '2020' },
-      notes: { en: ['5,000+ members'], zh: ['5,000+ 名成员'] },
+      notes: { en: [], zh: [] },
     },
   ],
   skills: ['AI', 'Python', 'C', 'MATLAB', 'LabVIEW', 'SolidWorks'],

@@ -1,0 +1,322 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import WorkArtwork from '../components/WorkArtwork.astro';
+import { buildArchiveLeaves } from '../lib/archive-content';
+import { pathFor, type Lang } from '../lib/i18n';
+import { profile } from '../data/profile';
+import medit from '../assets/medit-preview.png';
+import singularity from '../assets/singularity-preview.png';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const zh = lang === 'zh';
+const entries = buildArchiveLeaves(lang, await getCollection('publications'));
+const featured = entries.filter((entry) =>
+  ['casmd', 'dlselex', 'medit', 'tempo', 'singularity', 'yaos'].includes(entry.id),
+);
+const poses = [
+  { x: 16, y: 33, z: -70, rx: 5, ry: 24, rz: -13 },
+  { x: 48, y: 41, z: 100, rx: -5, ry: -9, rz: 5 },
+  { x: 79, y: 28, z: 20, rx: 6, ry: -22, rz: 13 },
+  { x: 33, y: 7, z: -140, rx: 13, ry: 154, rz: -8 },
+  { x: 65, y: 8, z: -140, rx: -9, ry: 198, rz: 12 },
+  { x: 66, y: 68, z: -90, rx: 2, ry: 12, rz: -12 },
+  { x: 12, y: 83, z: -150, rx: 0, ry: 155, rz: 12 },
+  { x: 90, y: 85, z: -190, rx: 8, ry: 209, rz: 5 },
+  { x: 37, y: 85, z: -210, rx: 0, ry: 175, rz: -5 },
+];
+---
+
+<div class="grail-home" data-lang={lang}>
+  <section class="grail-hero" aria-labelledby="home-title">
+    <h1 id="home-title">Zibin Zhao</h1>
+    <div class="card-field" aria-label={zh ? '点选作品，查看详情' : 'Select a work to read more'}>
+      {
+        entries.map((entry, index) => {
+          const p = poses[index];
+          return (
+            <div
+              class="orbit-position"
+              style={`--x:${p.x}%;--y:${p.y}%;--depth:${p.z}px;--rx:${p.rx}deg;--ry:${p.ry}deg;--rz:${p.rz}deg;--delay:${index * -1.3}s;--drift:${index % 2 ? 1 : -1};--order:${index}`}
+            >
+              <a
+                class="orbit-card"
+                href={entry.links[0].href}
+                data-work-open={entry.id}
+                aria-label={`${zh ? '查看' : 'Explore'} ${entry.title}`}
+              >
+                <span class="card-face card-front" aria-hidden="true">
+                  <span class="card-stamp">
+                    <WorkArtwork kind={entry.id} />
+                  </span>
+                  <span class="card-kicker">{entry.kicker}</span>
+                  <strong>{entry.title}</strong>
+                  <span class="card-summary">{entry.summary}</span>
+                  <span class="card-bottom">
+                    <>
+                      <span>{zh ? '研究与造物' : 'From the collection'}</span>
+                      <span>↗</span>
+                    </>
+                  </span>
+                </span>
+                <span class="card-face card-back" aria-hidden="true">
+                  <WorkArtwork kind={entry.id} variant="back" />
+                </span>
+              </a>
+            </div>
+          );
+        })
+      }
+    </div>
+    <div class="hero-baseline">
+      <p>
+        {zh ? '从分子，走向更多可能。' : 'From molecules to possibilities.'}<span
+          >{zh ? '点开一件作品，看看里面。' : 'Pick a card. Follow the curiosity.'}</span
+        >
+      </p>
+      <a href="#collection" class="round-link"
+        >{zh ? '浏览作品' : 'Explore the collection'}<span aria-hidden="true">↓</span></a
+      >
+      <button
+        data-motion-toggle
+        aria-pressed="false"
+        hidden
+        data-pause={zh ? '暂停动效' : 'Pause motion'}
+        data-play={zh ? '开启动效' : 'Play motion'}>{zh ? '暂停动效' : 'Pause motion'}</button
+      >
+    </div>
+  </section>
+
+  <section class="question-section" id="research" aria-labelledby="research-title">
+    <div class="section-caption">
+      <span>{zh ? '关于好奇心' : 'A practice of curiosity'}</span><a href={pathFor('about', lang)}
+        >{zh ? '认识我' : 'Meet the person'} ↗</a
+      >
+    </div>
+    <h2 id="research-title" class="question-type">
+      {
+        zh ? (
+          <>
+            <>
+              <span>问题从实验室开始。</span>
+              <span>想法，走向更远处。</span>
+            </>
+          </>
+        ) : (
+          <>
+            <>
+              <span>Questions start</span>
+              <span>in the lab.</span>
+              <span>Ideas go further.</span>
+            </>
+          </>
+        )
+      }
+    </h2>
+    <div class="question-foot">
+      <span class="question-star" aria-hidden="true">✳</span><p>
+        {
+          zh
+            ? '我在香港科技大学研究分子诊断、CRISPR 和适体设计。也写软件，做小工具，把偶然冒出的想法变成可以使用的东西。'
+            : 'I study molecular diagnostics, CRISPR and aptamer design at HKUST. I also write software, make small tools, and turn passing questions into things you can use.'
+        }
+      </p><a class="text-link" href={pathFor('research', lang)}
+        >{zh ? '阅读全部研究' : 'Read the research'} ↗</a
+      >
+    </div>
+  </section>
+
+  <section class="work-stage" id="collection" aria-labelledby="collection-title">
+    <div class="section-caption">
+      <span>{zh ? '六个项目，各有去处' : 'Six projects. Different possibilities.'}</span><a
+        href={pathFor('projects', lang)}>{zh ? '全部项目' : 'All projects'} ↗</a
+      >
+    </div>
+    <h2 id="collection-title">{zh ? '循着好奇心。' : 'Follow a curiosity.'}</h2>
+    <div class="feature-display">
+      {
+        featured.map((entry, index) => (
+          <article data-feature-panel={entry.id} hidden={index !== 0}>
+            <div class="feature-art">
+              <WorkArtwork kind={entry.id} />
+              {entry.id === 'medit' && (
+                <Image
+                  class="feature-preview"
+                  src={medit}
+                  alt={zh ? 'Medit 应用界面' : 'Medit application interface'}
+                  width={700}
+                  format="webp"
+                  loading="lazy"
+                />
+              )}
+              {entry.id === 'singularity' && (
+                <Image
+                  class="feature-preview"
+                  src={singularity}
+                  alt={zh ? 'Singularity 粒子宇宙' : 'Singularity particle universe'}
+                  width={700}
+                  format="webp"
+                  loading="lazy"
+                />
+              )}
+            </div>
+            <div class="feature-copy">
+              <>
+                <p>{entry.kicker}</p>
+                <h3>{entry.title}</h3>
+                <p>{entry.summary}</p>
+                <a
+                  href={entry.links[0].href}
+                  data-work-open={entry.id}
+                  class="round-link dark-link"
+                >
+                  {zh ? '展开作品' : 'Inside the project'} <span aria-hidden="true">↗</span>
+                </a>
+              </>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+    <nav class="feature-selectors" aria-label={zh ? '选择项目' : 'Choose a project'}>
+      {
+        featured.map((entry, index) => (
+          <button type="button" data-feature-select={entry.id} aria-pressed={index === 0}>
+            {entry.title}
+          </button>
+        ))
+      }
+    </nav>
+    <noscript
+      ><p>
+        {zh ? '全部作品与链接在下方。' : 'Every project and its links are listed below.'}
+      </p></noscript
+    >
+  </section>
+
+  <section class="collection-index" aria-labelledby="index-title">
+    <div class="section-caption">
+      <span>{zh ? '论文、工具与实验' : 'Papers, tools & experiments'}</span><span
+        >{entries.length} {zh ? '件作品' : 'works'}</span
+      >
+    </div>
+    <h2 id="index-title">
+      {
+        zh ? (
+          <>
+            每个想法，
+            <br />
+            都有迹可循。
+          </>
+        ) : (
+          <>
+            A few things
+            <br />I put into the world.
+          </>
+        )
+      }
+    </h2>
+    <div class="work-ledger">
+      {
+        entries.map((entry) => (
+          <details class="ledger-entry" id={`entry-${entry.id}`}>
+            <>
+              <summary>
+                <>
+                  <span class="ledger-title">{entry.title}</span>
+                  <span class="ledger-kicker">{entry.kicker}</span>
+                  <span class="ledger-icon" aria-hidden="true">
+                    +
+                  </span>
+                </>
+              </summary>
+              <div class="ledger-body">
+                <>
+                  <div class="ledger-art">
+                    <WorkArtwork kind={entry.id} />
+                  </div>
+                  <div>
+                    <>
+                      <p>{entry.summary}</p>
+                      <p class="ledger-detail">{entry.detail}</p>
+                      <div class="work-links">
+                        {entry.links.map((link) => (
+                          <a href={link.href}>
+                            {link.label} <span aria-hidden="true">↗</span>
+                          </a>
+                        ))}
+                      </div>
+                    </>
+                  </div>
+                </>
+              </div>
+            </>
+          </details>
+        ))
+      }
+    </div>
+    <div class="index-links">
+      <a href={pathFor('research', lang)}>{zh ? '全部论文' : 'All publications'} ↗</a><a
+        href={pathFor('prompts', lang)}>{zh ? '研究提示词库' : 'Research prompt library'} ↗</a
+      ><a href="/cv.pdf">{zh ? '下载简历' : 'Download CV'} ↓</a>
+    </div>
+  </section>
+
+  <section class="hello-section" aria-labelledby="hello-title">
+    <div class="section-caption">
+      <span>{zh ? '下一个问题' : 'The next question'}</span><span>Hong Kong</span>
+    </div><h2 id="hello-title">{zh ? '聊聊看。' : 'Let’s talk.'}</h2><a
+      class="hello-email"
+      href={`mailto:${profile.email}`}>{profile.email}<span aria-hidden="true">↗</span></a
+    ><div class="hello-links">
+      <a href={pathFor('about', lang)}>{zh ? '关于我' : 'About me'}</a><a href={pathFor('cv', lang)}
+        >CV</a
+      ><a href={pathFor('contact', lang)}>{zh ? '联系方式' : 'Find me elsewhere'}</a>
+    </div>
+  </section>
+
+  <dialog data-work-dialog aria-label={zh ? '作品详情' : 'Work details'}>
+    <div class="work-dialog-top">
+      <span>{zh ? '来自作品集' : 'From the collection'}</span><button
+        data-work-close
+        aria-label={zh ? '关闭详情' : 'Close details'}>✕</button
+      >
+    </div>
+    {
+      entries.map((entry) => (
+        <article data-work-detail={entry.id} hidden>
+          <>
+            <div class="dialog-art">
+              <WorkArtwork kind={entry.id} />
+            </div>
+            <div class="dialog-copy">
+              <>
+                <p class="dialog-kicker">{entry.kicker}</p>
+                <h2>{entry.title}</h2>
+                <p>{entry.summary}</p>
+                <p class="dialog-detail">{entry.detail}</p>
+                <div class="work-links">
+                  {entry.links.map((link) => (
+                    <a href={link.href}>
+                      {link.label} <span aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </div>
+              </>
+            </div>
+          </>
+        </article>
+      ))
+    }
+    <div class="work-dialog-bottom">
+      <button data-work-prev>{zh ? '← 上一件' : '← Previous'}</button><span
+        data-work-count
+        aria-live="polite"></span><button data-work-next>{zh ? '下一件 →' : 'Next →'}</button>
+    </div>
+  </dialog>
+</div>
+<script>
+  import '../scripts/grail';
+</script>

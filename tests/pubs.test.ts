@@ -10,7 +10,7 @@ const sample = [
 describe('sortPubs', () => {
   it('orders by year descending', () => {
     const out = sortPubs(sample);
-    expect(out.map(p => p.year)).toEqual([2026, 2025, 2023]);
+    expect(out.map((p) => p.year)).toEqual([2026, 2025, 2023]);
   });
   it('keeps featured flag intact', () => {
     expect(sortPubs(sample)[0].featured).toBe(true);
