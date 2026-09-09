@@ -13,6 +13,7 @@ export default [
       'dist/**',
       'public/medit/**',
       'public/singularity/**',
+      'public/past-designs/**',
       'node_modules/**',
     ],
   },

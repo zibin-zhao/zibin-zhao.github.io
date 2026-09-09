@@ -1,0 +1,37 @@
+---
+import { glyphs, inkSource, sourceSize, type Glyph } from '../data/lanting';
+interface Props {
+  text: string;
+  class?: string;
+}
+const { text, class: className } = Astro.props;
+const crops = [...text].map((char) => {
+  const crop = glyphs[char as Glyph];
+  if (!crop) throw new Error(`No sourced Lanting glyph for ${char}`);
+  return crop;
+});
+---
+
+<span class:list={['ink-text', className]} aria-hidden="true">
+  {
+    crops.map((crop) => (
+      <svg
+        class="ink-glyph"
+        viewBox={crop.join(' ')}
+        focusable="false"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <svg
+          x={crop[0]}
+          y={crop[1]}
+          width={crop[2]}
+          height={crop[3]}
+          viewBox={crop.join(' ')}
+          overflow="hidden"
+        >
+          <image href={inkSource} width={sourceSize.width} height={sourceSize.height} />
+        </svg>
+      </svg>
+    ))
+  }
+</span>

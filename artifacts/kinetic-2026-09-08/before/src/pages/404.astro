@@ -1,0 +1,17 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout lang="en" page="home" notFound
+  ><div class="container not-found">
+    <p class="eyebrow">404 / A small detour</p><h1>This path ends here.</h1><p class="intro-copy">
+      The page may have moved. There’s still plenty to explore.
+    </p><p lang="zh-CN" class="muted">这个页面可能已经搬走了，换条路继续看看。</p><div
+      class="actions"
+    >
+      <a href="/" class="button">Back to home ↗</a><a href="/projects/" class="text-link"
+        >Explore projects ↗</a
+      ><a href="/zh/" class="text-link" lang="zh-CN">中文首页 ↗</a>
+    </div>
+  </div></SiteLayout
+>

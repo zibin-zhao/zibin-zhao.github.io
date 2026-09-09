@@ -1,7 +1,5 @@
 ---
-import { Image } from 'astro:assets';
-import medit from '../assets/medit-preview.png';
-import singularity from '../assets/singularity-preview.png';
+import ProjectArtwork from './ProjectArtwork.astro';
 import { t, type Lang } from '../lib/i18n';
 import type { Project } from '../data/projects';
 interface Props {
@@ -9,8 +7,7 @@ interface Props {
   lang: Lang;
 }
 const { project, lang } = Astro.props;
-const visual =
-  project.id === 'medit' ? medit : project.id === 'singularity' ? singularity : undefined;
+const visual = project.id === 'medit' || project.id === 'singularity' ? project.id : undefined;
 ---
 
 <article class="project-card" data-category={project.category} id={project.id}>
@@ -41,19 +38,7 @@ const visual =
   {
     visual && (
       <a class="project-preview" href={project.href} aria-label={t(project.action, lang)}>
-        <Image
-          src={visual}
-          alt={
-            lang === 'en'
-              ? project.name + ' application screenshot'
-              : project.name + ' 应用界面截图'
-          }
-          widths={[400, 700]}
-          sizes="(max-width:760px) 90vw, 300px"
-          format="webp"
-          quality={80}
-          loading="lazy"
-        />
+        <ProjectArtwork project={visual} />
       </a>
     )
   }

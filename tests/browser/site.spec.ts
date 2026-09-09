@@ -85,12 +85,12 @@ test('native navigation and prompt disclosure work without JavaScript', async ({
     viewport: isMobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 },
   });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:43218/zh/');
+  await page.goto('http://127.0.0.1:43229/zh/');
   await expect(page.locator('h1')).toContainText('Zibin');
   await page.locator('.mobile-menu summary').click();
   await page.locator('.mobile-menu nav').getByRole('link', { name: '研究', exact: true }).click();
   await expect(page).toHaveURL(/\/zh\/research\/$/);
-  await page.goto('http://127.0.0.1:43218/zh/prompts/');
+  await page.goto('http://127.0.0.1:43229/zh/prompts/');
   await page.locator('#step-8 summary').click();
   await expect(page.locator('#step-8 .prompt-text')).toBeVisible();
   await expect(page.locator('[data-copy-target]:visible')).toHaveCount(0);
@@ -185,17 +185,21 @@ test('all pages reflow at 320 px with 200 percent text', async ({ page }) => {
     }));
     expect(overflow.actual, name).toBeLessThanOrEqual(overflow.expected);
     await page.locator('.site-footer').scrollIntoViewIfNeeded();
-    await expect(page.getByRole('contentinfo').getByRole('navigation')).toBeInViewport();
+    await expect(
+      page.getByRole('contentinfo').getByRole('navigation', { name: /Footer navigation|页脚导航/ }),
+    ).toBeInViewport();
   }
 });
 
 test('native reading survives landscape resize and reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/#research');
-  await expect(page.locator('#research-title')).toBeInViewport();
+  await page.goto('/#collection');
+  await expect(page.locator('#collection-title')).toBeInViewport();
   await page.setViewportSize({ width: 844, height: 390 });
   await page.locator('.site-footer').scrollIntoViewIfNeeded();
-  await expect(page.getByRole('contentinfo').getByRole('navigation')).toBeInViewport();
+  await expect(
+    page.getByRole('contentinfo').getByRole('navigation', { name: /Footer navigation|页脚导航/ }),
+  ).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -207,7 +211,7 @@ test('404 and public demo entry points provide recovery and allow zoom', async (
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('This path ends here.');
   await page.getByRole('link', { name: 'Back to home' }).click();
-  await expect(page).toHaveURL(/43218\/$/);
+  await expect(page).toHaveURL(/43229\/$/);
   await expect(page.locator('a[href*="/night/"]')).toHaveCount(0);
   for (const removedRoute of ['/night/', '/zh/night/']) {
     expect((await request.get(removedRoute)).status()).toBe(404);

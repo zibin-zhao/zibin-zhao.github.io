@@ -3,9 +3,8 @@ import '@fontsource/manrope/latin-400.css';
 import '@fontsource/manrope/latin-500.css';
 import '@fontsource/manrope/latin-600.css';
 import '@fontsource/manrope/latin-700.css';
-import '@fontsource/bodoni-moda/latin-400.css';
 import '../styles/global.css';
-import '../styles/grail.css';
+import '../styles/lanting.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { pathFor, t, pageNames, descriptions, type Lang, type Page } from '../lib/i18n';
@@ -46,7 +45,7 @@ const schema = {
     <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title><meta name="description" content={description} /><meta
       name="theme-color"
-      content="#000000"
+      content="#e7ddc8"
     /><link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     {
       notFound ? (
@@ -105,6 +104,18 @@ const schema = {
     }
   </head>
   <body class={`page-${page}`}>
+    <svg width="0" height="0" aria-hidden="true" style="position:absolute"
+      ><defs
+        ><filter id="ink-separation" color-interpolation-filters="sRGB"
+          ><feColorMatrix type="matrix" values="0 0 0 0 .16 0 0 0 0 .13 0 0 0 0 .09 -4 0 0 2.4 0"
+          ></feColorMatrix></filter
+        ><clipPath id="reader-cut" clipPathUnits="objectBoundingBox"
+          ><path
+            d="M.01 .002 L.42 .003 C.42 .035 .48 .035 .48 .003 L.99 .006 L.995 .35 C.95 .35 .95 .42 .995 .42 L.99 .99 L.56 .995 C.56 .96 .49 .96 .49 .995 L.005 .99 L.002 .69 C.05 .69 .05 .61 .002 .61 Z"
+          ></path></clipPath
+        ></defs
+      ></svg
+    >
     <a class="skip-link" href="#main">{lang === 'en' ? 'Skip to content' : '跳转到正文'}</a>
     <SiteHeader lang={lang} page={page} />
     <main id="main" tabindex="-1">
@@ -116,7 +127,7 @@ const schema = {
             <>
               <a class="sheet-close" href={pathFor('home', lang)}>
                 <span aria-hidden="true">↖</span>
-                {lang === 'en' ? 'Back to the collection' : '回到作品集'}
+                {lang === 'en' ? 'Back to the writing' : '回到字里行间'}
               </a>
               <slot />
             </>
@@ -124,8 +135,5 @@ const schema = {
         )
       }
     </main><SiteFooter lang={lang} />
-    <script>
-      import '../scripts/gallery-interface';
-    </script>
   </body>
 </html>

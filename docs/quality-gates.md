@@ -1,17 +1,18 @@
 # Quality gates
 
-The September 2026 rebuild replaces the chapter-navigation and source-layout snapshot tests. Current checks exercise the resulting public behavior.
+The current Lanting prototype preserves the portfolio contract and verifies the collected-character interface. Its base evidence is in `docs/lanting-verification.md`; the added history archive is documented in `docs/past-designs.md`. Older nature and gallery receipts describe previous implementations.
 
-| Gate                 | Command or observation                                                                                                                                                         |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Declared install     | `npm ci` using the committed lockfile                                                                                                                                          |
-| Static verification  | `npm run verify`: formatting, lint, Astro check, unit tests, and build                                                                                                         |
-| Browser behavior     | `npm run test:browser`: desktop and mobile, both locales, no-JavaScript navigation, keyboard, filters, real clipboard and denied clipboard, downloads, 404, 320 px / 200% text |
-| Accessibility        | Browser test axe scans use WCAG A/AA tags through WCAG 2.2. Automated scans do not certify conformance or replace assistive-technology testing.                                |
-| Publication identity | Follow `docs/content-verification.md`; check article type, author order, DOI, and version relationships.                                                                       |
-| Visual review        | Inspect actual desktop/mobile screenshots, Projects, Research, Contact, CV, and expanded prompt states.                                                                        |
-| Exports              | Regenerate CV/OG from the current build, render each PDF page, verify reading order, absence of orphan headings, and file dimensions.                                          |
-| Performance          | Record a named Lighthouse version and exact environment. Local lab results are not production field metrics.                                                                   |
-| Demo cache change    | Test initial installation, old-client update, and offline navigation when changing a precached app entry point.                                                                |
-| Dependencies         | `npm audit` and `npm audit --omit=dev`; record the check date.                                                                                                                 |
-| Delivery             | Review the complete diff; disclose untested external application flows and publication status.                                                                                 |
+| Gate          | Check                                                                                                                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static        | `npm run verify`: formatting, lint, Astro check, unit tests, build                                                                                                                          |
+| Interaction   | `npm run test:browser`: eleven insertions, thirteen reading records, exact project content, reveal, pointer proximity, focus, Escape, touch, return position, reduced motion, no JavaScript |
+| Portfolio     | Fourteen routes, language continuity, filters, clipboard success and failure, exact prompt downloads, 404, and both application entry points                                                |
+| Accessibility | Axe WCAG A/AA tags through WCAG 2.2; explicit keyboard checks and 320 px / 200% text reflow. Automated checks do not certify conformance.                                                   |
+| Visual        | Inspect actual desktop and phone sheet, discovered piece, expanded reader, and reveal state                                                                                                 |
+| Source        | Retain original image hash, artwork attribution, license metadata, and individually reviewed collected characters                                                                           |
+| Font coverage | Disclose that long-form Chinese still requires a complete licensed typeface; do not relabel the fallback                                                                                    |
+| Delivery      | Review this task's complete change relative to the fork snapshot; distinguish local preview from publication                                                                                |
+
+Do not regenerate a verified CV for a homepage-only change. Production deployment, paid font acquisition, external application flows, and field performance remain separate from the local checks.
+
+Archive checks cover the eight final design versions and local assets, consecutive footer numbering, version selection, inner routes, full-page return, language context, 320-pixel wrapper layout, and no-JavaScript navigation. Superseded viewer URLs must redirect to their family's final version. Accessibility checks cover the new viewer and current portfolio; they do not retroactively certify every historical design. Historic replays use noindex metadata and are omitted from the current portfolio sitemap.

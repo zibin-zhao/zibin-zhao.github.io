@@ -1,0 +1,40 @@
+---
+interface Props {
+  target: string;
+  label: string;
+  success: string;
+  failure: string;
+}
+const { target, label, success, failure } = Astro.props;
+---
+
+<button
+  type="button"
+  class="copy-button"
+  data-copy-target={target}
+  data-success={success}
+  data-failure={failure}
+  hidden>{label}</button
+><span class="live-status" role="status" aria-live="polite"></span>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-target]').forEach((button) => {
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      const target = document.getElementById(button.dataset.copyTarget ?? '');
+      const status = button.nextElementSibling;
+      if (!target || !status) return;
+      try {
+        await navigator.clipboard.writeText(target.textContent ?? '');
+        status.textContent = button.dataset.success ?? 'Copied.';
+      } catch {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        status.textContent =
+          button.dataset.failure ?? 'Could not copy. Select the text and copy it manually.';
+      }
+    });
+  });
+</script>

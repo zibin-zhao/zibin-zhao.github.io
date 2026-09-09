@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import medit from '../assets/medit-preview.png';
+import singularity from '../assets/singularity-preview.png';
+import { t, type Lang } from '../lib/i18n';
+import type { Project } from '../data/projects';
+interface Props {
+  project: Project;
+  lang: Lang;
+}
+const { project, lang } = Astro.props;
+const visual =
+  project.id === 'medit' ? medit : project.id === 'singularity' ? singularity : undefined;
+---
+
+<article class="project-card" data-category={project.category} id={project.id}>
+  <div class="project-copy">
+    <p class="project-type">{t(project.type, lang)}</p>
+    <h2><a href={project.href}>{project.name}<span aria-hidden="true">↗</span></a></h2>
+    <p class="project-summary">{t(project.summary, lang)}</p>
+    <p class="project-role">{t(project.contribution, lang)}</p>
+    <p class="project-stack">{project.stack}</p>
+    <div class="project-links">
+      <a href={project.href}>{t(project.action, lang)} <span aria-hidden="true">↗</span></a>
+      {
+        project.source && (
+          <a href={project.source}>
+            {lang === 'en' ? 'Source code' : '源代码'} <span aria-hidden="true">↗</span>
+          </a>
+        )
+      }
+      {
+        project.paper && (
+          <a href={project.paper}>
+            {lang === 'en' ? 'Paper' : '论文'} <span aria-hidden="true">↗</span>
+          </a>
+        )
+      }
+    </div>
+  </div>
+  {
+    visual && (
+      <a class="project-preview" href={project.href} aria-label={t(project.action, lang)}>
+        <Image
+          src={visual}
+          alt={
+            lang === 'en'
+              ? project.name + ' application screenshot'
+              : project.name + ' 应用界面截图'
+          }
+          widths={[400, 700]}
+          sizes="(max-width:760px) 90vw, 300px"
+          format="webp"
+          quality={80}
+          loading="lazy"
+        />
+      </a>
+    )
+  }
+</article>

@@ -1,0 +1,165 @@
+---
+import { Image } from 'astro:assets';
+import GalleryScene from '../components/GalleryScene.astro';
+import medit from '../assets/medit-preview.png';
+import singularity from '../assets/singularity-preview.png';
+import { pathFor, type Lang } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<section class="spatial-home" aria-labelledby="home-title">
+  <GalleryScene page="home" lang={lang} />
+  <div class="field-identity">
+    <p class="field-kicker">
+      {lang === 'en' ? 'An open-ended collection by' : '一个还在生长的世界，来自'}
+    </p>
+    <h1 id="home-title">Zibin Zhao<span>.</span></h1>
+    <p>
+      {
+        lang === 'en'
+          ? 'Bioengineering at HKUST. A mind that wanders.'
+          : '在香港科技大学研究生物工程。也时常走神，去做别的东西。'
+      }
+    </p>
+  </div>
+
+  <a
+    class="spatial-artifact artifact-research"
+    data-spatial-anchor="research"
+    href={pathFor('research', lang)}
+    id="research"
+  >
+    <span class="artifact-pin" aria-hidden="true">01</span>
+    <div class="artifact-label">
+      <span class="artifact-meta">Nature Biotechnology · 2026</span><h2 id="research-title">
+        {lang === 'en' ? 'Life, reprogrammed.' : '重新理解生命。'}
+      </h2><span class="artifact-foot"
+        >{lang === 'en' ? 'CRISPR, aptamers & the papers' : 'CRISPR、适体，以及论文'}
+        <span aria-hidden="true">↗</span></span
+      >
+    </div>
+  </a>
+  <a
+    class="spatial-artifact artifact-projects"
+    data-spatial-anchor="projects"
+    href={pathFor('projects', lang)}
+  >
+    <span class="artifact-pin" aria-hidden="true">02</span>
+    <div class="artifact-label">
+      <span class="artifact-meta">Python / molecules / ideas</span><h2>
+        {lang === 'en' ? 'The working parts' : '把想法组装起来'}
+      </h2><span class="artifact-foot"
+        >CasMD · DL-SELEX · TEMPO <span aria-hidden="true">↗</span></span
+      >
+    </div>
+  </a>
+  <a
+    class="spatial-artifact artifact-singularity"
+    data-spatial-anchor="singularity"
+    href="/singularity/"
+  >
+    <div class="artifact-label">
+      <span class="artifact-meta"
+        >{lang === 'en' ? 'An experiment. Go get lost.' : '一个实验。进去迷个路。'}</span
+      ><h2>Singularity <span aria-hidden="true">↗</span></h2><Image
+        src={singularity}
+        alt={lang === 'en' ? 'Singularity particle universe preview' : 'Singularity 粒子宇宙预览'}
+        widths={[180, 360]}
+        sizes="150px"
+        format="webp"
+        loading="eager"
+      />
+    </div>
+  </a>
+  <a class="spatial-artifact artifact-medit" data-spatial-anchor="medit" href="/medit/">
+    <div class="artifact-label">
+      <span class="artifact-meta"
+        >{lang === 'en' ? 'A small pause in the day' : '给一天留一点空白'}</span
+      ><h2>Medit <span aria-hidden="true">↗</span></h2><Image
+        src={medit}
+        alt={lang === 'en' ? 'Medit reflection app preview' : 'Medit 反思应用预览'}
+        widths={[180, 360]}
+        sizes="150px"
+        format="webp"
+        loading="eager"
+      />
+    </div>
+  </a>
+  <a
+    class="spatial-artifact artifact-about"
+    data-spatial-anchor="about"
+    href={pathFor('about', lang)}
+  >
+    <span class="artifact-pin" aria-hidden="true">↝</span><div class="artifact-label">
+      <span class="artifact-meta">Xinhui → Melbourne → Hong Kong</span><h2>
+        {lang === 'en' ? 'A few detours' : '关于沿途的风景'}
+      </h2><span class="artifact-foot"
+        >{lang === 'en' ? 'Music, trains, and the person' : '音乐、火车，以及我'}
+        <span aria-hidden="true">↗</span></span
+      >
+    </div>
+  </a>
+  <a
+    class="spatial-artifact artifact-prompts"
+    data-spatial-anchor="prompts"
+    href={pathFor('prompts', lang)}
+  >
+    <div class="artifact-label">
+      <span class="artifact-meta">{lang === 'en' ? 'From the notebook' : '从笔记本里抽一页'}</span
+      ><h2>{lang === 'en' ? 'Start with a question.' : '从一个问题开始。'}</h2><span
+        class="artifact-foot"
+        >{lang === 'en' ? '8 steps for a research review' : '研究综述的 8 步提示词'}
+        <span aria-hidden="true">↗</span></span
+      >
+    </div>
+  </a>
+  <a class="spatial-artifact artifact-cv" data-spatial-anchor="cv" href={pathFor('cv', lang)}>
+    <div class="artifact-label">
+      <span class="artifact-meta">{lang === 'en' ? 'The paper trail' : '一些履历'}</span><h2>
+        CV <span aria-hidden="true">↗</span>
+      </h2>
+    </div>
+  </a>
+  <a
+    class="spatial-artifact artifact-contact"
+    data-spatial-anchor="contact"
+    href={pathFor('contact', lang)}
+  >
+    <div class="artifact-label">
+      <span class="artifact-meta"
+        >{lang === 'en' ? 'Something on your mind?' : '有什么想聊的？'}</span
+      ><h2>{lang === 'en' ? 'Say hello.' : '打个招呼。'} <span aria-hidden="true">↗</span></h2>
+    </div>
+  </a>
+
+  <div class="field-instructions">
+    <span class="instruction-cross" aria-hidden="true">+</span><p>
+      {lang === 'en' ? 'Nothing has to be explored in order.' : '这里没有规定的参观顺序。'}<span
+        >{
+          lang === 'en' ? 'Pick an object. Follow a thought.' : '点开一件东西，顺着好奇心走。'
+        }</span
+      >
+    </p>
+  </div>
+  <div class="field-controls" data-gallery-controls hidden>
+    <button type="button" data-gallery-shuffle
+      ><span aria-hidden="true">⤨</span>{lang === 'en' ? 'Another angle' : '换个角度'}</button
+    >
+    <button
+      type="button"
+      data-gallery-reset
+      aria-label={lang === 'en' ? 'Reset spatial view' : '重置空间视角'}>↺</button
+    >
+    <button
+      type="button"
+      data-gallery-motion
+      aria-pressed="false"
+      data-label-pause={lang === 'en' ? 'Pause motion' : '暂停动效'}
+      data-label-play={lang === 'en' ? 'Play motion' : '开启动效'}
+      >{lang === 'en' ? 'Pause motion' : '暂停动效'}</button
+    >
+  </div>
+</section>

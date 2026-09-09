@@ -1,40 +1,47 @@
-# Zibin Zhao
+# Zibin Zhao, between the lines
 
-A bilingual personal website built with Astro. The design follows [Grail](https://grail-app.com/): a black, oversized serif opening, floating double-sided work cards, lilac project stage and editorial content index. Each work opens real research or project content with working source links. The original orange mechanical archive trial is preserved in its separate source checkout.
+A bilingual Astro portfolio with a Lanting Xu discovery interface. Projects and personal entries are gathered into the calligraphy. A fragment reveals its paper edge on approach and opens into a reading view.
 
-Production is [zibinzhao.com](https://zibinzhao.com/). GitHub Pages builds and deploys the site when `main` is pushed, through `.github/workflows/deploy.yml`.
+Production address: [zibinzhao.com](https://zibinzhao.com/). Merges into `main` are published through the existing [GitHub Pages workflow](https://github.com/zibin-zhao/zibin-zhao.github.io/actions/workflows/deploy.yml).
 
 ## Development
 
+Use Node 22.13 or newer in a supported even-numbered release.
+
 ```sh
 npm ci
-npm run dev -- --host 127.0.0.1 --port 43222
-```
-
-Use Node 22.13 or newer in a supported even-numbered release. The fork uses a separate port from the original preview at 43220.
-
-```sh
+npm run dev -- --host 127.0.0.1 --port 43228
 npm run verify
-npm run test:browser -- --reporter=line
+npm run test:browser
 ```
 
-`verify` runs formatting, ESLint, Astro checking, seven unit tests and the static build. Browser tests use port 43218 and cover desktop/mobile content, both languages, real work details, paging, focus recovery, project selection, native navigation, accessibility scans, clipboard recovery, downloads, filters and narrow layouts. Previous archive/gallery tests remain historical files excluded by the current configuration.
+Static verification runs formatting, lint, Astro checks, unit tests, and the build. Browser tests use a separate preview on port 43229. Run the build first. Install test browsers with `npx playwright install chromium webkit` if needed. The final tests exercise desktop Chromium, phone Chromium, and the calligraphic interface in phone WebKit.
 
-## Canonical content
+## Implementation
 
-- `src/data/projects.ts`: six actual projects, localized text, contribution and destinations.
-- `src/content/publications/`: seven journal papers and one independent preprint, with version relationships preserved.
-- `src/data/cv.ts`, `src/data/profile.ts`: CV, identity and contact sources.
-- `src/data/prompts.ts`: eight stages containing eleven unchanged English prompt blocks.
-- `src/lib/i18n.ts`: fourteen page URLs and same-page language switching.
-- `public/medit/`, `public/singularity/`: preserved local applications.
+- `src/views/Home.astro`: the composed sheet, real destinations, index, and thirteen server-rendered reading records.
+- `src/components/InkText.astro`: clipped windows onto the source reproduction.
+- `src/data/lanting.ts`: character coordinates and the eleven insertion maps.
+- `src/styles/lanting.css`: paper, ink, responsive columns, discovery, and reading.
+- `src/scripts/lanting.ts`: proximity, reveal, source-connected dialog transitions, keyboard and focus restoration.
+- `src/lib/archive-content.ts`, `src/data/`, and `src/content/publications/`: retained factual content.
 
-The home uses nine selected records through `buildArchiveLeaves`; this existing mapper supplies exact source content to the new cards, dialog and expandable index. Full publications, projects, CV, about, contact and prompts remain on their ordinary bilingual routes.
+See [product direction](PRODUCT.md), [design](DESIGN.md), [source and typography notes](docs/lanting-assets.md), and [verification](docs/lanting-verification.md). The inherited visual direction is preserved in `artifacts/lanting-2026-09-09/before.tgz` and earlier dated archives.
 
-## Design and verification
+## Past designs
 
-See [DESIGN.md](DESIGN.md), [reference observations](docs/grail-design.md), [fork brief](docs/grail-fork-brief.md), [local verification](docs/grail-verification.md) and [release checks](docs/grail-release.md). Older archive and kinetic receipts describe earlier snapshots.
+The footer's quiet numbered row opens eight design families, each represented by its final recoverable revision. The original eighteen snapshots have been consolidated, from the watercolor portrait to the Grail design. Each edition can be browsed inside a simple viewer or opened as its own page. English and Chinese archive routes retain a return to the current site. Historical words remain part of the historical design.
 
-The new hero uses CSS perspective, authored SVG card artwork and native HTML rather than loading the previous Three.js scene. Fonts are self-hosted. Medit and Singularity previews use their actual application images. No Grail proprietary artwork, model, branding or code is bundled.
+`tools/past-designs.json` is the edition catalog. `tools/archive_past_designs.py` restores sources in the ignored `.worktrees/past-designs/` directory and exports static replays into `public/past-designs/`. The normal site build uses those retained exports and does not rebuild every historical source. Archive assets load only when an edition is opened.
 
-The 1200 × 630 social preview and two-page CV PDF are generated from the current build with `node tools/generate-exports.mjs http://127.0.0.1:43222`. Export checks include PDF reading order and rendered-page inspection. Local automated scans and browser checks do not establish behavior on every physical device; deployment and live verification are separate steps.
+See [the archive inventory and recovery notes](docs/past-designs.md) for exact commits, snapshot recipes, dependency setup, adjustments, and verification evidence.
+
+## Content and typography
+
+Fourteen bilingual portfolio routes, six projects, seven journal articles and one standalone preprint, eight prompt stages, eleven original prompt blocks, CV PDF, contact destinations, and both embedded apps are retained. Without JavaScript the entry anchors keep their real destinations and the full index remains available.
+
+Calligraphy uses a public-domain reproduction of Feng Chengsu's copy after Wang Xizhi. The image remains unmodified on disk. Gathered characters and responsive reordering create a contemporary composition; it is not presented as an intact historical transcription. The complete Chinese reading layer still uses system typography pending a suitable complete font license. No commercial font binary is included.
+
+## Release workflow
+
+The current production CV PDF and embedded application bundles are preserved. The sharing image is captured from the Lanting homepage. Before a release, run the static and browser checks, merge into `main`, push `main`, and verify the resulting GitHub Pages deployment and live routes. The dated local verification documents describe the checks completed before publication.

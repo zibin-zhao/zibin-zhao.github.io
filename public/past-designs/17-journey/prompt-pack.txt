@@ -1,0 +1,164 @@
+Research Review Prompt Pack
+Zibin Zhao | https://zibinzhao.com/prompts/
+
+Replace the running example and bracketed inputs with your own research question. Verify original sources before using a claim.
+
+1. Sharpen the scope
+Original tool suggestion: frontier LLM
+
+
+I'm planning a review article and want to sharpen its scope before I start searching.
+
+Working topic: molecular dynamics (MD) simulations of CRISPR-Cas effector
+complexes, focused on what they reveal about conformational mechanisms —
+target recognition, R-loop formation, conformational gating, and cleavage
+activation.
+
+Help me by:
+1. Proposing 3 candidate research questions at different scope levels
+   (broad / focused / narrow), each phrased as a single answerable question.
+2. For the focused option, drafting explicit inclusion and exclusion criteria:
+   date range, simulation types to include (classical all-atom, enhanced
+   sampling, QM/MM, coarse-grained), which Cas families are in vs out of scope,
+   and what counts as in-scope vs merely adjacent.
+3. Listing 4–6 sub-themes a thorough review of this question must cover.
+
+Ask me clarifying questions first if anything about the scope is ambiguous.
+
+2. Orientation
+Original tool suggestion: Perplexity · Academic Focus + Deep Research
+
+Turn on Academic Focus and run it in Deep Research mode. Treat the output as a map, not a draft — click and verify the sources it cites.
+
+
+Act as a research analyst. Give me a structured, cited overview of the use of
+molecular dynamics simulations to study CRISPR-Cas effector complexes from
+2018 to 2026.
+
+Cover:
+- Which Cas systems MD has been applied to (Cas9, Cas12 family, Cas13, etc.)
+  and what mechanistic questions each line of work addressed
+- The dominant simulation approaches — classical all-atom MD, enhanced sampling
+  (metadynamics, umbrella sampling, replica exchange), QM/MM, coarse-grained —
+  and the force fields used for protein–nucleic acid complexes
+- Landmark papers and their most-cited findings
+- Open questions and known methodological limitations
+
+For every claim, cite a peer-reviewed source with a working link. Explicitly
+flag where the evidence is thin, preliminary, or contested.
+
+3. Search & screen
+Original tool suggestion: Elicit
+
+Search question — paste into Elicit's main query box
+What do molecular dynamics simulations reveal about the conformational
+mechanisms of CRISPR-Cas effector complexes during target recognition,
+R-loop formation, and cleavage?
+
+Screening criteria — apply while reviewing the result list
+INCLUDE: peer-reviewed primary studies, 2018–2026, that run MD (any flavor)
+on a CRISPR-Cas effector–nucleic acid complex and report a conformational or
+mechanistic result.
+
+EXCLUDE: pure experimental papers with no simulation; docking-only or static
+structure-prediction papers with no dynamics; reviews; Cas systems outside
+[your chosen families]; simulations under [e.g., 50 ns] with no enhanced
+sampling.
+
+4. Extraction
+Original tool suggestion: Elicit columns · SciSpace · Scite
+
+Elicit custom columns — add these so the corpus drops into a comparable grid
+- Cas effector studied
+- Simulation method + force field
+- Timescale (ns/µs) and system size (atoms)
+- Enhanced sampling used? (which)
+- Key conformational finding
+- Validated against experiment? (how)
+- Stated limitations
+
+Per-paper deep read — paste into SciSpace / any chat-with-PDF tool with the paper open
+Summarize this paper's MD methodology in 5 bullets: system built, force field,
+solvation and ions, ensemble + timescale, and enhanced-sampling method (if any).
+Then state the single main conformational conclusion, and quote the specific
+result — with its numbers — that supports it.
+
+Do not infer beyond the text. If a detail isn't stated, write "not reported."
+
+Reception check — paste into Scite for any finding you plan to lean on
+Has the finding that [e.g., "the REC2 domain gates HNH activation in Cas9"]
+been supported, mentioned, or contradicted by later studies?
+
+5. Synthesis & outline
+Original tool suggestion: frontier LLM
+
+Feed it your finished extraction table. This is where you decide the argument — the model only organizes.
+
+
+Below is my extraction table from [N] papers on MD simulations of CRISPR-Cas
+complexes.
+
+[PASTE TABLE]
+
+Using ONLY the information in this table:
+1. Group the papers into 4–6 coherent themes and name each theme.
+2. For each theme, state the consensus finding and note any disagreements
+   between papers.
+3. Identify 2–3 genuine gaps the table reveals — questions that none of these
+   papers answer.
+4. Propose a section-by-section outline for a review built around these themes.
+   Under each section, list which papers (first author + year) support it.
+
+Do not add any paper, fact, or citation that is not in the table. If something
+is missing, say so rather than filling it in.
+
+6. Draft one section
+Original tool suggestion: frontier LLM · sources-only
+
+Draft section by section. Paste in only the verified sources for that section.
+
+
+Draft the "[SECTION NAME — e.g., Enhanced-sampling approaches to R-loop
+formation]" section of my review. Target ~[600] words.
+
+Rules:
+- Use ONLY the sources pasted below. Introduce no other papers, facts, or
+  citations.
+- Cite as [Author, Year], matching the provided sources exactly.
+- Preserve every number, unit, and statistical value exactly as written —
+  never round, rephrase, or "improve" them.
+- Where sources disagree, present the disagreement; do not smooth it over.
+- Academic register. No filler, no "in conclusion."
+
+Sources:
+[PASTE each verified paper or your notes, tagged with Author + Year]
+
+7. Build a verification checklist
+Original tool suggestion: frontier LLM
+
+The model can't verify citations — it just extracts them so you can check each one by hand.
+
+
+Here is a section of my review draft. Extract every factual or numerical claim
+and the [Author, Year] it is attributed to. Output a table with columns:
+Claim | Cited source | Verified? (leave this column blank for me).
+
+Do NOT judge whether any citation is correct — you cannot verify sources. Only
+pull out the claims and their attributed sources so I can check each manually.
+
+[PASTE draft section]
+
+Then open every DOI yourself and fill the "Verified?" column.
+
+8. Academic line edit
+Original tool suggestion: frontier LLM · or Writefull / Paperpal
+
+
+Line-edit the following for academic journal register. Tighten wordiness, fix
+grammar, and sharpen vague phrasing (e.g., replace bare "significant" with the
+specific statistical claim). Do NOT change any technical claim, number,
+citation, or the argument.
+
+Show the edited text, then a short list of the substantive changes you made.
+
+[PASTE text]

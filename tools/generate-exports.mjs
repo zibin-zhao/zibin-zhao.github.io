@@ -8,7 +8,7 @@ const positional = args.filter((argument) => !argument.startsWith('--'));
 if (args.some((argument) => argument.startsWith('--') && argument !== '--og-only'))
   throw new Error('Usage: node tools/generate-exports.mjs [local-preview-url] [--og-only]');
 if (positional.length > 1) throw new Error('Provide only one local preview URL.');
-const baseURL = (positional[0] ?? 'http://127.0.0.1:43222').replace(/\/$/, '');
+const baseURL = (positional[0] ?? 'http://127.0.0.1:43219').replace(/\/$/, '');
 const previewURL = new URL(baseURL);
 if (
   !['http:', 'https:'].includes(previewURL.protocol) ||
@@ -32,10 +32,6 @@ try {
         walker.currentNode.textContent =
           walker.currentNode.textContent?.replace(/[\u2011\u2013\u2014]/g, '-') ?? '';
     });
-    // Keep the introduction first in PDF text extraction as well as on the page.
-    await page.addStyleTag({
-      content: '@media print { .page-intro { position: static; } }',
-    });
     await page.pdf({
       path: 'public/cv.pdf',
       format: 'A4',
@@ -52,36 +48,12 @@ try {
   await page.goto(baseURL + '/', { waitUntil: 'networkidle' });
   await page.evaluate(async () => {
     await document.fonts.ready;
-    // Images in later, hidden project panels intentionally remain lazy-loaded.
-    await Promise.all(
-      [...document.querySelectorAll('.grail-hero img')].map((image) => image.decode()),
-    );
+    await Promise.all([...document.images].map((image) => image.decode()));
   });
-  // Fit the current CSS 3D hero to the sharing frame using its existing DOM and poses.
-  await page.addStyleTag({
-    content: `
-      .grail-hero { min-height: 0; height: 520px; max-height: none; }
-      .grail-hero .card-field { inset: 140px 7% 140px; }
-    `,
-  });
-  await page.waitForFunction(
-    () => {
-      const hero = document.querySelector('.grail-home .grail-hero');
-      const bounds = hero?.getBoundingClientRect();
-      const cards = hero?.querySelectorAll('.orbit-card');
-      return (
-        bounds?.width === 1200 &&
-        bounds.bottom === 630 &&
-        cards?.length === 9 &&
-        [...cards].every((card) => card.getBoundingClientRect().height > 0)
-      );
-    },
-    undefined,
-    { timeout: 15000 },
-  );
+  await page.locator('[data-lanting]').waitFor({ state: 'visible' });
   await page.screenshot({ path: 'public/og.png', animations: 'disabled', fullPage: false });
   console.log(
-    `Generated ${ogOnly ? 'public/og.png' : 'public/cv.pdf and public/og.png'} from the local site (Grail CSS 3D hero, nine works, 1200 x 630).`,
+    `Generated ${ogOnly ? 'public/og.png' : 'public/cv.pdf and public/og.png'} from the local Lanting site (1200 x 630).`,
   );
 } finally {
   await browser.close();

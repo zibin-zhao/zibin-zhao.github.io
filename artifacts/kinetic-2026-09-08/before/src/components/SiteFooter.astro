@@ -1,0 +1,18 @@
+---
+import { pathFor, type Lang } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <span>© {new Date().getFullYear()} Zibin Zhao</span>
+    <nav aria-label={lang === 'en' ? 'Footer navigation' : '页脚导航'}>
+      <a href={pathFor('prompts', lang)}>{lang === 'en' ? 'Prompt library' : '提示词库'}</a>
+      <a href="https://github.com/zibin-zhao">GitHub <span aria-hidden="true">↗</span></a>
+      <a href={pathFor('contact', lang)}>{lang === 'en' ? 'Contact' : '联系'}</a>
+    </nav>
+  </div>
+</footer>

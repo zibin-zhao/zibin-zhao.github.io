@@ -1,0 +1,126 @@
+[
+  {
+    "id": "03-watercolor",
+    "date": "2026-07-01",
+    "title": {
+      "en": "Watercolor",
+      "zh": "水彩肖像"
+    },
+    "note": {
+      "en": "A watercolor portrait beneath the name.",
+      "zh": "姓名下方的一幅水彩肖像。"
+    },
+    "ref": "7989978",
+    "recipe": "git",
+    "runtime": "legacy",
+    "supersedes": ["01-poster", "02-type"]
+  },
+  {
+    "id": "09-paths",
+    "date": "2026-07-14",
+    "title": {
+      "en": "Paper playground",
+      "zh": "纸面游园"
+    },
+    "note": {
+      "en": "Illustrated project covers, hobby badges, and moving rails.",
+      "zh": "插画项目封面、兴趣徽章与流动轨道。"
+    },
+    "ref": "678958b",
+    "recipe": "git",
+    "runtime": "legacy",
+    "supersedes": ["04-collage", "05-notebook", "06-stitch", "07-playful", "08-coaster"]
+  },
+  {
+    "id": "10-night",
+    "date": "2026-08-29",
+    "title": {
+      "en": "Night voyage",
+      "zh": "螺钿夜航"
+    },
+    "note": {
+      "en": "A lamp, a moon, and a nocturnal chapter log.",
+      "zh": "一盏灯、一轮月亮与夜间章节。"
+    },
+    "ref": "9962637",
+    "recipe": "git",
+    "runtime": "legacy",
+    "supersedes": []
+  },
+  {
+    "id": "12-dark",
+    "date": "2026-09-05",
+    "title": {
+      "en": "Dark collection",
+      "zh": "暗色作品集"
+    },
+    "note": {
+      "en": "A unified dark reading surface and a vertical collection.",
+      "zh": "统一的暗色阅读页面与纵向作品集。"
+    },
+    "recipe": "dark",
+    "runtime": "modern",
+    "supersedes": ["11-editorial"]
+  },
+  {
+    "id": "13-gallery",
+    "date": "2026-09-07",
+    "title": {
+      "en": "Open collection",
+      "zh": "开放画廊"
+    },
+    "note": {
+      "en": "Research, music, and software become objects in space.",
+      "zh": "研究、音乐与软件化作空间里的物件。"
+    },
+    "recipe": "gallery",
+    "runtime": "modern",
+    "supersedes": []
+  },
+  {
+    "id": "15-archive",
+    "date": "2026-09-08",
+    "title": {
+      "en": "Turning leaves",
+      "zh": "翻页装置"
+    },
+    "note": {
+      "en": "The instrument's leaves become readable project surfaces.",
+      "zh": "让装置上的每一页都承载真实项目。"
+    },
+    "recipe": "archive",
+    "runtime": "modern",
+    "supersedes": ["14-kinetic"]
+  },
+  {
+    "id": "17-journey",
+    "date": "2026-09-09",
+    "title": {
+      "en": "Lakeside journey",
+      "zh": "湖边漫游"
+    },
+    "note": {
+      "en": "A continuous passage through lake, field, work, and universe.",
+      "zh": "从湖泊、旷野、作品一路走向宇宙。"
+    },
+    "recipe": "journey",
+    "runtime": "modern",
+    "supersedes": ["16-lake"]
+  },
+  {
+    "id": "18-grail",
+    "date": "2026-09-09",
+    "title": {
+      "en": "Grail",
+      "zh": "Grail"
+    },
+    "note": {
+      "en": "Floating cards, a black ground, and large editorial type.",
+      "zh": "黑色底面上的悬浮卡片与大幅文字。"
+    },
+    "ref": "b0576ba",
+    "recipe": "git",
+    "runtime": "modern",
+    "supersedes": []
+  }
+]

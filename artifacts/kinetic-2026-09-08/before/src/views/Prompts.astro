@@ -1,0 +1,91 @@
+---
+import PageIntro from '../components/PageIntro.astro';
+import PromptStage from '../components/PromptStage.astro';
+import { promptPack } from '../data/prompts';
+import type { Lang } from '../lib/i18n';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const zhTitles = [
+  '明确范围',
+  '建立全局认识',
+  '检索与筛选',
+  '提取证据',
+  '综合与提纲',
+  '逐节起草',
+  '建立核验清单',
+  '学术语言润色',
+];
+---
+
+<div class="container">
+  <PageIntro
+    title={lang === 'en' ? 'Prompt library' : '提示词库'}
+    description={lang === 'en'
+      ? 'Eight steps from defining a question to checking the final draft. A reusable prompt pack, illustrated with a running research example.'
+      : '从确定问题到核验终稿，共八个步骤。以一个连续的研究主题为例，提供可以复用的提示词。'}
+    ><div class="actions">
+      <a class="button" href="/prompt-pack.txt" download
+        >{lang === 'en' ? 'Download all prompts' : '下载全部提示词'} <span>TXT ↓</span></a
+      ><span class="muted" style="font-size:.85rem"
+        >{lang === 'en' ? 'English prompts · 8 steps' : '英文提示词 · 8 个步骤'}</span
+      >
+    </div></PageIntro
+  >
+  <div class="note-panel">
+    <p>
+      <strong>{lang === 'en' ? 'Start with your own question. ' : '从你自己的问题开始。'}</strong>{
+        lang === 'en'
+          ? 'The examples use molecular dynamics of CRISPR-Cas complexes. Replace the topic, date range, and bracketed inputs with your own. Keep the evidence checks, and verify original sources before using a claim.'
+          : '示例主题是 CRISPR-Cas 复合物的分子动力学。请替换主题、时间范围和方括号内的输入，保留证据核查要求；使用任何结论之前，回到原始来源核验。'
+      }
+    </p><p>
+      {
+        lang === 'en'
+          ? 'Tool labels belong to the original workflow. Use the equivalent capability in your preferred tool; product menus and availability may change.'
+          : '工具名称沿用原始工作流程。你可以使用偏好工具中的同类功能，具体菜单与可用功能可能变化。'
+      }
+    </p>
+  </div>
+  <div class="prompts-layout">
+    <nav class="prompt-toc" aria-label={lang === 'en' ? 'Review workflow steps' : '综述写作步骤'}>
+      <p class="eyebrow">{lang === 'en' ? 'The workflow' : '工作流程'}</p><ol>
+        {
+          promptPack.stages.map((stage, i) => (
+            <li>
+              <a href={`#step-${i + 1}`}>
+                {String(i + 1).padStart(2, '0')} · {lang === 'en' ? stage.title : zhTitles[i]}
+              </a>
+            </li>
+          ))
+        }
+      </ol><a class="text-link" href="#main">{lang === 'en' ? 'Back to top' : '返回顶部'} ↑</a>
+    </nav>
+    <div>
+      {
+        promptPack.stages.map((stage, i) => (
+          <PromptStage
+            stage={stage}
+            index={i}
+            title={lang === 'en' ? stage.title : zhTitles[i]}
+            lang={lang}
+          />
+        ))
+      }
+    </div>
+  </div>
+</div>
+<script>
+  const openStep = (hash: string) => {
+    const step = document.getElementById(hash.slice(1));
+    if (step instanceof HTMLDetailsElement) step.open = true;
+  };
+  openStep(location.hash);
+  window.addEventListener('hashchange', () => openStep(location.hash));
+  document.querySelector('.prompt-toc')?.addEventListener('click', (event) => {
+    const link =
+      event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a') : null;
+    if (link) openStep(link.hash);
+  });
+</script>

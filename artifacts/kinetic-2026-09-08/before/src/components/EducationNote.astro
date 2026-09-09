@@ -1,0 +1,14 @@
+---
+interface Props {
+  school: string;
+  qualification: string;
+  period: string;
+}
+const { school, qualification, period } = Astro.props;
+---
+
+<p>
+  <strong>{school}</strong><br />
+  {qualification}<br />
+  {period}
+</p>

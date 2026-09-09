@@ -12,19 +12,20 @@ for (const name of [
 ])
   delete process.env[name];
 delete process.env.NO_COLOR;
-const baseURL = 'http://127.0.0.1:43218';
+const baseURL = 'http://127.0.0.1:43229';
 
 export default defineConfig({
   testDir: './tests/browser',
-  // These retained suites describe the superseded mechanical archive and gallery design.
-  testIgnore: ['**/archive.spec.ts', '**/gallery.spec.ts'],
   fullyParallel: false,
   workers: 1,
-  reporter: [['line'], ['json', { outputFile: 'artifacts/grail-2026-09-09/browser-results.json' }]],
-  use: { baseURL, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
+  reporter: [
+    ['line'],
+    ['json', { outputFile: 'artifacts/past-designs-2026-09-09/deduplicated/browser-results.json' }],
+  ],
+  use: { baseURL, trace: 'retain-on-failure' },
   outputDir: 'test-results/playwright',
   webServer: {
-    command: 'npm run build && npm run preview -- --host 127.0.0.1 --port 43218 --ignore-lock',
+    command: 'npm run preview -- --host 127.0.0.1 --port 43229 --ignore-lock',
     // Astro 7 normally backgrounds agent-started servers; Playwright must own its server process.
     env: { ASTRO_PREVIEW_BACKGROUND: '0' },
     url: baseURL,
@@ -37,5 +38,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } },
     },
     { name: 'mobile', use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } } },
+    {
+      name: 'webkit-phone',
+      testMatch: ['**/lanting.spec.ts', '**/past-designs.spec.ts'],
+      use: { ...devices['iPhone 13'] },
+    },
   ],
 });
