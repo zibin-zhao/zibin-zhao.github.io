@@ -1,18 +1,23 @@
 # Quality gates
 
-The current Lanting interface preserves both the original manuscript and the portfolio contract. The source-fidelity correction is documented in `docs/lanting-fidelity.md`; history is documented in `docs/past-designs.md`. The September 9 Lanting, nature, and gallery receipts describe previous implementations.
+The current direction is defined in PRODUCT.md and DESIGN.md. Verification applies to the manuscript discovery interface and the retained portfolio contracts.
 
-| Gate          | Check                                                                                                                                                                                                                 |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Static        | `npm run verify`: formatting, lint, Astro check, unit tests, build                                                                                                                                                    |
-| Interaction   | `npm run test:browser`: eleven original-word entries, thirteen reading records, exact project content, reveal, pointer proximity, focus, Escape, touch, horizontal and vertical return, reduced motion, no JavaScript |
-| Portfolio     | Fourteen routes, language continuity, filters, clipboard success and failure, exact prompt downloads, 404, and both application entry points                                                                          |
-| Accessibility | Axe WCAG A/AA tags through WCAG 2.2; explicit keyboard checks and 320 px / 200% text reflow. Automated checks do not certify conformance.                                                                             |
-| Visual        | Inspect actual desktop and phone sheet, discovered piece, expanded reader, and reveal state                                                                                                                           |
-| Source        | Exact original image hash; one complete bitmap at its original aspect ratio; no replacement ink or masks; transparent contours; individually reviewed entry regions in original coordinates                           |
-| Font coverage | Disclose that long-form Chinese still requires a complete licensed typeface; do not relabel the fallback                                                                                                              |
-| Delivery      | Review this task's complete change relative to the fork snapshot; distinguish local preview from publication                                                                                                          |
+| Gate          | Check                                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Static        | `npm run verify`: formatting, lint, Astro check, unit tests, and build                                                                |
+| Arrival       | Full viewport manuscript and exactly one Highlight button; no exposed navigation, footer, hints, counters, or index                   |
+| Discovery     | Twelve original-word entry points, thirteen reading records, proximity, hover, keyboard focus, touch, and exact content               |
+| Highlight     | One sourced 一觀 control; dark ink and reversible veil, individual labels, concealed 昔 history glyph, eight editions, restored focus |
+| Reading       | Contents, previous/next, close, Escape, browser Back/Forward, direct reading URLs, and preserved source position                      |
+| Typography    | One reading stack across current pages; supporting text at least 14 px at default size; normal Chinese tracking                       |
+| Portfolio     | Fourteen routes, language continuity, filters, clipboard success/failure, exact prompt downloads, 404, and application entry points   |
+| Accessibility | Axe WCAG A/AA tags through WCAG 2.2, explicit keyboard checks, reduced motion, no JavaScript, and 320 px / 200% text reflow           |
+| Visual        | Inspect desktop and phone manuscript, highlighted labels, Past versions, proximity feedback, opened leaf, Contents, and inner pages   |
+| Source        | Exact image hash, unchanged base image, aligned Highlight ink, centered hover enlargement, and restored pixels after interaction      |
+| Delivery      | Review the complete task diff from production baseline `92745b6`; distinguish local preview from publication                          |
 
-Do not regenerate a verified CV for a homepage-only change. Production deployment, paid font acquisition, external application flows, and field performance remain separate from the local checks.
+Run `npm run test:browser` against the built site. It covers desktop Chromium, phone Chromium, and the manuscript and archive contracts in phone WebKit. Mouse-wheel checks apply to desktop, while phones have explicit touch journeys. Automated accessibility checks are evidence for tested states, not certification.
 
-Archive checks cover the eight final design versions and local assets, consecutive footer numbering, version selection, inner routes, full-page return, language context, 320-pixel wrapper layout, and no-JavaScript navigation. Superseded viewer URLs must redirect to their family's final version. Accessibility checks cover the new viewer and current portfolio; they do not retroactively certify every historical design. Historic replays use noindex metadata and are omitted from the current portfolio sitemap.
+The existing archive checks preserve destination loading, numbering, redirects, language context, local assets, and return paths. They do not change or recertify historical designs.
+
+Keep the verified CV PDF and embedded application bundles unchanged. No font purchase or new credential is required. Deployment and live-site verification are separate actions.

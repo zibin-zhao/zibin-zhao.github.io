@@ -1,9 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
 import InkText from '../components/InkText.astro';
+import ReadingIndex from '../components/ReadingIndex.astro';
 import { buildArchiveLeaves } from '../lib/archive-content';
-import { pathFor, type Lang } from '../lib/i18n';
+import { pathFor, t, type Lang } from '../lib/i18n';
 import { fragments, inkSource, sourcePixels, sourceSize, writingStart } from '../data/lanting';
+import { pastDesigns, pastPath } from '../data/past-designs';
 import { profile } from '../data/profile';
 interface Props {
   lang: Lang;
@@ -52,7 +54,7 @@ entries.push(
   },
   {
     id: 'cv',
-    title: 'Curriculum vitae',
+    title: en ? 'Curriculum vitae' : '履历',
     kicker: 'Zibin Zhao',
     summary: en ? 'Education, research, publications, and experience.' : '教育、研究、论文与经历。',
     detail: en
@@ -64,14 +66,36 @@ entries.push(
     ],
   },
 );
-const contour =
-  'M9 3 L44 4 Q45 18 56 18 Q67 18 66 4 L93 3 L96 72 Q82 71 82 83 Q82 95 96 94 L97 197 L63 198 Q65 184 53 184 Q42 184 44 198 L5 197 L4 123 Q18 125 18 113 Q18 102 4 103 L3 6 Z';
+const indexTitle = en ? 'Contents' : '目次';
+const pastTitle = en ? 'Past versions' : '往昔';
 ---
 
 <div class="lanting-home" data-lanting data-lang={lang}>
   <h1 id="home-title" class="sr-only">
     Zibin Zhao · {en ? 'A collection between the lines' : '藏在字里行间的作品'}
   </h1>
+  <div class="discovery-controls">
+    <a
+      class="revealed-past"
+      href="#read-past"
+      data-past-entry
+      data-entry={entries.length + 1}
+      data-reader-launcher="past"
+      aria-label={pastTitle}
+      title={pastTitle}
+      hidden><InkText text="昔" /></a
+    >
+    <button
+      class="reveal-button"
+      type="button"
+      data-reveal
+      aria-pressed="false"
+      aria-label={en ? 'Highlight hidden entries' : '显影：高亮隐藏入口'}
+      title={en ? 'Highlight hidden entries' : '显影：高亮隐藏入口'}
+      hidden><InkText text="一觀" /></button
+    >
+  </div>
+  <p class="sr-only" data-reveal-status aria-live="polite"></p>
   <div
     class="manuscript"
     data-manuscript
@@ -108,28 +132,29 @@ const contour =
             return (
               <a
                 class="paper-fragment"
-                href={entries[fragment.entry]!.links[0]!.href}
+                href={
+                  fragment.id === 'index' ? '#collection' : entries[fragment.entry]!.links[0]!.href
+                }
                 data-fragment={fragment.id}
                 data-entry={fragment.entry}
-                aria-label={`${fragment.phrase} · ${entries[fragment.entry]!.title}`}
+                aria-label={`${fragment.phrase} · ${fragment.id === 'index' ? indexTitle : entries[fragment.entry]!.title}`}
                 style={{
                   '--left': `${(x / sourceSize.width) * 100}%`,
                   '--top': `${(y / sourceSize.height) * 100}%`,
                   '--width': `${(width / sourceSize.width) * 100}%`,
+                  '--crop-width': width / sourceSize.width,
                   '--height': `${(height / sourceSize.height) * 100}%`,
                   '--crop-ratio': width / height,
                   '--crop-size': `${(sourceSize.width / width) * 100}% ${(sourceSize.height / height) * 100}%`,
                   '--crop-position': `${(x / (sourceSize.width - width)) * 100}% ${(y / (sourceSize.height - height)) * 100}%`,
                 }}
               >
-                <span class="fragment-surface" aria-hidden="true">
-                  <span
-                    class="fragment-magnifier"
-                    style={{ 'background-image': `url('${inkSource}')` }}
-                  />
-                  <svg class="fragment-edge" viewBox="0 0 100 200" preserveAspectRatio="none">
-                    <path d={contour} />
-                  </svg>
+                <span
+                  class="fragment-surface"
+                  style={{ '--fragment-source': `url('${inkSource}')` }}
+                  aria-hidden="true"
+                >
+                  <span class="fragment-ink" />
                 </span>
                 <template data-fragment-cue>
                   <svg
@@ -142,8 +167,7 @@ const contour =
                   </svg>
                 </template>
                 <span class="fragment-caption" aria-hidden="true">
-                  {entries[fragment.entry]!.title}
-                  <span>↗</span>
+                  {fragment.id === 'index' ? indexTitle : entries[fragment.entry]!.title}
                 </span>
               </a>
             );
@@ -151,53 +175,17 @@ const contour =
         }
       </div>
     </div>
-    <div class="discovery-dock" data-discovery-dock>
-      <p class="discovery-hint">{en ? '← Unroll the writing' : '← 展卷'}</p>
-      <button
-        class="reveal-button"
-        data-reveal
-        hidden
-        type="button"
-        aria-pressed="false"
-        aria-label={en ? 'Reveal hidden entries' : '显影：显示隐藏入口'}
-        ><InkText text="一觀" /><span class="reveal-count" data-found-count aria-hidden="true"
-          >0 / {fragments.length}</span
-        ></button
-      >
-    </div>
   </div>
-  <div class="sheet-colophon">
-    <p>
-      {en ? 'Feng Chengsu, after Wang Xizhi.' : '王羲之《兰亭序》，冯承素摹本。'}<br />{
-        en
-          ? 'Scroll left through the original writing. Find a story within.'
-          : '向左展卷，在原来的字里，找到新的故事。'
-      }
-    </p>
-    <a href="https://commons.wikimedia.org/wiki/File:LantingXu.jpg"
-      >{en ? 'The original sheet' : '查看摹本来源'} ↗</a
+  <noscript>
+    <section
+      class="collection-fallback container"
+      id="collection"
+      aria-labelledby="collection-title"
     >
-  </div>
-  <section class="collection-index container" id="collection" aria-labelledby="collection-title">
-    <div class="index-heading">
-      <h2 id="collection-title">{en ? 'Everything in the writing' : '字里行间的全部内容'}</h2><p>
-        {en ? 'Follow a thread, or choose a work.' : '顺着好奇找，也可以直接翻阅。'}
-      </p>
-    </div>
-    <div class="index-links">
-      {
-        entries.map((entry, index) => (
-          <a href={entry.links[0]!.href} data-index-entry={index}>
-            {entry.title}
-            <span aria-hidden="true">↗</span>
-          </a>
-        ))
-      }
-    </div>
-    <a class="text-link" id="research-title" href={pathFor('research', lang)}
-      >{en ? 'All research and publications' : '全部研究与论文'}</a
-    >
-  </section>
+      <h2 id="collection-title">{indexTitle}</h2>
+      <ReadingIndex entries={entries} lang={lang} interactive={false} />
+    </section>
+  </noscript>
   <dialog class="paper-reader" data-paper-reader aria-labelledby="reader-title">
     <div class="reader-sheet">
       <div class="reader-topline">
@@ -207,10 +195,16 @@ const contour =
           aria-label={en ? 'Close reading view' : '关闭阅读'}>×</button
         >
       </div>
-      <h2 id="reader-title" data-reader-title></h2>
+      <h2 id="reader-title" data-reader-title tabindex="-1"></h2>
       {
         entries.map((entry, index) => (
-          <article class="reader-entry" data-reader-entry={index} data-title={entry.title} hidden>
+          <article
+            class="reader-entry"
+            data-reader-entry={index}
+            data-entry-id={entry.id}
+            data-title={entry.title}
+            hidden
+          >
             <p class="reader-kicker">{entry.kicker}</p>
             <p class="reader-summary">{entry.summary}</p>
             <p class="reader-detail">{entry.detail}</p>
@@ -225,14 +219,43 @@ const contour =
           </article>
         ))
       }
+      <article
+        class="reader-entry"
+        data-reader-entry={entries.length}
+        data-entry-id="index"
+        data-title={indexTitle}
+        hidden
+      >
+        <ReadingIndex entries={entries} lang={lang} />
+      </article>
+      <article
+        class="reader-entry"
+        data-reader-entry={entries.length + 1}
+        data-entry-id="past"
+        data-title={pastTitle}
+        hidden
+      >
+        <ul class="past-version-list">
+          {
+            pastDesigns.map((entry) => (
+              <li>
+                <a href={pastPath(entry.id, lang)}>
+                  <span>{t(entry.title, lang)}</span>
+                  <time datetime={entry.date}>{entry.date}</time>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </article>
       <div class="reader-navigation">
         <button type="button" data-reader-prev aria-label={en ? 'Previous entry' : '上一个内容'}
           >←</button
-        ><label class="sr-only" for="reader-selection">{en ? 'Choose an entry' : '选择内容'}</label
-        ><select id="reader-selection" data-reader-select
-          >{entries.map((entry, index) => <option value={index}>{entry.title}</option>)}</select
-        ><button type="button" data-reader-next aria-label={en ? 'Next entry' : '下一个内容'}
-          >→</button
+        ><button type="button" data-reader-index>{indexTitle}</button><button
+          type="button"
+          data-reader-next
+          aria-label={en ? 'Next entry' : '下一个内容'}>→</button
         >
       </div>
       <p class="sr-only" aria-live="polite" data-reader-status></p>

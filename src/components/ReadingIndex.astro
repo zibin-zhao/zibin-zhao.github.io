@@ -1,0 +1,69 @@
+---
+import type { ArchiveLeaf } from '../lib/archive-content';
+import { pathFor, type Lang } from '../lib/i18n';
+import PastDesignLinks from './PastDesignLinks.astro';
+
+interface Props {
+  entries: ArchiveLeaf[];
+  lang: Lang;
+  interactive?: boolean;
+}
+const { entries, lang, interactive = true } = Astro.props;
+const en = lang === 'en';
+const groups = [
+  { title: en ? 'Research' : '研究', items: [0, 1, 2, 7, 8], page: 'research' as const },
+  { title: en ? 'Experiments' : '实验', items: [3, 4, 5, 6], page: 'projects' as const },
+  { title: en ? 'Personal' : '个人', items: [9, 10, 11, 12] },
+];
+---
+
+<div class="reading-index">
+  <div class="index-groups">
+    {
+      groups.map((group) => (
+        <section class="index-group">
+          <h3>{group.title}</h3>
+          <ul>
+            {group.items.map((index) => (
+              <li>
+                <a
+                  href={entries[index]!.links[0]!.href}
+                  data-index-entry={interactive ? index : undefined}
+                >
+                  {entries[index]!.title}
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          {group.page && (
+            <a class="index-all" href={pathFor(group.page, lang)}>
+              {group.page === 'research'
+                ? en
+                  ? 'All research & publications'
+                  : '全部研究与论文'
+                : en
+                  ? 'All projects'
+                  : '全部项目'}
+              <span aria-hidden="true"> →</span>
+            </a>
+          )}
+        </section>
+      ))
+    }
+  </div>
+  <div class="index-colophon">
+    <a
+      class="language-link"
+      href={`${pathFor('home', en ? 'zh' : 'en')}${interactive ? '#read-index' : '#collection'}`}
+      lang={en ? 'zh-CN' : 'en'}>{en ? '中文' : 'English'}</a
+    >
+    <p>
+      {en ? 'Lanting Xu. Feng Chengsu, after Wang Xizhi.' : '王羲之《兰亭序》，冯承素摹本。'}<br />
+      <a href="https://commons.wikimedia.org/wiki/File:LantingXu.jpg"
+        >{en ? 'Public-domain reproduction' : '摹本来源 · 公共领域'} ↗</a
+      >
+    </p>
+    <PastDesignLinks lang={lang} />
+  </div>
+</div>

@@ -1,37 +1,39 @@
 # Between the lines
 
-Canonical direction, corrected September 10, 2026.
+Canonical direction: September 10, 2026.
 
-The opening is a full-screen view into the complete reproduction of Feng Chengsu's copy of Wang Xizhi's Lanting Xu. Native horizontal scrolling follows the original columns from right to left. Eleven transparent regions over existing words lead to the six real projects, a research record, an introduction, prompts, contact, and CV. No original words are replaced, repeated, reordered, or cropped out of the manuscript.
+A visitor arrives inside an unfamiliar manuscript and discovers the person and work by exploring it. The desktop opening fills the browser viewport with the original Lanting Xu reproduction. There is no exposed homepage name, navigation bar, instruction strip, progress counter, or content inventory.
 
-This direction replaces the lake, forest, and 3D gallery in this fork. It leaves the original working directory and its ongoing design work intact.
+This brief supersedes the earlier visible menu, below-fold index, puzzle contours, and mixed utility typography. The source manuscript and factual portfolio remain canonical. A single optional Highlight control restores findability without exposing a navigation bar.
 
-## Experience
+## Discovery and reading
 
-At rest the original writing carries no visible boxes, titles, or badges. Pointer proximity, hover, or keyboard focus enlarges the exact source region in place by fourteen percent, with an irregular outline and the real destination name. This temporary magnifier covers the same underlying words and retracts when discovery ends. The complete source image remains unchanged. Selecting an entry expands a native reading dialog from that location. Closing restores focus, vertical page position, and horizontal manuscript position.
+The complete scan retains its proportions and original arrangement. Native horizontal scrolling follows the columns. A mouse wheel also moves through the writing; touch and keyboard navigation remain native. No scroll instruction is displayed.
 
-The visible Lanting title is removed; a descriptive heading remains for assistive technology. The scroll hint and reveal control sit in a narrow strip at the manuscript edge. They have no floating panel, large lettering, or glow, and scroll away with the manuscript.
+Twelve transparent regions lie over existing words. Proximity gently enlarges the current word and reinforces its dark ink. Hover and keyboard focus reveal one destination note at a time. Moving away returns the writing to the original scan. Clicking or tapping opens a rectangular reading sheet from that point. There is no mandatory order, timed introduction, or discovery quota.
 
-Touch opens an entry directly. A quiet reveal toggle exposes all clues, and a complete index below the writing lets visitors choose any record directly. The menu remains available at arrival. There is no requirement to find a particular clue first. Discovery progress lasts for the current page only and does not leave the device.
+The only visible homepage button uses the earlier original-manuscript 一觀 lettering, with the accessible name Highlight (显影). It has no filled background or box border. Activating it temporarily softens the surrounding manuscript while the twelve entry regions retain clear dark ink. Names appear individually on hover or keyboard focus, keeping the revealed manuscript free of a label inventory. Past versions stays behind a small sourced 昔 glyph, visible only during Highlight and identified by its accessible name and hover title. That glyph opens the eight retained editions with names and dates. Toggling Highlight off restores the original manuscript and conceals the history glyph. Returning from an edition restores the list; closing it returns focus to the history glyph.
 
-Reduced motion removes the opening and closing transitions. With JavaScript disabled, the same entry links navigate to their actual destinations. Normal scrolling, language continuity, and an accessible native menu remain available.
+The original 蘭亭 words open Contents. This discovered index contains all thirteen reading records, links to the research and project pages, the language switch, manuscript attribution, and existing history links. Ordinary leaves also offer Contents and previous/next controls. Changing language inside Contents preserves that context.
 
-## Content and scope
+Closing, Escape, and browser Back restore the originating word, focus, and horizontal position. Browser Forward restores the reading view. Paging replaces the current reading state instead of filling browser history. Shared reading URLs open the intended content; closing a direct link stays on the homepage.
 
-Preserve fourteen bilingual portfolio routes, six projects, eight publication records, exact source relationships, CV PDF, eight prompt stages and eleven original prompt blocks, contact destinations, and both embedded applications. The reader contains thirteen records: the existing nine research/project records and four personal/navigation records. No scientific claim or project identity was rewritten for this design.
+## Typography
 
-The manuscript is the complete unmodified source image, including its original line arrangement and corrections. The separately retained transcript is a reading reference from another copy, not a replacement for the image.
+The original manuscript remains an image. Reading and interface text share one book typography stack: Georgia for Latin with Songti SC, Noto Serif CJK SC, SimSun, and generic serif fallbacks for Chinese. System font availability may change the exact glyph rendering between operating systems.
 
-## Past designs
+Headings use regular weight, restrained Latin tracking, and normal Chinese tracking. Body text is 16–18 px at the default browser size; supporting text is at least 14 px. Monospace is reserved for actual code. No handwriting font is needed for ordinary prose.
 
-A quiet footer row links eight previous design families, each using its final recoverable revision. The original eighteen snapshots are consolidated by visual direction. Portrait studies, paper compositions, editorial drafts, instrument revisions, and lake revisions each resolve to their final version. Earlier snapshots remain in local recovery artifacts.
+Projects use compact rows with a title, summary, contribution, stack, and real destinations. Research, About, CV, Contact, and Prompts use the same paper, typography, and spacing rules as the reader.
 
-Each numbered link opens an English or Chinese viewer with the historical website, date, previous/next editions, a full-page option, and a return to the present. The viewer preserves the archived design's behavior and historic text. Archive assets are fetched only after an edition is opened. The opening Lanting composition remains dominant.
+## Preserved contracts
 
-## Typography boundary
+Keep fourteen bilingual portfolio routes, six projects, eight publication records, exact source relationships, CV PDF, eight prompt stages and eleven original prompt blocks, contact destinations, and both embedded applications. Preserve all current archive destinations without redesigning their contents.
 
-The manuscript uses the original bitmap. Separate UI lettering and reader cues use windows onto the source. Extended Chinese reading content and navigation use system typography. A complete, appropriately licensed Wang Xizhi font remains necessary to satisfy the request for all Chinese text, including long descriptions, in that style. No paid font was purchased or embedded.
+The original bitmap and base image must not be replaced, filtered, rearranged, or retouched. Reader cues quote its existing regions. Highlight applies ink-only overlays registered at the original scale and position, with a reversible paper veil underneath. The currently approached, hovered, or keyboard-focused region enlarges to 114% over 340 ms. A feathered source-paper layer prevents doubled strokes during enlargement without a frame or raised shadow. Highlight never enlarges all entries at once. Source hashing, geometry checks, and restored-state pixel comparison protect this contract.
+
+Reduced motion removes discovery and sheet transitions. Every concealed entry is keyboard reachable. Without JavaScript, the original links still navigate directly and the 蘭亭 anchor reaches a complete static index. The no-JavaScript index is the only homepage content below the manuscript.
 
 ## Delivery
 
-Production uses GitHub Pages at `https://zibinzhao.com/`. Preview: `http://127.0.0.1:43228/zh/`. Run `npm run verify` and `npm run test:browser`; consult `docs/lanting-fidelity.md` for the source correction. Publication and live checks are recorded separately from local verification.
+Implementation begins from production source commit `92745b6` in the isolated `codex/manuscript-discovery` worktree. The original working directory is preserved. Run `npm run verify` and `npm run test:browser`, inspect actual desktop and phone renders, and report local verification separately from any publication.

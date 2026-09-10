@@ -12,7 +12,7 @@ describe('Lanting manuscript fidelity', () => {
   });
 
   it('gives each entry one distinct region inside the original writing', () => {
-    expect(new Set(fragments.map((entry) => entry.id)).size).toBe(11);
+    expect(new Set(fragments.map((entry) => entry.id)).size).toBe(12);
     for (const [
       index,
       {

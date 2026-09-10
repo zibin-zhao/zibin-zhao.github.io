@@ -24,7 +24,7 @@ for (const lang of ['en', 'zh'] as const) {
       );
       await expect(page.locator('.language-link')).toHaveAttribute(
         'href',
-        pathFor(name, lang === 'en' ? 'zh' : 'en'),
+        pathFor(name, lang === 'en' ? 'zh' : 'en') + (name === 'home' ? '#read-index' : ''),
       );
       expect(await page.locator('meta[name="description"]').getAttribute('content')).toBeTruthy();
       await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3);
@@ -87,8 +87,11 @@ test('native navigation and prompt disclosure work without JavaScript', async ({
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:43229/zh/');
   await expect(page.locator('h1')).toContainText('Zibin');
-  await page.locator('.mobile-menu summary').click();
-  await page.locator('.mobile-menu nav').getByRole('link', { name: '研究', exact: true }).click();
+  await page.locator('[data-fragment="index"]').click();
+  await page
+    .locator('#collection')
+    .getByRole('link', { name: /全部研究与论文/ })
+    .click();
   await expect(page).toHaveURL(/\/zh\/research\/$/);
   await page.goto('http://127.0.0.1:43229/zh/prompts/');
   await page.locator('#step-8 summary').click();
@@ -103,12 +106,12 @@ test('keyboard navigation has a skip link and recoverable collection index', asy
   await expect(page.locator('.skip-link')).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.locator('main')).toBeFocused();
-  await page.locator('.mobile-menu summary').focus();
+  await page.locator('[data-fragment="index"]').focus();
   await page.keyboard.press('Enter');
-  await expect(page.locator('.mobile-menu')).toHaveAttribute('open', '');
+  await expect(page.locator('[data-reader-title]')).toHaveText('Contents');
   await page.keyboard.press('Escape');
-  await expect(page.locator('.mobile-menu')).not.toHaveAttribute('open', '');
-  await expect(page.locator('.mobile-menu summary')).toBeFocused();
+  await expect(page.locator('[data-paper-reader]')).toBeHidden();
+  await expect(page.locator('[data-fragment="index"]')).toBeFocused();
 });
 
 test('project filters expose matching work and announce the result', async ({ page }) => {
@@ -179,27 +182,40 @@ test('all pages reflow at 320 px with 200 percent text', async ({ page }) => {
   for (const name of pages) {
     await page.goto(pathFor(name, 'zh'));
     await page.addStyleTag({ content: 'html { font-size: 200%; }' });
+    await expect(page.locator('html')).toHaveCSS('font-size', '32px');
     const overflow = await page.evaluate(() => ({
       actual: document.documentElement.scrollWidth,
       expected: innerWidth,
     }));
     expect(overflow.actual, name).toBeLessThanOrEqual(overflow.expected);
-    await page.locator('.site-footer').scrollIntoViewIfNeeded();
-    await expect(
-      page.getByRole('contentinfo').getByRole('navigation', { name: /Footer navigation|页脚导航/ }),
-    ).toBeInViewport();
+    if (name === 'home') {
+      await page.locator('[data-fragment="index"]').click();
+      await page.locator('.language-link').scrollIntoViewIfNeeded();
+      await expect(page.locator('.language-link')).toBeInViewport();
+      expect(
+        await page
+          .locator('[data-paper-reader]')
+          .evaluate((el) => el.scrollWidth <= el.clientWidth),
+      ).toBe(true);
+    } else {
+      await page.locator('.site-footer').scrollIntoViewIfNeeded();
+      await expect(
+        page
+          .getByRole('contentinfo')
+          .getByRole('navigation', { name: /Footer navigation|页脚导航/ }),
+      ).toBeInViewport();
+    }
   }
 });
 
 test('native reading survives landscape resize and reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/#collection');
-  await expect(page.locator('#collection-title')).toBeInViewport();
+  await expect(page.locator('[data-reader-title]')).toHaveText('Contents');
   await page.setViewportSize({ width: 844, height: 390 });
-  await page.locator('.site-footer').scrollIntoViewIfNeeded();
-  await expect(
-    page.getByRole('contentinfo').getByRole('navigation', { name: /Footer navigation|页脚导航/ }),
-  ).toBeInViewport();
+  await page.locator('.language-link').scrollIntoViewIfNeeded();
+  await expect(page.locator('.language-link')).toBeInViewport();
+  await expect(page.locator('[data-reader-close]')).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 

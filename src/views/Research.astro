@@ -44,7 +44,7 @@ const preprints = sorted.filter((publication) => publication.data.kind === 'prep
       <h2 id="preprint-title">{lang === 'en' ? 'Preprints' : '预印本'}</h2>
     </div>
     <PublicationList publications={preprints} lang={lang} />
-    <p class="research-note" style="font-size:.82rem;margin-top:24px">
+    <p class="research-note" style="margin-top:24px">
       {
         lang === 'en'
           ? 'Earlier versions of published work are linked with the journal article above.'

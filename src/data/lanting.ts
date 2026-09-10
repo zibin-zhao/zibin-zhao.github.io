@@ -28,11 +28,13 @@ export const glyphs = {
   言: [1013, 437, 58, 50],
   蘭: [1702, 352, 62, 64],
   亭: [1705, 420, 62, 57],
+  昔: [454, 307, 56, 62],
 } satisfies Record<string, InkCrop>;
 export type Glyph = keyof typeof glyphs;
 // Reading order follows the original columns, right to left and top to bottom.
 // Every phrase already exists at its region. Never replace or redraw these words.
 export const fragments = [
+  { id: 'index', phrase: '蘭亭', region: [1698, 346, 74, 135], entry: 13 },
   { id: 'research', phrase: '觀', region: [1207, 0, 80, 77], entry: 0 },
   { id: 'singularity', phrase: '宇宙之大', region: [1207, 77, 80, 212], entry: 5 },
   { id: 'casmd', phrase: '品類', region: [1207, 412, 80, 116], entry: 1 },

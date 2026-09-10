@@ -8,13 +8,13 @@ for (const lang of ['en', 'zh'] as const) {
   test(`${lang}: every original-text entry opens its content and restores focus and scroll`, async ({
     page,
   }) => {
-    // Eleven complete journeys include WebKit's scroll and tap settling time.
+    // Complete journeys include WebKit's scroll and tap settling time.
     test.setTimeout(60000);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(lang === 'en' ? '/' : '/zh/');
     await expect(page.locator('[data-lanting]')).toHaveAttribute('data-ready', 'true');
-    await expect(page.locator('[data-fragment]')).toHaveCount(11);
-    await expect(page.locator('[data-reader-select] option')).toHaveCount(13);
+    await expect(page.locator('[data-fragment]')).toHaveCount(12);
+    await expect(page.locator('[data-index-entry]')).toHaveCount(13);
     for (const fragment of fragments) {
       const source = page.locator(`[data-fragment="${fragment.id}"]`);
       await source.scrollIntoViewIfNeeded();
@@ -43,11 +43,10 @@ for (const lang of ['en', 'zh'] as const) {
         await page.locator('[data-manuscript-scroll]').evaluate((el) => el.scrollLeft),
       ).toBeCloseTo(scrollLeft, 0);
     }
-    await expect(page.locator('[data-found-count]')).toHaveText('11 / 11');
   });
 }
 
-test('discovery starts hidden, proximity and focus expose the cut edge, reveal toggles all', async ({
+test('discovery starts hidden; proximity enlarges the ink, hover and focus reveal its label', async ({
   page,
   isMobile,
 }) => {
@@ -55,22 +54,29 @@ test('discovery starts hidden, proximity and focus expose the cut edge, reveal t
   const fragment = page.locator('[data-fragment="casmd"]');
   await fragment.scrollIntoViewIfNeeded();
   await expect(fragment.locator('.fragment-caption')).toHaveCSS('opacity', '0');
-  await expect(fragment.locator('.fragment-edge')).toHaveCSS('opacity', '0');
+  await expect(fragment.locator('.fragment-ink')).toHaveCSS('opacity', '0');
   if (!isMobile) {
     const box = (await fragment.boundingBox())!;
     await page.mouse.move(box.x - 18, box.y + box.height / 2);
     await expect(fragment).toHaveClass(/is-near/);
-    await expect(fragment.locator('.fragment-edge')).toHaveCSS('opacity', '1');
+    await expect(fragment.locator('.fragment-ink')).toHaveCSS('opacity', '1');
+    await expect(fragment.locator('.fragment-surface')).toHaveCSS(
+      'transform',
+      'matrix(1.14, 0, 0, 1.14, 0, 0)',
+    );
+    await expect(fragment.locator('.fragment-caption')).toHaveCSS('opacity', '0');
+    await fragment.hover();
+    await expect(fragment.locator('.fragment-caption')).toHaveCSS('opacity', '1');
     await page.mouse.move(2, 2);
   }
   await fragment.focus();
-  await expect(fragment.locator('.fragment-edge')).toHaveCSS('opacity', '1');
-  await page.locator('[data-reveal]').click();
-  await expect(page.locator('[data-lanting]')).toHaveAttribute('data-revealed', 'true');
-  for (const item of await page.locator('.fragment-caption').all())
-    await expect(item).toHaveCSS('opacity', '1');
-  await page.locator('[data-reveal]').click();
-  await expect(page.locator('[data-reveal]')).toHaveAttribute('aria-pressed', 'false');
+  await expect(fragment.locator('.fragment-ink')).toHaveCSS('opacity', '1');
+  await expect(fragment.locator('.fragment-surface')).toHaveCSS(
+    'transform',
+    'matrix(1.14, 0, 0, 1.14, 0, 0)',
+  );
+  await expect(fragment.locator('.fragment-caption')).toHaveCSS('opacity', '1');
+  await expect(page.locator('[data-reader-entry]:visible')).toHaveCount(0);
 });
 
 test('the complete original is rendered once, with transparent entries at its original positions', async ({
@@ -88,7 +94,7 @@ test('the complete original is rendered once, with transparent entries at its or
       height: el.naturalHeight,
     })),
   ).toEqual(sourcePixels);
-  // The resting manuscript stays intact. Only a transient source magnifier may appear on discovery.
+  // The resting manuscript stays intact. Discovery overlays quote the same source regions.
   await expect(manuscript.locator('image, .ink-text, clipPath, mask')).toHaveCount(0);
   await expect(source).toHaveCSS('filter', 'none');
   await expect(source).toHaveCSS('clip-path', 'none');
@@ -107,48 +113,54 @@ test('the complete original is rendered once, with transparent entries at its or
       fragment.region[1] / sourceSize.height,
       3,
     );
-    await expect(target.locator('.fragment-edge path')).toHaveCSS('fill', 'none');
-    await expect(target.locator('.fragment-magnifier')).toHaveCSS('visibility', 'hidden');
+    await expect(target.locator('.fragment-ink')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await expect(target.locator('.fragment-ink')).toHaveCSS('visibility', 'hidden');
   }
-  await page.locator('[data-reveal]').click();
-  await expect(source).toHaveCSS('transform', 'none');
-  await expect(manuscript.locator('image, .ink-text, clipPath, mask')).toHaveCount(0);
-  for (const magnifier of await manuscript.locator('.fragment-magnifier').all())
-    await expect(magnifier).toHaveCSS('visibility', 'hidden');
 });
 
-test('discovery magnifies the original region and restores the resting manuscript', async ({
+test('discovery enlarges the original writing around its center and restores the resting manuscript', async ({
   page,
   isMobile,
 }, testInfo) => {
   await page.goto('/zh/');
   const source = page.locator('[data-fragment="casmd"]');
   const surface = source.locator('.fragment-surface');
-  const magnifier = source.locator('.fragment-magnifier');
+  const ink = source.locator('.fragment-ink');
   const scroll = page.locator('[data-manuscript-scroll]');
   await source.scrollIntoViewIfNeeded();
   await page.locator('[data-manuscript-image]').evaluate((el: HTMLImageElement) => el.decode());
-  const prefix = `artifacts/lanting-hover-2026-09-10/${testInfo.project.name}`;
+  const prefix = `artifacts/manuscript-discovery/hover-${testInfo.project.name}`;
   const position = await scroll.evaluate((el) => el.scrollLeft);
-  const before = await scroll.screenshot({ path: `${prefix}-before-magnification.png` });
+  const resting = (await surface.boundingBox())!;
+  const before = await scroll.screenshot({ path: `${prefix}-before-ink.png` });
   if (isMobile) await source.focus();
   else await source.hover();
-  await expect(magnifier).toHaveCSS('visibility', 'visible');
-  await expect(magnifier).toHaveCSS('background-image', /\/lanting\/lantingxu\.jpg/);
+  await expect(ink).toHaveCSS('visibility', 'visible');
+  await expect(ink).toHaveCSS('background-image', /\/lanting\/lantingxu\.jpg/);
+  await expect(ink).toHaveCSS('filter', /ink-emphasis/);
+  await expect(ink).toHaveCSS('box-shadow', 'none');
   await expect(surface).toHaveCSS('transform', 'matrix(1.14, 0, 0, 1.14, 0, 0)');
+  await expect
+    .poll(() => surface.evaluate((el) => getComputedStyle(el, '::before').opacity))
+    .toBe('1');
   await expect(page.locator('[data-manuscript-image]')).toHaveCSS('transform', 'none');
-  await expect(page.locator('.fragment-magnifier:visible')).toHaveCount(1);
-  const frame = (await source.boundingBox())!;
-  const lifted = (await surface.boundingBox())!;
-  expect(lifted.x).toBeLessThanOrEqual(frame.x);
-  expect(lifted.width).toBeCloseTo(frame.width * 1.14, 1);
+  await expect(page.locator('.fragment-ink:visible')).toHaveCount(1);
+  const marked = (await surface.boundingBox())!;
+  expect(marked.x + marked.width / 2).toBeCloseTo(resting.x + resting.width / 2, 1);
+  expect(marked.y + marked.height / 2).toBeCloseTo(resting.y + resting.height / 2, 1);
+  expect(marked.width / resting.width).toBeCloseTo(1.14, 2);
+  expect(marked.height / resting.height).toBeCloseTo(1.14, 2);
+  await scroll.screenshot({ path: `${prefix}-active.png` });
   await page.mouse.move(2, 2);
-  await page.locator('.brand').focus();
-  await expect(magnifier).toHaveCSS('visibility', 'hidden');
+  await page.locator('main').focus();
+  await expect(ink).toHaveCSS('visibility', 'hidden');
   await expect(surface).toHaveCSS('transform', 'none');
-  await expect(source.locator('.fragment-edge')).toHaveCSS('opacity', '0');
+  await expect
+    .poll(() => surface.evaluate((el) => getComputedStyle(el, '::before').opacity))
+    .toBe('0');
+  await expect(ink).toHaveCSS('opacity', '0');
   expect(await scroll.evaluate((el) => el.scrollLeft)).toBeCloseTo(position, 1);
-  const after = await scroll.screenshot({ path: `${prefix}-after-magnification.png` });
+  const after = await scroll.screenshot({ path: `${prefix}-after-ink.png` });
   const difference = await page.evaluate(
     async ({ before, after }) => {
       async function pixels(png: string) {
@@ -219,7 +231,8 @@ test('all reading entries remain accessible, paging wraps, and dialog traps focu
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('[data-reader-title]')).toHaveText('CasMD');
   for (const index of [0, 7, 8, 9, 10, 11, 12]) {
-    await page.locator('[data-reader-select]').selectOption(String(index));
+    await page.locator('[data-reader-index]').click();
+    await page.locator(`[data-index-entry="${index}"]`).click();
     await expect(page.locator(`[data-reader-entry="${index}"] .reader-summary`)).not.toBeEmpty();
     await expect(
       page.locator(`[data-reader-entry="${index}"] .reader-links a`).first(),
@@ -245,7 +258,13 @@ test('reduced motion removes sheet transitions and touch opens directly', async 
   await page.goto('/zh/');
   const source = page.locator('[data-fragment="casmd"]');
   await source.focus();
+  await expect(source.locator('.fragment-ink')).toHaveCSS('transition-duration', '0s');
   await expect(source.locator('.fragment-surface')).toHaveCSS('transition-duration', '0s');
+  expect(
+    await source
+      .locator('.fragment-surface')
+      .evaluate((el) => getComputedStyle(el, '::before').transitionDuration),
+  ).toBe('0s');
   if (isMobile) await source.tap();
   else await source.click();
   await expect(page.locator('[data-reader-title]')).toHaveText('CasMD');
@@ -262,8 +281,10 @@ test('no JavaScript retains the source image, direct project links, and complete
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('[data-reveal]')).toBeHidden();
-  await expect(page.locator('[data-fragment]')).toHaveCount(11);
-  await expect(page.locator('[data-index-entry]')).toHaveCount(13);
+  await expect(page.locator('[data-fragment]')).toHaveCount(12);
+  await page.locator('[data-fragment="index"]').click();
+  await expect(page.locator('#collection')).toBeInViewport();
+  await expect(page.locator('#collection .index-group li a')).toHaveCount(13);
   await page.locator('[data-fragment="medit"]').click();
   await expect(page).toHaveURL(/\/medit\/$/);
   await context.close();
@@ -275,9 +296,11 @@ test('returning from the embedded application leaves the sheet usable', async ({
   await page.locator('[data-reader-entry="3"] a').click();
   await expect(page).toHaveURL(/\/medit\/$/);
   await page.goBack();
-  await expect(page.locator(reader)).not.toBeVisible();
-  await page.locator('[data-fragment="medit"]').click();
+  await expect(page.locator(reader)).toBeVisible();
   await expect(page.locator('[data-reader-title]')).toHaveText('Medit');
+  await page.locator('[data-reader-close]').click();
+  await expect(page.locator(reader)).not.toBeVisible();
+  await expect(page.locator('[data-fragment="medit"]')).toBeFocused();
 });
 
 test('capture the actual sheet, discovered paper, and reading layer', async ({
@@ -290,7 +313,7 @@ test('capture the actual sheet, discovered paper, and reading layer', async ({
   await page
     .locator('[data-manuscript-image]')
     .evaluate(async (el: HTMLImageElement) => el.decode());
-  const prefix = `artifacts/lanting-hover-2026-09-10/${testInfo.project.name}`;
+  const prefix = `artifacts/manuscript-discovery/${testInfo.project.name}`;
   await page.screenshot({ path: `${prefix}-sheet.png` });
   if (testInfo.project.name === 'desktop') {
     const image = (await page.locator('[data-manuscript-image]').boundingBox())!;
@@ -317,7 +340,7 @@ test('capture the actual sheet, discovered paper, and reading layer', async ({
   await source.scrollIntoViewIfNeeded();
   if (isMobile) await source.focus();
   else await source.hover();
-  await expect(source.locator('.fragment-edge')).toHaveCSS('opacity', '1');
+  await expect(source.locator('.fragment-ink')).toHaveCSS('opacity', '1');
   await page.screenshot({ path: `${prefix}-discovered.png` });
   await source.click();
   await expect(page.locator('[data-reader-title]')).toHaveText('CasMD');
@@ -331,7 +354,14 @@ test('capture the actual sheet, discovered paper, and reading layer', async ({
   await page.screenshot({ path: `${prefix}-reading.png` });
   await page.locator('[data-reader-close]').click();
   await expect(page.locator(reader)).not.toBeVisible();
-  await page.locator('[data-reveal]').click();
-  await expect(page.locator('[data-lanting]')).toHaveAttribute('data-revealed', 'true');
-  await page.screenshot({ path: `${prefix}-revealed.png`, fullPage: true });
+  await page.locator('[data-fragment="index"]').click();
+  await expect(page.locator('[data-reader-title]')).toHaveText('目次');
+  await expect
+    .poll(() =>
+      page
+        .locator(reader)
+        .evaluate((el) => el.getAnimations().filter((a) => a.playState === 'running').length),
+    )
+    .toBe(0);
+  await page.screenshot({ path: `${prefix}-index.png` });
 });

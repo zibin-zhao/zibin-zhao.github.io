@@ -37,7 +37,7 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } } },
     {
       name: 'webkit-phone',
-      testMatch: ['**/lanting.spec.ts', '**/past-designs.spec.ts'],
+      testMatch: ['**/lanting.spec.ts', '**/discovery.spec.ts', '**/past-designs.spec.ts'],
       use: { ...devices['iPhone 13'] },
     },
   ],

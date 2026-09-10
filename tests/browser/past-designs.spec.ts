@@ -14,7 +14,7 @@ const finalEditions = [
   '18-grail',
 ];
 
-test('footer keeps all editions quiet and loads no archived site before selection', async ({
+test('discovered index retains all editions and loads no archived site before selection', async ({
   page,
 }, info) => {
   const archiveRequests: string[] = [];
@@ -22,11 +22,11 @@ test('footer keeps all editions quiet and loads no archived site before selectio
     if (request.url().includes('/past-designs/')) archiveRequests.push(request.url());
   });
   await page.goto('/zh/');
-  const navigation = page.getByRole('navigation', { name: '过往网站设计' });
+  const navigation = page.locator('.past-design-links');
   await expect(navigation).not.toBeInViewport();
-  await expect(navigation.getByRole('link')).toHaveCount(finalEditions.length);
+  await expect(navigation.locator('a')).toHaveCount(finalEditions.length);
   expect(
-    await navigation.getByRole('link').evaluateAll((links) =>
+    await navigation.locator('a').evaluateAll((links) =>
       links.map((link) => ({
         text: link.textContent?.trim(),
         href: link.getAttribute('href'),
@@ -36,6 +36,7 @@ test('footer keeps all editions quiet and loads no archived site before selectio
     finalEditions.map((id, index) => ({ text: String(index + 1), href: pastPath(id, 'zh') })),
   );
   expect(archiveRequests).toEqual([]);
+  await page.locator('[data-fragment="index"]').click();
   await navigation.scrollIntoViewIfNeeded();
   await expect(navigation).toBeInViewport();
   await page.screenshot({ path: `${evidence}/${info.project.name}-footer.png` });

@@ -1,40 +1,52 @@
-# A sheet with things to find
+# A manuscript with things to find
 
-The original writing is the layout. The entire reproduction is rendered once, and each discovery is a transparent interaction region over an existing word or phrase. It must never remove, replace, duplicate, or rearrange the manuscript's text. Project identities appear only on discovery and in the reading layer.
+The original writing is the layout. The visitor sees a full browser viewport of calligraphy, then discovers entry points within it. Content becomes easy to read once opened.
 
 ## Material and type
 
-| Token         | Value     | Role                          |
-| ------------- | --------- | ----------------------------- |
-| Paper         | `#e7ddc8` | The continuous sheet          |
-| Reading paper | `#eee5d3` | The expanded piece            |
-| Ink           | `#302a22` | Text and controls             |
-| Quiet ink     | `#62523e` | Secondary reading text        |
-| Seal          | `#963c29` | Discovered labels and actions |
-| Fiber         | `#c8b99e` | Fine divisions                |
+| Token         | Value     | Role                        |
+| ------------- | --------- | --------------------------- |
+| Paper         | `#e7ddc8` | Surrounding paper           |
+| Reading paper | `#eee5d3` | Reader and inner pages      |
+| Ink           | `#302a22` | Text and controls           |
+| Quiet ink     | `#62523e` | Secondary text              |
+| Seal          | `#963c29` | Discovered labels and links |
+| Division      | `#c8b99e` | Fine rules                  |
 
-The manuscript displays the unmodified scan with its original ink, paper, seals, line spacing, and corrections. It receives no image filter or procedural grain overlay. Separate UI lettering uses source windows and ink separation. Reader cues quote the actual continuous source region associated with the selected entry.
+The unmodified scan supplies all manuscript texture, ink, seals, spacing, and corrections. Do not add procedural noise, replacement lettering, or filters to the base image. Reader cues and temporary discovery overlays quote continuous regions of the original.
 
-Manrope retains the exact Latin project identifiers and utility text. Georgia and system Chinese serif fonts supply the extended reading layer. This fallback is explicitly a remaining typography limitation, not an authentic Wang Xizhi typeface.
+A single `--reading-font` in `global.css` supplies Georgia and Chinese system serif fallbacks throughout current portfolio pages. There are no Manrope font requests or monospace metadata. Actual code retains a monospace stack.
+
+| Role                   | Default size   | Treatment                       |
+| ---------------------- | -------------- | ------------------------------- |
+| Page title             | 40–64 px       | Regular, Latin tracking -0.02em |
+| Reader title           | 32–44 px       | Regular, Latin tracking -0.02em |
+| Main prose             | 16–18 px       | Line height 1.75–1.85           |
+| Metadata and utilities | 14–15 px       | Same serif stack                |
+| Chinese headings       | Same hierarchy | Normal tracking                 |
+
+The project page uses one column of divided rows, with project identity beside its description on desktop and above it on phones. There are no tall empty cards or unrelated calligraphy illustrations competing with the original manuscript.
 
 ## Composition and motion
 
-The complete scan keeps its original aspect ratio at every viewport size. A native horizontal scroll region presents it at a readable height, with the first writing column visible on arrival. The outer seals and final column remain reachable. Touch, trackpad, keyboard focus, and the native scrollbar can move through the scroll; vertical scrolling reaches the complete content index and history links. No column is extracted or reflowed.
+The opening has no visible header, footer, navigation, inventory, hint, or reveal counter. The scan spans the viewport height and overflows horizontally while keeping its original aspect ratio. The right opening columns are visible on arrival. The 蘭亭 region provides a concealed index in the initial phone viewport as well.
 
-Each clue has a fine irregular SVG edge, including puzzle-like concavities. Discovery scales a continuous source crop to 1.14 around its original center over 340 ms, with a small paper shadow. The crop includes the original paper and covers the same underlying words; it never gathers characters from elsewhere. The contour has no fill, the complete source image stays fixed, and the magnifier disappears after retracting. Reveal shows only the outlines and labels. Reduced motion changes state immediately.
+The Highlight button restores the earlier sourced 一觀 lettering on a transparent 44 px target. It sits in the lower right, moving to the upper right in short landscape viewports. A fine underline indicates the pressed state; there is no filled button or rectangle. Its pressed state places a 50% paper veil above the base image and below the twelve ink overlays, creating a clear dark-ink emphasis without recoloring the writing. A small sourced 昔 glyph appears beside the button and opens the eight past editions. It has an accessible name and hover title but no exposed printed label. Toggling the button off restores the original view and conceals the glyph. The toggle reports its state to assistive technology and is omitted without JavaScript.
 
-The header carries only the existing name, language switch, and menu. Its former central calligraphy title is removed. Below the scan, a 44 px strip holds a small scroll hint and a single-row reveal control. Transparent backgrounds and no glow keep both ends quiet. The controls scroll with the manuscript rather than floating over the content.
+Proximity within 34 px fades in dark source ink over 220 ms and restores the earlier 114% enlargement over 340 ms with `cubic-bezier(0.2, 0.7, 0.2, 1)`. The enlargement stays centered on the source region, including on short screens where the hit area is larger than the writing. A feathered copy of the same source paper prevents doubled strokes beneath the enlarged ink. There is no raised paper shadow or region outline. The emphasis filter rejects lighter paper and red seal pixels while preserving variation within dark strokes. Hover or keyboard focus reveals a single destination note below the enlarged region. In Highlight mode, unselected entries retain their original scale and position; only the hovered or keyboard-focused entry enlarges. Exiting restores the exact underlying scan; no persistent marks or progress badges accumulate.
 
-The native dialog opens from the originating bounding rectangle; its closing animation returns to the launcher and restores both scroll axes. There is no scroll interception, WebGL requirement, or loading gate.
+A plain rectangular sheet expands from the selected position over 380 ms and returns over 240 ms. It has generous margins, a persistent close control, a small source cue, and calm reading text. There is no puzzle cutout, rotation, blur, or select-box inventory. Reduced motion removes the transitions.
 
-## Quiet history
+The discovered Contents view groups research, experiments, and personal records. Language, source attribution, and existing history links follow the index. Long indexes scroll within the reader, while the close control stays reachable.
 
-The footer carries a small `Past designs` / `往昔` caption and eight consecutive numbers separated by fine vertical rules. Each number represents the final recoverable version of one design family. Names and dates appear on hover or in accessible labels. Numbers wrap on narrow screens rather than forcing a wider page. This entry remains below the manuscript and complete content index.
+## Navigation behavior
 
-Historical pages fill an independent viewer, bordered only by warm-paper utility strips. The upper strip carries the edition, date, return, and full-page link. The lower strip provides a short design note and numbered navigation. Its selected number remains visible on narrow screens. Each iframe retains its own fonts, layout, and motion, so historic CSS never changes the present homepage.
+A first opening pushes one `#read-<id>` browser history entry. Changing records or opening Contents replaces that entry. Back, Escape, and close return to the manuscript; Forward restores the reader. A direct shared URL closes without navigating away. The older `#collection` link remains an alias for Contents.
 
-## Calibration and evidence
+Touch taps open content directly. Horizontal touch and trackpad panning stay native; vertical mouse-wheel movement unrolls the manuscript. Ctrl-wheel zoom is not intercepted. Keyboard users retain a skip link, focus indications, a trapped dialog, and exact focus return. No-JavaScript visitors retain direct destinations and a static index.
 
-The September 10 correction removes the earlier text-replacement and column-cropping mechanism. The previous checks covered interaction, but did not catch changed wording and duplicated phrases. Every current interaction region has been reviewed against the original with adjoining characters visible. Coordinates and source identity are recorded in `src/data/lanting.ts` and `docs/lanting-assets.md`.
+## Evidence
 
-The browser suite covers the single complete manuscript image, absence of replacement ink and masks, original source coordinates, temporary magnification, return to the resting image, every entry, both scroll axes, touch, reduced motion, no JavaScript, and the retained portfolio contracts. Source hashing protects the reference bitmap. Current screenshots are in `artifacts/lanting-hover-2026-09-10/`; earlier receipts remain historical evidence.
+`src/data/lanting.ts` records the original coordinates, including the 蘭亭 index region. Unit tests preserve the bitmap hash and reject overlapping or out-of-bounds regions. Browser checks exercise full viewport arrival, Highlight on/off, direct access to Past versions, every entry, reading history, direct links, all indexed content, both languages, focus recovery, touch, reduced motion, aligned ink emphasis, restored pixels, and no-JavaScript access.
+
+Current captures are stored in `artifacts/manuscript-discovery/`. Earlier dated visual receipts describe earlier interfaces and do not define this direction. Archived websites retain their independent typography and behavior.
