@@ -11,6 +11,7 @@ if (root && dialog) {
   const cue = dialog.querySelector<HTMLElement>('[data-reader-cue]')!;
   const status = dialog.querySelector<HTMLElement>('[data-reader-status]')!;
   const dock = root.querySelector<HTMLElement>('[data-discovery-dock]')!;
+  const manuscriptScroll = root.querySelector<HTMLElement>('[data-manuscript-scroll]')!;
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const hover = matchMedia('(hover: hover) and (pointer: fine)');
   const found = new Set<string>();
@@ -18,7 +19,14 @@ if (root && dialog) {
   let active = 0;
   let animation: Animation | null = null;
   let scrollY = 0;
+  let scrollLeft = 0;
   let closing = false;
+
+  // Start with the opening text in view, while retaining the full scan on either side.
+  manuscriptScroll.scrollLeft = -Math.max(
+    0,
+    (1 - Number(manuscriptScroll.dataset.writingStart)) * manuscriptScroll.scrollWidth - 24,
+  );
 
   function discover(fragment: HTMLAnchorElement) {
     found.add(fragment.dataset.fragment!);
@@ -36,7 +44,8 @@ if (root && dialog) {
     const fragment = fragments.find((item) => Number(item.dataset.entry) === active);
     cue.replaceChildren();
     if (fragment) {
-      cue.append(fragment.querySelector('.ink-text')!.cloneNode(true));
+      const template = fragment.querySelector<HTMLTemplateElement>('[data-fragment-cue]')!;
+      cue.append(template.content.cloneNode(true));
       discover(fragment);
     }
     status.textContent = `${title.textContent}, ${active + 1} / ${entries.length}`;
@@ -48,6 +57,7 @@ if (root && dialog) {
     launcher = source;
     const sourceRect = source.getBoundingClientRect();
     scrollY = window.scrollY;
+    scrollLeft = manuscriptScroll.scrollLeft;
     showEntry(index);
     dialog!.showModal();
     document.body.style.overflow = 'hidden';
@@ -84,6 +94,7 @@ if (root && dialog) {
     dock.style.visibility = '';
     closing = false;
     window.scrollTo({ top: scrollY, behavior: 'instant' });
+    manuscriptScroll.scrollLeft = scrollLeft;
     launcher?.focus({ preventScroll: true });
   }
 
@@ -124,10 +135,12 @@ if (root && dialog) {
   });
   root.addEventListener('pointermove', (event) => {
     if (!hover.matches || dialog!.open) return;
+    const viewport = manuscriptScroll.getBoundingClientRect();
     let nearest: HTMLAnchorElement | undefined;
     let distance = 38;
     for (const fragment of fragments) {
       const box = fragment.getBoundingClientRect();
+      if (box.right <= viewport.left || box.left >= viewport.right) continue;
       const dx = Math.max(box.left - event.clientX, 0, event.clientX - box.right);
       const dy = Math.max(box.top - event.clientY, 0, event.clientY - box.bottom);
       const next = Math.hypot(dx, dy);
@@ -139,6 +152,9 @@ if (root && dialog) {
     fragments.forEach((fragment) => fragment.classList.toggle('is-near', fragment === nearest));
     if (nearest) discover(nearest);
   });
+  manuscriptScroll.addEventListener('scroll', () =>
+    fragments.forEach((fragment) => fragment.classList.remove('is-near')),
+  );
   root.addEventListener('pointerleave', () =>
     fragments.forEach((fragment) => fragment.classList.remove('is-near')),
   );

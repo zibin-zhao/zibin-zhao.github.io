@@ -1,6 +1,6 @@
 # Zibin Zhao, between the lines
 
-A bilingual Astro portfolio with a Lanting Xu discovery interface. Projects and personal entries are gathered into the calligraphy. A fragment reveals its paper edge on approach and opens into a reading view.
+A bilingual Astro portfolio with a Lanting Xu discovery interface. The complete original reproduction forms a horizontally scrollable manuscript. Transparent regions over existing words reveal a paper contour on approach and open a reading view, without replacing any original writing.
 
 Production address: [zibinzhao.com](https://zibinzhao.com/). Merges into `main` are published through the existing [GitHub Pages workflow](https://github.com/zibin-zhao/zibin-zhao.github.io/actions/workflows/deploy.yml).
 
@@ -19,10 +19,10 @@ Static verification runs formatting, lint, Astro checks, unit tests, and the bui
 
 ## Implementation
 
-- `src/views/Home.astro`: the composed sheet, real destinations, index, and thirteen server-rendered reading records.
-- `src/components/InkText.astro`: clipped windows onto the source reproduction.
-- `src/data/lanting.ts`: character coordinates and the eleven insertion maps.
-- `src/styles/lanting.css`: paper, ink, responsive columns, discovery, and reading.
+- `src/views/Home.astro`: the intact manuscript, real destinations, index, and thirteen server-rendered reading records.
+- `src/components/InkText.astro`: collected-character UI lettering outside the manuscript.
+- `src/data/lanting.ts`: source dimensions and eleven original-word interaction regions.
+- `src/styles/lanting.css`: the scroll viewport, transparent contours, discovery, and reading.
 - `src/scripts/lanting.ts`: proximity, reveal, source-connected dialog transitions, keyboard and focus restoration.
 - `src/lib/archive-content.ts`, `src/data/`, and `src/content/publications/`: retained factual content.
 
@@ -40,7 +40,9 @@ See [the archive inventory and recovery notes](docs/past-designs.md) for exact c
 
 Fourteen bilingual portfolio routes, six projects, seven journal articles and one standalone preprint, eight prompt stages, eleven original prompt blocks, CV PDF, contact destinations, and both embedded apps are retained. Without JavaScript the entry anchors keep their real destinations and the full index remains available.
 
-Calligraphy uses a public-domain reproduction of Feng Chengsu's copy after Wang Xizhi. The image remains unmodified on disk. Gathered characters and responsive reordering create a contemporary composition; it is not presented as an intact historical transcription. The complete Chinese reading layer still uses system typography pending a suitable complete font license. No commercial font binary is included.
+Calligraphy uses a public-domain reproduction of Feng Chengsu's copy after Wang Xizhi. The manuscript renders that image once, without text masks, rearranged columns, replacement lettering, or color filters. Its existing words, spacing, corrections, and seals stay in place. Only separate UI controls and reading cues use source windows. The complete Chinese reading layer still uses system typography pending a suitable complete font license. No commercial font binary is included.
+
+The September 10 source-fidelity correction supersedes the earlier gathered-character manuscript. See [the audit and regression checks](docs/lanting-fidelity.md).
 
 ## Release workflow
 

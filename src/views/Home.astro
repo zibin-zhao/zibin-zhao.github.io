@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import InkText from '../components/InkText.astro';
 import { buildArchiveLeaves } from '../lib/archive-content';
 import { pathFor, type Lang } from '../lib/i18n';
-import { columns, fragments, inkSource, sourceSize } from '../data/lanting';
+import { fragments, inkSource, sourcePixels, sourceSize, writingStart } from '../data/lanting';
 import { profile } from '../data/profile';
 interface Props {
   lang: Lang;
@@ -75,62 +75,52 @@ const contour =
         >{en ? 'A collection between the lines' : '藏在字里行间的作品'}</span
       >
     </h1>
-    {en && <p>A collection between the lines.</p>}
   </div>
   <div
     class="manuscript"
     data-manuscript
-    aria-label={en ? 'Explore the calligraphy' : '探索书法中的内容'}
+    aria-label={en ? 'Explore the original manuscript' : '探索原稿中的内容'}
   >
-    {
-      columns.map((center, index) => {
-        const fragment = fragments.find((item) => item.column === index);
-        const regionTop = fragment?.cut[0] ?? 0;
-        const regionHeight = fragment ? fragment.cut[1] - fragment.cut[0] : 0;
-        const clipId = `column-${index}`;
-        return (
-          <div
-            class="ink-column"
-            style={{ '--column': index, '--stagger': `${[0, 12, -7, 18, 2, -14, 6][index % 7]}px` }}
-          >
-            <svg
-              class="column-ink"
-              viewBox={`${center - 34} 8 68 644`}
-              preserveAspectRatio="xMidYMin meet"
-              aria-hidden="true"
-              focusable="false"
-            >
-              {fragment && (
-                <defs>
-                  <clipPath id={clipId}>
-                    <rect x={center - 34} y="8" width="68" height={regionTop - 8} />
-                    <rect
-                      x={center - 34}
-                      y={regionTop + regionHeight}
-                      width="68"
-                      height={660 - regionTop - regionHeight}
-                    />
-                  </clipPath>
-                </defs>
-              )}
-              <image
-                href={inkSource}
-                width={sourceSize.width}
-                height={sourceSize.height}
-                clip-path={fragment ? `url(#${clipId})` : undefined}
-              />
-            </svg>
-            {fragment && (
+    <div
+      class="manuscript-scroll"
+      data-manuscript-scroll
+      data-writing-start={writingStart}
+      tabindex="0"
+      role="region"
+      aria-label={en ? 'Scroll left to unroll the manuscript' : '向左滚动，展开原稿'}
+    >
+      <div
+        class="manuscript-stage"
+        style={{ '--source-ratio': sourcePixels.width / sourcePixels.height }}
+      >
+        <img
+          class="manuscript-image"
+          data-manuscript-image
+          src={inkSource}
+          width={sourcePixels.width}
+          height={sourcePixels.height}
+          alt={en
+            ? "The complete Lanting Xu reproduction, Feng Chengsu's copy after Wang Xizhi, in its original arrangement."
+            : '王羲之《兰亭序》冯承素摹本完整图像，保留原文、行列、字距与改笔。'}
+          loading="eager"
+          fetchpriority="high"
+          draggable="false"
+        />
+        {
+          fragments.map((fragment) => {
+            const [x, y, width, height] = fragment.region;
+            return (
               <a
                 class="paper-fragment"
                 href={entries[fragment.entry]!.links[0]!.href}
                 data-fragment={fragment.id}
                 data-entry={fragment.entry}
-                aria-label={`${fragment.glyphs} · ${entries[fragment.entry]!.title}`}
+                aria-label={`${fragment.phrase} · ${entries[fragment.entry]!.title}`}
                 style={{
-                  '--top': `${((regionTop - 8) / 644) * 100}%`,
-                  '--height': `${(regionHeight / 644) * 100}%`,
-                  '--length': [...fragment.glyphs].length,
+                  '--left': `${(x / sourceSize.width) * 100}%`,
+                  '--top': `${(y / sourceSize.height) * 100}%`,
+                  '--width': `${(width / sourceSize.width) * 100}%`,
+                  '--height': `${(height / sourceSize.height) * 100}%`,
                 }}
               >
                 <svg
@@ -141,22 +131,33 @@ const contour =
                 >
                   <path d={contour} />
                 </svg>
-                <InkText text={fragment.glyphs} />
+                <template data-fragment-cue>
+                  <svg
+                    class="reader-cue-ink"
+                    viewBox={fragment.region.join(' ')}
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <image href={inkSource} width={sourceSize.width} height={sourceSize.height} />
+                  </svg>
+                </template>
                 <span class="fragment-caption" aria-hidden="true">
                   {entries[fragment.entry]!.title}
                   <span>↗</span>
                 </span>
               </a>
-            )}
-          </div>
-        );
-      })
-    }
+            );
+          })
+        }
+      </div>
+    </div>
   </div>
   <div class="sheet-colophon">
     <p>
-      {en ? 'Feng Chengsu, after Wang Xizhi.' : '王羲之《兰亭序》，冯承素摹本集字。'}<br />{
-        en ? 'New stories, gathered into old writing.' : '旧笔墨里，藏着新的故事。'
+      {en ? 'Feng Chengsu, after Wang Xizhi.' : '王羲之《兰亭序》，冯承素摹本。'}<br />{
+        en
+          ? 'Scroll left through the original writing. Find a story within.'
+          : '向左展卷，在原来的字里，找到新的故事。'
       }
     </p>
     <a href="https://commons.wikimedia.org/wiki/File:LantingXu.jpg"
@@ -167,11 +168,12 @@ const contour =
     <p class="discovery-hint">
       <span class="hint-pointer" aria-hidden="true">◌</span>{
         en ? (
-          <span>Move closer. Find something.</span>
+          <span>← Scroll left. Find something.</span>
         ) : (
           <>
             <>
               <InkText text="觀之" />
+              <span class="scroll-hint">← 展卷</span>
               <span class="sr-only">走近一点，字里有东西。</span>
             </>
           </>

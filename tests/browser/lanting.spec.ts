@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { projects } from '../../src/data/projects';
-import { fragments } from '../../src/data/lanting';
+import { fragments, inkSource, sourcePixels, sourceSize } from '../../src/data/lanting';
 
 const reader = '[data-paper-reader]';
 for (const lang of ['en', 'zh'] as const) {
-  test(`${lang}: every hidden insertion opens its real content and restores focus`, async ({
+  test(`${lang}: every original-text entry opens its content and restores focus and scroll`, async ({
     page,
   }) => {
     // Eleven complete journeys include WebKit's scroll and tap settling time.
@@ -22,6 +22,9 @@ for (const lang of ['en', 'zh'] as const) {
       await expect(page.locator(reader)).toBeVisible();
       // Use the actual opening position after the browser aligns the tap target.
       const scroll = await page.evaluate(() => window.scrollY);
+      const scrollLeft = await page
+        .locator('[data-manuscript-scroll]')
+        .evaluate((el) => el.scrollLeft);
       const article = page.locator(`[data-reader-entry="${fragment.entry}"]`);
       await expect(article).toBeVisible();
       await expect(page.locator('[data-reader-entry]:visible')).toHaveCount(1);
@@ -36,6 +39,9 @@ for (const lang of ['en', 'zh'] as const) {
       await expect(page.locator(reader)).not.toBeVisible();
       await expect(source).toBeFocused();
       expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scroll, 0);
+      expect(
+        await page.locator('[data-manuscript-scroll]').evaluate((el) => el.scrollLeft),
+      ).toBeCloseTo(scrollLeft, 0);
     }
     await expect(page.locator('[data-found-count]')).toHaveText('11 / 11');
   });
@@ -47,6 +53,7 @@ test('discovery starts hidden, proximity and focus expose the cut edge, reveal t
 }) => {
   await page.goto('/');
   const fragment = page.locator('[data-fragment="casmd"]');
+  await fragment.scrollIntoViewIfNeeded();
   await expect(fragment.locator('.fragment-caption')).toHaveCSS('opacity', '0');
   await expect(fragment.locator('.fragment-edge')).toHaveCSS('opacity', '0');
   if (!isMobile) {
@@ -64,6 +71,67 @@ test('discovery starts hidden, proximity and focus expose the cut edge, reveal t
     await expect(item).toHaveCSS('opacity', '1');
   await page.locator('[data-reveal]').click();
   await expect(page.locator('[data-reveal]')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('the complete original is rendered once, with transparent entries at its original positions', async ({
+  page,
+}) => {
+  await page.goto('/zh/');
+  const manuscript = page.locator('[data-manuscript]');
+  const source = manuscript.locator('img');
+  await expect(source).toHaveCount(1);
+  await expect(source).toHaveAttribute('src', inkSource);
+  await source.evaluate(async (el: HTMLImageElement) => el.decode());
+  expect(
+    await source.evaluate((el: HTMLImageElement) => ({
+      width: el.naturalWidth,
+      height: el.naturalHeight,
+    })),
+  ).toEqual(sourcePixels);
+  // A second ink layer or a text-shaped hole would reintroduce replacement/duplication.
+  await expect(manuscript.locator('image, .ink-text, clipPath, mask')).toHaveCount(0);
+  await expect(source).toHaveCSS('filter', 'none');
+  await expect(source).toHaveCSS('clip-path', 'none');
+  await expect(source).toHaveCSS('transform', 'none');
+  await expect(source).toHaveCSS('opacity', '1');
+  const imageBox = (await source.boundingBox())!;
+  expect(imageBox.width / imageBox.height).toBeCloseTo(sourcePixels.width / sourcePixels.height, 3);
+  for (const fragment of fragments) {
+    const target = manuscript.locator(`[data-fragment="${fragment.id}"]`);
+    const box = (await target.boundingBox())!;
+    expect((box.x - imageBox.x) / imageBox.width).toBeCloseTo(
+      fragment.region[0] / sourceSize.width,
+      3,
+    );
+    expect((box.y - imageBox.y) / imageBox.height).toBeCloseTo(
+      fragment.region[1] / sourceSize.height,
+      3,
+    );
+    await expect(target.locator('.fragment-edge path')).toHaveCSS('fill', 'none');
+  }
+  await page.locator('[data-reveal]').click();
+  await expect(source).toHaveCSS('transform', 'none');
+  await expect(manuscript.locator('image, .ink-text, clipPath, mask')).toHaveCount(0);
+});
+
+test('the original can be unrolled to its final entries without widening the page', async ({
+  page,
+}) => {
+  await page.goto('/zh/');
+  const scroll = page.locator('[data-manuscript-scroll]');
+  expect(await scroll.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+  const start = await scroll.evaluate((el) => el.scrollLeft);
+  expect(start).toBeLessThan(0);
+  const finalEntry = page.locator('[data-fragment="tempo"]');
+  await finalEntry.focus();
+  await expect(finalEntry).toBeInViewport();
+  expect(await scroll.evaluate((el) => el.scrollLeft)).toBeLessThan(start);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await finalEntry.click();
+  await expect(page.locator('[data-reader-title]')).toHaveText('TEMPO');
+  await page.locator('[data-reader-close]').click();
+  await expect(finalEntry).toBeFocused();
+  await expect(finalEntry).toBeInViewport();
 });
 
 test('all reading entries remain accessible, paging wraps, and dialog traps focus', async ({
@@ -145,16 +213,33 @@ test('capture the actual sheet, discovered paper, and reading layer', async ({
   await page.evaluate(() => document.fonts.ready);
   await expect(page.locator('[data-lanting]')).toHaveAttribute('data-ready', 'true');
   await page
-    .locator('.column-ink image')
-    .first()
-    .evaluate(async (el) => {
-      const image = new Image();
-      image.src = el.getAttribute('href')!;
-      await image.decode();
-    });
-  const prefix = `artifacts/lanting-2026-09-09/${testInfo.project.name}`;
+    .locator('[data-manuscript-image]')
+    .evaluate(async (el: HTMLImageElement) => el.decode());
+  const prefix = `artifacts/lanting-fidelity-2026-09-10/${testInfo.project.name}`;
   await page.screenshot({ path: `${prefix}-sheet.png` });
+  if (testInfo.project.name === 'desktop') {
+    const image = (await page.locator('[data-manuscript-image]').boundingBox())!;
+    const scale = image.width / sourceSize.width;
+    for (const {
+      name,
+      region: [x, y, width, height],
+    } of [
+      { name: 'restored-kuaiji', region: [1699, 64, 84, 290] },
+      { name: 'original-universe', region: [1205, 0, 86, 411] },
+    ]) {
+      await page.screenshot({
+        path: `${prefix}-${name}.png`,
+        clip: {
+          x: image.x + x! * scale,
+          y: image.y + y! * scale,
+          width: width! * scale,
+          height: height! * scale,
+        },
+      });
+    }
+  }
   const source = page.locator('[data-fragment="casmd"]');
+  await source.scrollIntoViewIfNeeded();
   if (isMobile) await source.focus();
   else await source.hover();
   await expect(source.locator('.fragment-edge')).toHaveCSS('opacity', '1');

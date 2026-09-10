@@ -2,6 +2,8 @@
 
 Date: September 9, 2026.
 
+Historical fork brief. The gathered-character manuscript described here was superseded by the September 10 request to preserve the original writing and positions. [PRODUCT.md](../PRODUCT.md), [DESIGN.md](../DESIGN.md), and [the fidelity correction](lanting-fidelity.md) describe the current implementation.
+
 ## Canonical direction and scope
 
 The user requested a new fork of the personal website with an opening screen filled by the Lanting Xu. Projects, a personal introduction, and other destinations should be inserted into the writing itself. All visible Chinese typography should carry Wang Xizhi's calligraphy. Visitors discover the insertions, hover to emphasize them and reveal puzzle-like edges, then click to read the full content.
@@ -41,9 +43,9 @@ Treat Wang Xizhi calligraphy as a central acceptance criterion for the visible C
 
 Sources checked by the parent task on September 9, 2026:
 
-- Palace Museum, *Feng Chengsu's copy of the Lanting Xu*: https://www.dpm.org.cn/collection/handwriting/228279.html . This identifies the reproduction and supplies a visual reference. It is not by itself permission to redistribute every downloaded asset.
-- National Palace Museum, *Dingwu Lanting*: https://digitalarchive.npm.gov.tw/Collection/Detail/14853?dep=P . The catalog search result includes an attribution/license notice. Inspect the exact downloadable image and its terms before reuse.
-- Founder, *Wang Xizhi Running Script*: https://www.foundertype.com/index.php/FontInfo/index/id/6716 . The official page identifies a GBK simplified/traditional character set and lists distinct authorization categories. This is a candidate to evaluate, not an acquired or approved license. Do not download from unverified mirrors or buy a license without authority.
+- Palace Museum, _Feng Chengsu's copy of the Lanting Xu_: https://www.dpm.org.cn/collection/handwriting/228279.html . This identifies the reproduction and supplies a visual reference. It is not by itself permission to redistribute every downloaded asset.
+- National Palace Museum, _Dingwu Lanting_: https://digitalarchive.npm.gov.tw/Collection/Detail/14853?dep=P . The catalog search result includes an attribution/license notice. Inspect the exact downloadable image and its terms before reuse.
+- Founder, _Wang Xizhi Running Script_: https://www.foundertype.com/index.php/FontInfo/index/id/6716 . The official page identifies a GBK simplified/traditional character set and lists distinct authorization categories. This is a candidate to evaluate, not an acquired or approved license. Do not download from unverified mirrors or buy a license without authority.
 
 If a complete suitable font cannot be sourced, continue with the sourced calligraphy and independently implement the discovery/open/close interaction. Report the specific remaining character or font limitation honestly. Do not quietly replace the all-calligraphy requirement with a generic serif font and call the result complete. Maintain true Latin project names, factual citations, and identifiers in the accessible content layer rather than inventing Chinese names for the person or scholarly records.
 

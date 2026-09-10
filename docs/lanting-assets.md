@@ -1,6 +1,6 @@
 # Lanting source and character map
 
-Retrieved and inspected September 9, 2026.
+Source retrieved September 9, 2026. Manuscript fidelity and entry regions reviewed September 10, 2026.
 
 ## Reproduction
 
@@ -12,27 +12,27 @@ Retrieved and inspected September 9, 2026.
 - SHA-256: `b2cb481ea097d5fc8188389f787eb9b45369d8ad0489e02b17a80d9697a2eb54`.
 - The Commons record identifies this file as public domain, with PD-Art and PD-old-100-expired metadata. The retrieved record is retained in `artifacts/lanting-2026-09-09/wikimedia-source.json`.
 
-No pixels in the source file were edited. SVG viewports crop the reproduction at render time, and a shared SVG color/alpha filter separates ink from the photographic paper. CSS reflows columns and combines individual source characters. The inserted cues and responsive arrangement are contemporary authorship. The public source link lets the reader inspect the unmodified historical composition.
+The complete manuscript renders this file once as an image at its original aspect ratio. No source pixels, colors, line positions, spacing, corrections, or seals are altered. A native horizontal viewport makes the whole image reachable on small screens. The initial view aligns with the opening text; the outside margins remain scrollable. The former cropped-column and replacement-lettering system has been removed.
 
-The digitization was manually reviewed in a collected-character study. Exact source windows use a 2048 x 671.7 coordinate system and are retained in `src/data/lanting.ts`. A nested SVG clips each window before layout, preventing adjacent characters from leaking into tall glyph boxes. No image generator or synthetic lettering was used.
+Interaction regions use a coordinate width of 2048 and the exact proportional height, `1480 / 4513 * 2048`. Every region was inspected with surrounding characters visible in the source. Rectangles locate transparent links only; they neither crop nor draw the manuscript. The current map is in `src/data/lanting.ts`. Separate reader cues quote continuous source regions, and UI lettering outside the manuscript still uses the smaller collected-character map. No synthetic lettering is used.
 
-## Authored insertions
+## Original-word entries
 
-| Collected text | Destination              |
-| -------------- | ------------------------ |
-| 與人           | Zibin Zhao introduction  |
-| 觀形           | CasMD                    |
-| 靜觀           | Medit                    |
-| 宇宙之大       | Singularity              |
-| 取類           | DL-SELEX                 |
-| 察品           | TEMPO                    |
-| 隨時           | Yaos                     |
-| 觀察           | DNA-guided Cas12a record |
-| 言之           | Prompt library           |
-| 信             | Contact                  |
-| 事             | CV                       |
+| Original text | Source context           | Destination              |
+| ------------- | ------------------------ | ------------------------ |
+| 觀            | 仰觀宇宙之大             | DNA-guided Cas12a record |
+| 宇宙之大      | 仰觀宇宙之大俯察品類之盛 | Singularity              |
+| 品類          | 俯察品類之盛             | CasMD                    |
+| 信            | 信可樂也                 | Contact                  |
+| 人            | 夫人之相與               | Zibin Zhao introduction  |
+| 取            | 或取諸懷抱               | DL-SELEX                 |
+| 言            | 悟言一室之內             | Prompt library           |
+| 靜            | 趣舍萬殊靜躁不同         | Medit                    |
+| 隨            | 情隨事遷                 | Yaos                     |
+| 事            | 情隨事遷                 | CV                       |
+| 時            | 故列敘時人               | TEMPO                    |
 
-These are interpretive entry cues, not renamed projects or scientific descriptions. The true names, summaries, contributions, and URLs come from the existing canonical data. The title uses 蘭亭, the reveal control 一觀, and the pointer hint 觀之. All characters used by these display elements are present in the local coordinate map; unknown characters throw at build time instead of silently falling back.
+These are existing words linked to interpretive destinations, not renamed projects or inserted text. The true names, summaries, contributions, and URLs come from the existing canonical data. In particular, the opening keeps `會于會稽山陰之蘭亭`, and `宇宙之大` remains in its original place between `觀` and `俯`. The title, reveal control, and pointer hint remain separate interface elements outside the original image.
 
 ## Transcript reference
 

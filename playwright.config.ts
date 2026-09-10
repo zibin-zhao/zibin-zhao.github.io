@@ -18,10 +18,7 @@ export default defineConfig({
   testDir: './tests/browser',
   fullyParallel: false,
   workers: 1,
-  reporter: [
-    ['line'],
-    ['json', { outputFile: 'artifacts/past-designs-2026-09-09/deduplicated/browser-results.json' }],
-  ],
+  reporter: [['line'], ['json', { outputFile: 'artifacts/browser/latest.json' }]],
   use: { baseURL, trace: 'retain-on-failure' },
   outputDir: 'test-results/playwright',
   webServer: {

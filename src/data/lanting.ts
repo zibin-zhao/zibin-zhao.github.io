@@ -1,7 +1,10 @@
-// Display coordinates refer to the unmodified 4513 x 1480 Wikimedia reproduction.
-// This 2048 x 672 coordinate space was manually inspected against the scan.
+// The manuscript is rendered once, intact. These coordinates only locate overlays.
+// Regions were inspected with their surrounding text in the original reproduction.
 export const inkSource = '/lanting/lantingxu.jpg';
-export const sourceSize = { width: 2048, height: 671.7 };
+export const sourcePixels = { width: 4513, height: 1480 };
+export const sourceSize = { width: 2048, height: (1480 / 4513) * 2048 };
+// Initial viewport aligns with the opening column. Outer seals remain scrollable.
+export const writingStart = 1850 / sourceSize.width;
 export type InkCrop = readonly [number, number, number, number];
 export const glyphs = {
   觀: [1212, 5, 70, 71],
@@ -27,20 +30,18 @@ export const glyphs = {
   亭: [1705, 420, 62, 57],
 } satisfies Record<string, InkCrop>;
 export type Glyph = keyof typeof glyphs;
-export const columns = [
-  1808, 1735, 1659, 1590, 1519, 1450, 1386, 1319, 1248, 1184, 1112, 1043, 978, 906, 839, 765, 692,
-  618, 551, 485, 417, 349, 282, 215, 154, 91, 30,
-];
+// Reading order follows the original columns, right to left and top to bottom.
+// Every phrase already exists at its region. Never replace or redraw these words.
 export const fragments = [
-  { id: 'about', column: 1, cut: [138, 251], glyphs: '與人', entry: 9 },
-  { id: 'casmd', column: 3, cut: [324, 456], glyphs: '觀形', entry: 1 },
-  { id: 'medit', column: 5, cut: [77, 186], glyphs: '靜觀', entry: 3 },
-  { id: 'singularity', column: 8, cut: [238, 460], glyphs: '宇宙之大', entry: 5 },
-  { id: 'dlselex', column: 10, cut: [427, 529], glyphs: '取類', entry: 2 },
-  { id: 'tempo', column: 12, cut: [125, 231], glyphs: '察品', entry: 4 },
-  { id: 'yaos', column: 15, cut: [230, 348], glyphs: '隨時', entry: 6 },
-  { id: 'research', column: 18, cut: [75, 191], glyphs: '觀察', entry: 0 },
-  { id: 'prompts', column: 20, cut: [342, 431], glyphs: '言之', entry: 10 },
-  { id: 'contact', column: 23, cut: [156, 204], glyphs: '信', entry: 11 },
-  { id: 'cv', column: 25, cut: [379, 442], glyphs: '事', entry: 12 },
+  { id: 'research', phrase: '觀', region: [1207, 0, 80, 77], entry: 0 },
+  { id: 'singularity', phrase: '宇宙之大', region: [1207, 77, 80, 212], entry: 5 },
+  { id: 'casmd', phrase: '品類', region: [1207, 412, 80, 116], entry: 1 },
+  { id: 'contact', phrase: '信', region: [1072, 66, 73, 59], entry: 11 },
+  { id: 'about', phrase: '人', region: [1075, 346, 62, 44], entry: 9 },
+  { id: 'dlselex', phrase: '取', region: [1003, 140, 76, 62], entry: 2 },
+  { id: 'prompts', phrase: '言', region: [1007, 431, 73, 60], entry: 10 },
+  { id: 'medit', phrase: '靜', region: [869, 235, 75, 66], entry: 3 },
+  { id: 'yaos', phrase: '隨', region: [700, 0, 75, 73], entry: 6 },
+  { id: 'cv', phrase: '事', region: [704, 79, 69, 61], entry: 12 },
+  { id: 'tempo', phrase: '時', region: [147, 83, 61, 59], entry: 4 },
 ] as const;

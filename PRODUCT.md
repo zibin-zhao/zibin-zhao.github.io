@@ -1,14 +1,14 @@
 # Between the lines
 
-Canonical direction for this independent fork, September 9, 2026.
+Canonical direction, corrected September 10, 2026.
 
-The opening is a full-screen, vertically flowing composition made from Feng Chengsu's copy of Wang Xizhi's Lanting Xu. Eleven contemporary insertions lead to the six real projects, a research record, an introduction, prompts, contact, and CV. Their Chinese lettering is gathered from the same reproduction as the surrounding writing.
+The opening is a full-screen view into the complete reproduction of Feng Chengsu's copy of Wang Xizhi's Lanting Xu. Native horizontal scrolling follows the original columns from right to left. Eleven transparent regions over existing words lead to the six real projects, a research record, an introduction, prompts, contact, and CV. No original words are replaced, repeated, reordered, or cropped out of the manuscript.
 
 This direction replaces the lake, forest, and 3D gallery in this fork. It leaves the original working directory and its ongoing design work intact.
 
 ## Experience
 
-At rest the entry phrases carry no visible boxes, titles, or badges. Pointer proximity, hover, or keyboard focus strengthens a fragment and exposes its irregular paper edge and real destination name. Selecting it expands a native reading dialog from that location. The dialog retains a cut-paper edge; closing reverses the transition and restores focus and the position at opening.
+At rest the original writing carries no visible boxes, titles, or badges. Pointer proximity, hover, or keyboard focus exposes a transparent irregular outline and the real destination name. The original ink stays fixed. Selecting an entry expands a native reading dialog from that location. Closing restores focus, vertical page position, and horizontal manuscript position.
 
 Touch opens an entry directly. A quiet reveal toggle exposes all clues, and a complete index below the writing lets visitors choose any record directly. The menu remains available at arrival. There is no requirement to find a particular clue first. Discovery progress lasts for the current page only and does not leave the device.
 
@@ -18,7 +18,7 @@ Reduced motion removes the opening and closing transitions. With JavaScript disa
 
 Preserve fourteen bilingual portfolio routes, six projects, eight publication records, exact source relationships, CV PDF, eight prompt stages and eleven original prompt blocks, contact destinations, and both embedded applications. The reader contains thirteen records: the existing nine research/project records and four personal/navigation records. No scientific claim or project identity was rewritten for this design.
 
-The visual text on the sheet is an authored contemporary composition, not a facsimile transcription. The unmodified source reproduction and a separate reference transcript are retained with provenance.
+The manuscript is the complete unmodified source image, including its original line arrangement and corrections. The separately retained transcript is a reading reference from another copy, not a replacement for the image.
 
 ## Past designs
 
@@ -28,8 +28,8 @@ Each numbered link opens an English or Chinese viewer with the historical websit
 
 ## Typography boundary
 
-The calligraphic composition and inserted phrases use image windows onto the sourced copy. This is a small collected-character system, not a complete Chinese font. Extended Chinese reading content and navigation use system typography. A complete, appropriately licensed Wang Xizhi font remains necessary to satisfy the request for all Chinese text, including long descriptions, in that style. No paid font was purchased or embedded.
+The manuscript uses the original bitmap. Separate UI lettering and reader cues use windows onto the source. Extended Chinese reading content and navigation use system typography. A complete, appropriately licensed Wang Xizhi font remains necessary to satisfy the request for all Chinese text, including long descriptions, in that style. No paid font was purchased or embedded.
 
 ## Delivery
 
-Local prototype only in `codex/lanting-paper`. Preview: `http://127.0.0.1:43228/zh/`. Run `npm run verify` and `npm run test:browser`; consult `docs/lanting-verification.md` for actual results and limitations. No merge, push, or deployment is included.
+Production uses GitHub Pages at `https://zibinzhao.com/`. Preview: `http://127.0.0.1:43228/zh/`. Run `npm run verify` and `npm run test:browser`; consult `docs/lanting-fidelity.md` for the source correction. Publication and live checks are recorded separately from local verification.
