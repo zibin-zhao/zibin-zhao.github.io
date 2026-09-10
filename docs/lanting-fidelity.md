@@ -12,7 +12,7 @@ The earlier interaction checks did not test this textual fidelity requirement. T
 
 The entire 4513 x 1480 reproduction is rendered once, without a color filter, mask, column extraction, reordering, or added lettering. Native horizontal scrolling preserves the original arrangement at a readable scale. The opening text is aligned into view; the outside seals and the end of the manuscript remain reachable.
 
-Eleven transparent links overlay words already present at their original coordinates. Their puzzle contours have no fill. Hover, focus, and reveal never move or redraw the ink. Selecting a link opens the existing thirteen-record reader. Its cue quotes the actual source region, and closing restores both vertical page position and horizontal manuscript position.
+Eleven transparent links overlay words already present at their original coordinates. Their puzzle contours have no fill. The complete source image stays fixed during discovery. A subsequent user-requested refinement adds a temporary 1.14-scale quote of the same source region over its original location, retracting when hover or focus ends. Reveal alone does not enlarge the entries. Selecting a link opens the existing thirteen-record reader. Its cue quotes the actual source region, and closing restores both vertical page position and horizontal manuscript position.
 
 Each entry region was inspected with its adjoining characters visible. The mapping and contextual phrases are recorded in [the source note](lanting-assets.md). The source scan is authoritative; the separate reference transcript represents another copy and is not used to redraw the text.
 
@@ -26,10 +26,16 @@ Each entry region was inspected with its adjoining characters visible. The mappi
 
 The originals, region study, screenshots, logs, and verification receipts are retained locally in `artifacts/lanting-fidelity-2026-09-10/`. Current browser JSON is written to `artifacts/browser/latest.json`, so subsequent runs do not replace an older dated report.
 
-## Verification results
+## Initial fidelity correction verification
 
 `npm run verify` passed formatting, ESLint, Astro checks, nine unit tests, and the static build. Astro reported zero errors, zero warnings, and one existing hint in the historical-viewer test. The build retains fourteen current portfolio routes, sixteen edition viewers, and twenty compatibility redirects.
 
 The complete browser run passed 118 cases with no skips, failures, or retries: desktop Chromium, phone Chromium, and phone WebKit. Actual captures include the restored `會稽山陰` region, the single original `宇宙之大` passage, the opening view, discovery, and the reader. The source hash and canonical portfolio data, CV, apps, and eight archived exports remain unchanged. The sharing image was regenerated from the corrected production preview.
 
 These checks establish local rendering and browser behavior. Release status and live verification are recorded separately in the local publication receipt.
+
+## Hover and visual refinement
+
+The later September 10 request retains horizontal scrolling and original writing, restores hover emphasis, removes the central title, and reduces the corner guides. The magnifier uses the exact continuous source region with its original paper, not individually collected characters. Its animation scales around the original location and retracts to the intact scan. The title is retained only as an accessible heading, and the compact controls now sit in the manuscript's flow. Evidence for this refinement is retained in `artifacts/lanting-hover-2026-09-10/`.
+
+`npm run verify` passed, with nine unit tests and the same existing Astro hint. All 121 browser cases passed on desktop Chromium, phone Chromium, and phone WebKit. The added regression checks cover actual 1.14-scale emphasis, its source image, reduced-motion behavior, original scroll position, and the restored manuscript. Before/after image comparison permits only a two-step RGB variation across at most 0.01 percent of pixels to account for Chromium's fractional-edge rasterization. The original image and all entry coordinates are unchanged. The sharing image was regenerated from the production preview.

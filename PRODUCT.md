@@ -8,7 +8,9 @@ This direction replaces the lake, forest, and 3D gallery in this fork. It leaves
 
 ## Experience
 
-At rest the original writing carries no visible boxes, titles, or badges. Pointer proximity, hover, or keyboard focus exposes a transparent irregular outline and the real destination name. The original ink stays fixed. Selecting an entry expands a native reading dialog from that location. Closing restores focus, vertical page position, and horizontal manuscript position.
+At rest the original writing carries no visible boxes, titles, or badges. Pointer proximity, hover, or keyboard focus enlarges the exact source region in place by fourteen percent, with an irregular outline and the real destination name. This temporary magnifier covers the same underlying words and retracts when discovery ends. The complete source image remains unchanged. Selecting an entry expands a native reading dialog from that location. Closing restores focus, vertical page position, and horizontal manuscript position.
+
+The visible Lanting title is removed; a descriptive heading remains for assistive technology. The scroll hint and reveal control sit in a narrow strip at the manuscript edge. They have no floating panel, large lettering, or glow, and scroll away with the manuscript.
 
 Touch opens an entry directly. A quiet reveal toggle exposes all clues, and a complete index below the writing lets visitors choose any record directly. The menu remains available at arrival. There is no requirement to find a particular clue first. Discovery progress lasts for the current page only and does not leave the device.
 

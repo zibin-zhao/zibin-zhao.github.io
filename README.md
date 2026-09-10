@@ -1,6 +1,6 @@
 # Zibin Zhao, between the lines
 
-A bilingual Astro portfolio with a Lanting Xu discovery interface. The complete original reproduction forms a horizontally scrollable manuscript. Transparent regions over existing words reveal a paper contour on approach and open a reading view, without replacing any original writing.
+A bilingual Astro portfolio with a Lanting Xu discovery interface. The complete original reproduction forms a horizontally scrollable manuscript. Existing words enlarge briefly in place on approach and open a reading view, without replacing any original writing. Compact controls sit at the edge of the scroll.
 
 Production address: [zibinzhao.com](https://zibinzhao.com/). Merges into `main` are published through the existing [GitHub Pages workflow](https://github.com/zibin-zhao/zibin-zhao.github.io/actions/workflows/deploy.yml).
 
@@ -40,7 +40,7 @@ See [the archive inventory and recovery notes](docs/past-designs.md) for exact c
 
 Fourteen bilingual portfolio routes, six projects, seven journal articles and one standalone preprint, eight prompt stages, eleven original prompt blocks, CV PDF, contact destinations, and both embedded apps are retained. Without JavaScript the entry anchors keep their real destinations and the full index remains available.
 
-Calligraphy uses a public-domain reproduction of Feng Chengsu's copy after Wang Xizhi. The manuscript renders that image once, without text masks, rearranged columns, replacement lettering, or color filters. Its existing words, spacing, corrections, and seals stay in place. Only separate UI controls and reading cues use source windows. The complete Chinese reading layer still uses system typography pending a suitable complete font license. No commercial font binary is included.
+Calligraphy uses a public-domain reproduction of Feng Chengsu's copy after Wang Xizhi. The resting manuscript renders that image once, without text masks, rearranged columns, replacement lettering, or color filters. Its existing words, spacing, corrections, and seals stay in place. A temporary magnifier quotes the exact source region over its original location during discovery. Separate UI controls and reading cues also use source windows. The complete Chinese reading layer still uses system typography pending a suitable complete font license. No commercial font binary is included.
 
 The September 10 source-fidelity correction supersedes the earlier gathered-character manuscript. See [the audit and regression checks](docs/lanting-fidelity.md).
 

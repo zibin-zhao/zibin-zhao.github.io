@@ -21,7 +21,11 @@ Manrope retains the exact Latin project identifiers and utility text. Georgia an
 
 The complete scan keeps its original aspect ratio at every viewport size. A native horizontal scroll region presents it at a readable height, with the first writing column visible on arrival. The outer seals and final column remain reachable. Touch, trackpad, keyboard focus, and the native scrollbar can move through the scroll; vertical scrolling reaches the complete content index and history links. No column is extracted or reflowed.
 
-Each clue has a fine irregular SVG edge, including puzzle-like concavities. The contour has no fill, and the source image stays fixed during discovery. The native dialog opens from the originating bounding rectangle; its closing animation returns to the launcher and restores both scroll axes. Reduced motion uses an immediate state change. There is no scroll interception, WebGL requirement, or loading gate.
+Each clue has a fine irregular SVG edge, including puzzle-like concavities. Discovery scales a continuous source crop to 1.14 around its original center over 340 ms, with a small paper shadow. The crop includes the original paper and covers the same underlying words; it never gathers characters from elsewhere. The contour has no fill, the complete source image stays fixed, and the magnifier disappears after retracting. Reveal shows only the outlines and labels. Reduced motion changes state immediately.
+
+The header carries only the existing name, language switch, and menu. Its former central calligraphy title is removed. Below the scan, a 44 px strip holds a small scroll hint and a single-row reveal control. Transparent backgrounds and no glow keep both ends quiet. The controls scroll with the manuscript rather than floating over the content.
+
+The native dialog opens from the originating bounding rectangle; its closing animation returns to the launcher and restores both scroll axes. There is no scroll interception, WebGL requirement, or loading gate.
 
 ## Quiet history
 
@@ -33,4 +37,4 @@ Historical pages fill an independent viewer, bordered only by warm-paper utility
 
 The September 10 correction removes the earlier text-replacement and column-cropping mechanism. The previous checks covered interaction, but did not catch changed wording and duplicated phrases. Every current interaction region has been reviewed against the original with adjoining characters visible. Coordinates and source identity are recorded in `src/data/lanting.ts` and `docs/lanting-assets.md`.
 
-The browser suite covers the single complete manuscript image, absence of replacement ink and masks, transparent contours, original source coordinates, discovery, every entry, both scroll axes, touch, reduced motion, no JavaScript, and the retained portfolio contracts. Source hashing protects the reference bitmap. Current screenshots are in `artifacts/lanting-fidelity-2026-09-10/`; earlier receipts remain historical evidence.
+The browser suite covers the single complete manuscript image, absence of replacement ink and masks, original source coordinates, temporary magnification, return to the resting image, every entry, both scroll axes, touch, reduced motion, no JavaScript, and the retained portfolio contracts. Source hashing protects the reference bitmap. Current screenshots are in `artifacts/lanting-hover-2026-09-10/`; earlier receipts remain historical evidence.

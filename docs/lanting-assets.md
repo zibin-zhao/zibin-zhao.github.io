@@ -14,7 +14,7 @@ Source retrieved September 9, 2026. Manuscript fidelity and entry regions review
 
 The complete manuscript renders this file once as an image at its original aspect ratio. No source pixels, colors, line positions, spacing, corrections, or seals are altered. A native horizontal viewport makes the whole image reachable on small screens. The initial view aligns with the opening text; the outside margins remain scrollable. The former cropped-column and replacement-lettering system has been removed.
 
-Interaction regions use a coordinate width of 2048 and the exact proportional height, `1480 / 4513 * 2048`. Every region was inspected with surrounding characters visible in the source. Rectangles locate transparent links only; they neither crop nor draw the manuscript. The current map is in `src/data/lanting.ts`. Separate reader cues quote continuous source regions, and UI lettering outside the manuscript still uses the smaller collected-character map. No synthetic lettering is used.
+Interaction regions use a coordinate width of 2048 and the exact proportional height, `1480 / 4513 * 2048`. Every region was inspected with surrounding characters visible in the source. Rectangles locate transparent links without cutting the manuscript. During discovery, the same rectangle is quoted as a temporary 1.14-scale magnifier over its original location. The current map is in `src/data/lanting.ts`. Separate reader cues quote continuous source regions, and UI lettering outside the manuscript still uses the smaller collected-character map. No synthetic lettering is used.
 
 ## Original-word entries
 
@@ -32,7 +32,7 @@ Interaction regions use a coordinate width of 2048 and the exact proportional he
 | 事            | 情隨事遷                 | CV                       |
 | 時            | 故列敘時人               | TEMPO                    |
 
-These are existing words linked to interpretive destinations, not renamed projects or inserted text. The true names, summaries, contributions, and URLs come from the existing canonical data. In particular, the opening keeps `會于會稽山陰之蘭亭`, and `宇宙之大` remains in its original place between `觀` and `俯`. The title, reveal control, and pointer hint remain separate interface elements outside the original image.
+These are existing words linked to interpretive destinations, not renamed projects or inserted text. The true names, summaries, contributions, and URLs come from the existing canonical data. In particular, the opening keeps `會于會稽山陰之蘭亭`, and `宇宙之大` remains in its original place between `觀` and `俯`. The title has been removed; compact reveal and scroll controls remain outside the original image.
 
 ## Transcript reference
 

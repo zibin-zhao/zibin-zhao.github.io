@@ -164,10 +164,6 @@ if (root && dialog) {
     reveal.setAttribute('aria-pressed', String(next));
     root.dataset.revealed = String(next);
   });
-  const observer = new IntersectionObserver(([entry]) => {
-    dock.hidden = !entry?.isIntersecting;
-  });
-  observer.observe(root.querySelector('[data-manuscript]')!);
   closeButton.addEventListener('click', close);
   dialog.addEventListener('cancel', (event) => {
     event.preventDefault();

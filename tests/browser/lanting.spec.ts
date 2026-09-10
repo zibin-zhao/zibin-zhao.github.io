@@ -77,7 +77,7 @@ test('the complete original is rendered once, with transparent entries at its or
   page,
 }) => {
   await page.goto('/zh/');
-  const manuscript = page.locator('[data-manuscript]');
+  const manuscript = page.locator('.manuscript-stage');
   const source = manuscript.locator('img');
   await expect(source).toHaveCount(1);
   await expect(source).toHaveAttribute('src', inkSource);
@@ -88,7 +88,7 @@ test('the complete original is rendered once, with transparent entries at its or
       height: el.naturalHeight,
     })),
   ).toEqual(sourcePixels);
-  // A second ink layer or a text-shaped hole would reintroduce replacement/duplication.
+  // The resting manuscript stays intact. Only a transient source magnifier may appear on discovery.
   await expect(manuscript.locator('image, .ink-text, clipPath, mask')).toHaveCount(0);
   await expect(source).toHaveCSS('filter', 'none');
   await expect(source).toHaveCSS('clip-path', 'none');
@@ -108,10 +108,83 @@ test('the complete original is rendered once, with transparent entries at its or
       3,
     );
     await expect(target.locator('.fragment-edge path')).toHaveCSS('fill', 'none');
+    await expect(target.locator('.fragment-magnifier')).toHaveCSS('visibility', 'hidden');
   }
   await page.locator('[data-reveal]').click();
   await expect(source).toHaveCSS('transform', 'none');
   await expect(manuscript.locator('image, .ink-text, clipPath, mask')).toHaveCount(0);
+  for (const magnifier of await manuscript.locator('.fragment-magnifier').all())
+    await expect(magnifier).toHaveCSS('visibility', 'hidden');
+});
+
+test('discovery magnifies the original region and restores the resting manuscript', async ({
+  page,
+  isMobile,
+}, testInfo) => {
+  await page.goto('/zh/');
+  const source = page.locator('[data-fragment="casmd"]');
+  const surface = source.locator('.fragment-surface');
+  const magnifier = source.locator('.fragment-magnifier');
+  const scroll = page.locator('[data-manuscript-scroll]');
+  await source.scrollIntoViewIfNeeded();
+  await page.locator('[data-manuscript-image]').evaluate((el: HTMLImageElement) => el.decode());
+  const prefix = `artifacts/lanting-hover-2026-09-10/${testInfo.project.name}`;
+  const position = await scroll.evaluate((el) => el.scrollLeft);
+  const before = await scroll.screenshot({ path: `${prefix}-before-magnification.png` });
+  if (isMobile) await source.focus();
+  else await source.hover();
+  await expect(magnifier).toHaveCSS('visibility', 'visible');
+  await expect(magnifier).toHaveCSS('background-image', /\/lanting\/lantingxu\.jpg/);
+  await expect(surface).toHaveCSS('transform', 'matrix(1.14, 0, 0, 1.14, 0, 0)');
+  await expect(page.locator('[data-manuscript-image]')).toHaveCSS('transform', 'none');
+  await expect(page.locator('.fragment-magnifier:visible')).toHaveCount(1);
+  const frame = (await source.boundingBox())!;
+  const lifted = (await surface.boundingBox())!;
+  expect(lifted.x).toBeLessThanOrEqual(frame.x);
+  expect(lifted.width).toBeCloseTo(frame.width * 1.14, 1);
+  await page.mouse.move(2, 2);
+  await page.locator('.brand').focus();
+  await expect(magnifier).toHaveCSS('visibility', 'hidden');
+  await expect(surface).toHaveCSS('transform', 'none');
+  await expect(source.locator('.fragment-edge')).toHaveCSS('opacity', '0');
+  expect(await scroll.evaluate((el) => el.scrollLeft)).toBeCloseTo(position, 1);
+  const after = await scroll.screenshot({ path: `${prefix}-after-magnification.png` });
+  const difference = await page.evaluate(
+    async ({ before, after }) => {
+      async function pixels(png: string) {
+        const image = new Image();
+        image.src = `data:image/png;base64,${png}`;
+        await image.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const context = canvas.getContext('2d')!;
+        context.drawImage(image, 0, 0);
+        return context.getImageData(0, 0, canvas.width, canvas.height).data;
+      }
+      const [a, b] = await Promise.all([pixels(before), pixels(after)]);
+      let maxChannelChange = 0;
+      let changedPixels = 0;
+      for (let i = 0; i < a.length; i += 4) {
+        const delta = Math.max(
+          ...[0, 1, 2].map((channel) => Math.abs(a[i + channel]! - b[i + channel]!)),
+        );
+        maxChannelChange = Math.max(maxChannelChange, delta);
+        if (delta) changedPixels++;
+      }
+      return {
+        sameSize: a.length === b.length,
+        maxChannelChange,
+        changedRatio: changedPixels / (a.length / 4),
+      };
+    },
+    { before: before.toString('base64'), after: after.toString('base64') },
+  );
+  expect(difference.sameSize).toBe(true);
+  // Chromium re-rasterizes a fractional crop boundary by up to two channel steps.
+  // Allow that tiny edge variation, while rejecting altered ink or a remaining overlay.
+  expect(difference.maxChannelChange).toBeLessThanOrEqual(2);
+  expect(difference.changedRatio).toBeLessThanOrEqual(0.0001);
 });
 
 test('the original can be unrolled to its final entries without widening the page', async ({
@@ -171,6 +244,8 @@ test('reduced motion removes sheet transitions and touch opens directly', async 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/zh/');
   const source = page.locator('[data-fragment="casmd"]');
+  await source.focus();
+  await expect(source.locator('.fragment-surface')).toHaveCSS('transition-duration', '0s');
   if (isMobile) await source.tap();
   else await source.click();
   await expect(page.locator('[data-reader-title]')).toHaveText('CasMD');
@@ -215,7 +290,7 @@ test('capture the actual sheet, discovered paper, and reading layer', async ({
   await page
     .locator('[data-manuscript-image]')
     .evaluate(async (el: HTMLImageElement) => el.decode());
-  const prefix = `artifacts/lanting-fidelity-2026-09-10/${testInfo.project.name}`;
+  const prefix = `artifacts/lanting-hover-2026-09-10/${testInfo.project.name}`;
   await page.screenshot({ path: `${prefix}-sheet.png` });
   if (testInfo.project.name === 'desktop') {
     const image = (await page.locator('[data-manuscript-image]').boundingBox())!;

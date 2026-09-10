@@ -69,13 +69,9 @@ const contour =
 ---
 
 <div class="lanting-home" data-lanting data-lang={lang}>
-  <div class="scroll-heading">
-    <h1 id="home-title">
-      <span class="sr-only">Zibin Zhao · </span><InkText text="蘭亭" /><span class="sr-only"
-        >{en ? 'A collection between the lines' : '藏在字里行间的作品'}</span
-      >
-    </h1>
-  </div>
+  <h1 id="home-title" class="sr-only">
+    Zibin Zhao · {en ? 'A collection between the lines' : '藏在字里行间的作品'}
+  </h1>
   <div
     class="manuscript"
     data-manuscript
@@ -121,16 +117,20 @@ const contour =
                   '--top': `${(y / sourceSize.height) * 100}%`,
                   '--width': `${(width / sourceSize.width) * 100}%`,
                   '--height': `${(height / sourceSize.height) * 100}%`,
+                  '--crop-ratio': width / height,
+                  '--crop-size': `${(sourceSize.width / width) * 100}% ${(sourceSize.height / height) * 100}%`,
+                  '--crop-position': `${(x / (sourceSize.width - width)) * 100}% ${(y / (sourceSize.height - height)) * 100}%`,
                 }}
               >
-                <svg
-                  class="fragment-edge"
-                  viewBox="0 0 100 200"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <path d={contour} />
-                </svg>
+                <span class="fragment-surface" aria-hidden="true">
+                  <span
+                    class="fragment-magnifier"
+                    style={{ 'background-image': `url('${inkSource}')` }}
+                  />
+                  <svg class="fragment-edge" viewBox="0 0 100 200" preserveAspectRatio="none">
+                    <path d={contour} />
+                  </svg>
+                </span>
                 <template data-fragment-cue>
                   <svg
                     class="reader-cue-ink"
@@ -151,6 +151,20 @@ const contour =
         }
       </div>
     </div>
+    <div class="discovery-dock" data-discovery-dock>
+      <p class="discovery-hint">{en ? '← Unroll the writing' : '← 展卷'}</p>
+      <button
+        class="reveal-button"
+        data-reveal
+        hidden
+        type="button"
+        aria-pressed="false"
+        aria-label={en ? 'Reveal hidden entries' : '显影：显示隐藏入口'}
+        ><InkText text="一觀" /><span class="reveal-count" data-found-count aria-hidden="true"
+          >0 / {fragments.length}</span
+        ></button
+      >
+    </div>
   </div>
   <div class="sheet-colophon">
     <p>
@@ -162,34 +176,6 @@ const contour =
     </p>
     <a href="https://commons.wikimedia.org/wiki/File:LantingXu.jpg"
       >{en ? 'The original sheet' : '查看摹本来源'} ↗</a
-    >
-  </div>
-  <div class="discovery-dock" data-discovery-dock>
-    <p class="discovery-hint">
-      <span class="hint-pointer" aria-hidden="true">◌</span>{
-        en ? (
-          <span>← Scroll left. Find something.</span>
-        ) : (
-          <>
-            <>
-              <InkText text="觀之" />
-              <span class="scroll-hint">← 展卷</span>
-              <span class="sr-only">走近一点，字里有东西。</span>
-            </>
-          </>
-        )
-      }
-    </p>
-    <button
-      class="reveal-button"
-      data-reveal
-      hidden
-      type="button"
-      aria-pressed="false"
-      aria-label={en ? 'Reveal hidden entries' : '显影：显示隐藏入口'}
-      ><InkText text="一觀" /><span class="reveal-count" data-found-count aria-hidden="true"
-        >0 / {fragments.length}</span
-      ></button
     >
   </div>
   <section class="collection-index container" id="collection" aria-labelledby="collection-title">
